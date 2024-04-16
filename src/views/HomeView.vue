@@ -1,5 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import Header from '@/components/Header.vue'
+
+const name = 'Exemple pour les bouffons'
+</script>
 
 <template>
-  <div class="w-full h-full bg-backgroundColor font-poppins text-4xl">Ceci est un test de font</div>
+  <Header />
+  <div class="w-full h-full text-4xl p-4 text-primary">
+    Ceci est un test pour vous montrer : {{ name }}
+  </div>
 </template>

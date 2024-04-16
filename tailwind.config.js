@@ -2,15 +2,17 @@
 export default {
   content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
   theme: {
-    colors: {
-      primary: '#e07e2d',
-      secondary: '#902de0',
-      backgroundColor: '#ededed'
-    },
-    fontFamily: {
-      sans: ['Graphik', 'sans-serif'],
-      serif: ['Merriweather', 'serif'],
-      poppins: ['Poppins', 'sans-serif']
+    extend: {
+      colors: {
+        secondary: '#e07e2d',
+        primary: '#902de0',
+        backgroundColor: '#ededed'
+      },
+      fontFamily: {
+        sans: ['Graphik', 'sans-serif'],
+        serif: ['Merriweather', 'serif'],
+        poppins: ['Poppins', 'sans-serif']
+      }
     }
   },
   plugins: []

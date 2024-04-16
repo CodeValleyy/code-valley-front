@@ -3,5 +3,5 @@ import { RouterView } from 'vue-router'
 </script>
 
 <template>
-  <div class="min-h-screen h-screen"><RouterView /></div>
+  <div class="min-h-screen bg-backgroundColor font-poppins"><RouterView /></div>
 </template>
