@@ -10,7 +10,7 @@ const name = '"Nom du site"'
   <Header />
   <div class="min-h-screen h-full flex flex-col justify-between">
     <div class="w-full h-full pt-40 p-4 flex flex-col items-center">
-      <div class="mb-4 text-2xl p-8">Bienvenue sur {{ name }}</div>
+      <div class="mb-4 text-2xl p-8 font-semibold">Bienvenue sur {{ name }}</div>
       <Button label="Getting Started" size="xl"></Button>
       <div class="mt-6 flex justify-center p-4 w-11/12 items-center">
         <div class="w-5/12 p-4">

@@ -13,16 +13,16 @@ const routes = [
 
 <template>
   <div
-    class="w-full p-8 flex items-center shadow-md bg-white justify-between text-primary text-xl fixed"
+    class="w-full p-8 flex items-center shadow-md bg-white justify-between text-primary text-xl fixed font-semibold"
   >
     <div class="flex">
-      <div class="mr-6 py-4 px-6 rounded hover:bg-gray-200" v-for="route in routes">
+      <div class="mr-6 py-4 px-6 rounded hover:bg-gray-200 cursor-pointer" v-for="route in routes">
         <RouterLink :to="`${route.location}`">
           {{ route.label }}
         </RouterLink>
       </div>
     </div>
-    <div class="flex items-center py-2 px-4 rounded hover:bg-gray-200">
+    <div class="flex items-center py-2 px-4 rounded hover:bg-gray-200 cursor-pointer">
       <div class="mr-auto p-2">Profil</div>
       <div>
         <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
