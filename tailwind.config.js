@@ -6,6 +6,7 @@ export default {
       colors: {
         secondary: '#e07e2d',
         primary: '#902de0',
+        primaryHover: '#6a21a6',
         backgroundColor: '#ededed'
       },
       fontFamily: {
