@@ -7,6 +7,14 @@ const routes = [
   {
     location: '/help',
     label: 'Aide'
+  },
+  {
+    location: '/register',
+    label: 'S\'inscrire'
+  },
+  {
+    location: '/login',
+    label: 'Se connecter'
   }
 ]
 </script>

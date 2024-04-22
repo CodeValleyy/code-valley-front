@@ -3,7 +3,7 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
 
-const name = '"Nom du site"'
+const name = 'Code Valley'
 </script>
 
 <template>

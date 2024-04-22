@@ -284,3 +284,7 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/vue,vuejs,openframeworks+visualstudio,visualstudiocode,intellij+all,macos,windows,linux
 .vscode/
+
+.idea/
+
+pnpm-lock.yaml

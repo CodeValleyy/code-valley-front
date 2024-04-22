@@ -8,6 +8,8 @@
       <div class="flex flex-col mr-40">
         <RouterLink to="/" class="mb-2 hover:underline">Accueil</RouterLink>
         <RouterLink to="/help" class="mb-2 hover:underline">Aide</RouterLink>
+        <RouterLink to="/register" class="mb-2 hover:underline">S'inscrire</RouterLink>
+        <RouterLink to="/login" class="mb-2 hover:underline">Se connecter</RouterLink>
         <div class="mb-2 hover:underline">Ceci est un lien pour une page du site</div>
       </div>
       <div class="flex flex-col mr-40">
