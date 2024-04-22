@@ -8,6 +8,7 @@ const email = ref('')
 const password = ref('')
 
 const login = () => {}
+const signInWithGoogle = () => {}
 </script>
 
 <template>
@@ -19,19 +20,20 @@ const login = () => {}
           <h1 class="text-4xl font-bold text-primary">Se connecter</h1>
           <p class="text-lg text-center text-primary">Déjà inscrit? Connectez-vous</p>
           <div class="p-2">
-            <form @submit.prevent="login">
-              <div class="flex flex-col">
-                <label for="email" class="text-primary">Email</label>
-                <input type="email" id="email" v-model="email" class="border border-primary rounded" />
-              </div>
-              <div class="flex flex-col">
-                <label for="password" class="text-primary">Password</label>
-                <input type="password" id="password" v-model="password" class="border border-primary rounded" />
-              </div>
-              <div class="flex flex-col p-4">
-                <Button type="submit" label="Se connecter" />
-              </div>
-            </form>
+            <div class="flex flex-col">
+              <label for="email" class="text-primary">Email</label>
+              <input type="email" id="email" v-model="email" class="border border-primary rounded" />
+            </div>
+            <div class="flex flex-col">
+              <label for="password" class="text-primary">Password</label>
+              <input type="password" id="password" v-model="password" class="border border-primary rounded" />
+            </div>
+            <div class="flex flex-col p-4">
+              <Button @click="login" label="Se connecter" />
+            </div>
+            <div class="flex flex-col p-4">
+              <Button @click="signInWithGoogle" label="Se connecter avec Google" />
+            </div>
           </div>
         </div>
       </div>
