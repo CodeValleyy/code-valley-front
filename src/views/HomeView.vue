@@ -2,8 +2,15 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
+import { useRouter } from 'vue-router'
 
 const name = '"Nom du site"'
+
+const router = useRouter()
+
+const sendTo = (location: string) => {
+  router.push(location)
+}
 </script>
 
 <template>
@@ -11,7 +18,7 @@ const name = '"Nom du site"'
   <div class="min-h-screen h-full flex flex-col justify-between">
     <div class="w-full h-full pt-40 p-4 flex flex-col items-center">
       <div class="mb-4 text-2xl p-8 font-semibold">Bienvenue sur {{ name }}</div>
-      <Button label="Getting Started" size="xl"></Button>
+      <Button label="Getting Started" size="xl" @click="sendTo('/code')"></Button>
       <div class="mt-6 flex justify-center p-4 w-11/12 items-center">
         <div class="w-5/12 p-4">
           <div class="font-bold text-primary mr-4 text-xl mb-4">Ce que nous faisons</div>

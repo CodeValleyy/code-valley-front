@@ -5,6 +5,10 @@ const routes = [
     label: 'Accueil'
   },
   {
+    location: '/code',
+    label: 'Code'
+  },
+  {
     location: '/help',
     label: 'Aide'
   }
