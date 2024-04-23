@@ -25,7 +25,7 @@ const routes = [
 
 <template>
   <div
-    class="w-full p-8 flex items-center shadow-md bg-white justify-between text-primary text-xl fixed font-semibold"
+    class="w-full p-8 flex items-center shadow-md bg-white justify-between text-primary text-xl fixed font-semibol z-10"
   >
     <div class="flex">
       <div class="mr-6 py-4 px-6 rounded hover:bg-gray-200 cursor-pointer" v-for="route in routes">

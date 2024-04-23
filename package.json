@@ -15,8 +15,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "firebase": "^10.11.0",
+    "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
+    "simple-code-editor": "^2.0.9",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
