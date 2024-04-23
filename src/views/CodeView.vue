@@ -2,8 +2,10 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
+import Loading from '@/components/Loading.vue'
 import CodeEditor from '@/components/CodeEditor.vue'
 import { ref } from 'vue'
+import { fetchData } from '@/composables/code'
 
 const name = '"Nom du site"'
 
@@ -11,12 +13,30 @@ const codeInput = ref('')
 const result = ref('')
 const isLoading = ref(false)
 const error = ref('')
+/*
+const languages = [
+  ['rust', 'Rust'],
+  ['python', 'Python'],
+  ['lua', 'Lua'],
+  ['javascript', 'JS']
+]
+*/
+const languages = [['python', 'Python']]
 
-const runCode = () => {
+const runCode = async () => {
   if (!codeInput || codeInput.value === '') return
-  console.log(codeInput.value)
-  result.value = codeInput.value
-  isLoading.value = false
+
+  isLoading.value = true
+  try {
+    console.log(codeInput.value)
+    const language = 'python'
+    const fetchedResult = await fetchData(language, codeInput.value)
+    result.value = fetchedResult
+  } catch (err: any) {
+    error.value = err
+  } finally {
+    isLoading.value = false
+  }
 }
 </script>
 
@@ -35,20 +55,16 @@ const runCode = () => {
             z-index="1"
             v-model="codeInput"
             :line-nums="true"
-            :languages="[
-              ['rust', 'Rust'],
-              ['python', 'Python'],
-              ['lua', 'Lua'],
-              ['javascript', 'JS']
-            ]"
+            :languages="languages"
           />
           <Button @click="runCode()" label="Run Code" color="primary" class="w-fit self-end mt-2" />
         </div>
 
         <div v-show="isLoading || error || result !== ''" class="w-3/12 h-full">
-          <div class="text-primary mb-2">Compilation :</div>
-          <div v-if="isLoading" class="w-full p-4 h-full rounded bg-gray-300">Compilating...</div>
-          <div v-else-if="error" class="w-full p-4 h-full rounded bg-gray-300">
+          <div v-show="!isLoading" class="text-primary mb-2">Compilation :</div>
+          <div v-show="isLoading" class="text-backgroundColor mb-2">Compilation :</div>
+          <Loading v-if="isLoading" />
+          <div v-else-if="error" class="w-full h-fit rounded text-secondary">
             {{ error }}
           </div>
           <div v-else class="w-full p-4 h-fit rounded bg-gray-300">{{ result }}</div>
