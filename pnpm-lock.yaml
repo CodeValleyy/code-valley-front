@@ -5,9 +5,15 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  highlight.js:
+    specifier: ^11.9.0
+    version: 11.9.0
   pinia:
     specifier: ^2.1.7
     version: 2.1.7(typescript@5.4.5)(vue@3.4.23)
+  simple-code-editor:
+    specifier: ^2.0.9
+    version: 2.0.9
   vue:
     specifier: ^3.4.21
     version: 3.4.23(typescript@5.4.5)
@@ -2311,6 +2317,11 @@ packages:
     hasBin: true
     dev: true
 
+  /highlight.js@11.9.0:
+    resolution: {integrity: sha512-fJ7cW7fQGCYAkgv4CPfwFHrfd/cLS4Hau96JuJ+ZTOWhjnhoeN1ub1tFmALm/+lW5z4WCAuAV9bm05AP0mS6Gw==}
+    engines: {node: '>=12.0.0'}
+    dev: false
+
   /hookable@5.5.3:
     resolution: {integrity: sha512-Yc+BQe8SvoXH1643Qez1zqLRmbA5rCL+sSmk6TVos0LWVfNIB7PGncdlId77WzLGSIB5KaWgTaNTs2lNVEI6VQ==}
     dev: true
@@ -3302,6 +3313,12 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
     dev: true
+
+  /simple-code-editor@2.0.9:
+    resolution: {integrity: sha512-bDekCSgcaFn79kiB6N+S07/m9fLLfgHchVsKhMLyKsqZNaRC5GWxn2fpbMZPKmORDyWzUML3hy2mrN3XWyGSfA==}
+    dependencies:
+      highlight.js: 11.9.0
+    dev: false
 
   /sirv@2.0.4:
     resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}

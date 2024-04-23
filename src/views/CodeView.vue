@@ -2,16 +2,21 @@
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
-import CodeInput from '@/components/CodeInput.vue'
+import CodeEditor from '@/components/CodeEditor.vue'
 import { ref } from 'vue'
 
 const name = '"Nom du site"'
 
 const codeInput = ref('')
+const result = ref('')
+const isLoading = ref(false)
+const error = ref('')
 
 const runCode = () => {
   if (!codeInput || codeInput.value === '') return
   console.log(codeInput.value)
+  result.value = codeInput.value
+  isLoading.value = false
 }
 </script>
 
@@ -20,33 +25,34 @@ const runCode = () => {
   <div class="min-h-screen h-full flex flex-col justify-between">
     <div class="w-full h-full pt-40 p-4 flex flex-col items-center mb-20">
       <div class="mb-4 text-2xl p-8 font-semibold">Page de code</div>
-      {{ codeInput }}
-      <div class="mt-6 flex justify-center w-11/12 items-center mb-2">
-        <div class="w-7/12 flex justify-between items-end rounded text-primary mr-4">
-          <div>Code :</div>
-          <select class="rounded px-3 text-black bg-backgroundColor">
-            <option value="js" default>JS</option>
-            <option value="js">C++</option>
-            <option value="js">Python</option>
-            <option value="js">Lua</option>
-          </select>
-        </div>
-        <div class="w-3/12 rounded flex items-end text-primary">Compilation :</div>
-      </div>
-      <div class="flex justify-center h-80 w-11/12 items-start">
-        <CodeInput v-model="codeInput" />
-        <div class="w-3/12 p-4 h-full rounded bg-gray-300">Compilating...</div>
-      </div>
-      <div class="flex justify-center w-11/12 items-start">
-        <div class="w-7/12 flex justify-end mr-2 mt-2">
-          <Button
-            @click="runCode()"
-            label="Run Code"
-            color="primary"
-            class="ml-44 w-fit self-end"
+      <div class="flex justify-center h-96 w-11/12 items-start">
+        <div class="w-7/12 h-full flex flex-col mr-6">
+          <div class="text-primary mb-2">Code :</div>
+          <CodeEditor
+            class="mr-10"
+            width="100%"
+            height="100%"
+            z-index="1"
+            v-model="codeInput"
+            :line-nums="true"
+            :languages="[
+              ['rust', 'Rust'],
+              ['python', 'Python'],
+              ['lua', 'Lua'],
+              ['javascript', 'JS']
+            ]"
           />
+          <Button @click="runCode()" label="Run Code" color="primary" class="w-fit self-end mt-2" />
         </div>
-        <div class="w-3/12 p-4 h-full"></div>
+
+        <div v-show="isLoading || error || result !== ''" class="w-3/12 h-full">
+          <div class="text-primary mb-2">Compilation :</div>
+          <div v-if="isLoading" class="w-full p-4 h-full rounded bg-gray-300">Compilating...</div>
+          <div v-else-if="error" class="w-full p-4 h-full rounded bg-gray-300">
+            {{ error }}
+          </div>
+          <div v-else class="w-full p-4 h-fit rounded bg-gray-300">{{ result }}</div>
+        </div>
       </div>
     </div>
     <Footer />

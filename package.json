@@ -15,7 +15,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
+    "simple-code-editor": "^2.0.9",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
