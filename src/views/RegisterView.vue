@@ -9,24 +9,37 @@ import router from '@/router'
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
+const errorMessage = ref('')
 
 
 const register = () => {
   if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match');
+    errorMessage.value = "Passwords do not match";
     return;
   }
 
-  createUserWithEmailAndPassword(getAuth(), email.value, password.value)
-    .then((userCredential) => {
-      const user = userCredential.user;
-      console.log(user + " has been registered successfully");
+  const auth = getAuth();
+  createUserWithEmailAndPassword(auth, email.value, password.value)
+    .then(() => {
+      console.log(auth.currentUser + " has been registered successfully");
       router.push('/')
     })
     .catch((error) => {
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      console.log(errorCode + ": " + errorMessage);
+      console.log(error.code + ": " + error.message);
+      switch (error.code) {
+        case "auth/invalid-email":
+          errorMessage.value = "Invalid email address";
+          break;
+        case "auth/email-already-in-use":
+          errorMessage.value = "Email already in use";
+          break;
+        case "auth/weak-password":
+          errorMessage.value = "Password is too weak";
+          break;
+        default:
+          errorMessage.value = "Email or password is incorrect";
+          break;
+      }
     });
 }
 
@@ -55,6 +68,7 @@ const signInWithGoogle = () => {}
               <label for="confirmPassword" class="text-primary">Confirm Password</label>
               <input type="password" id="confirmPassword" v-model="confirmPassword" class="border border-primary rounded" />
             </div>
+            <div class="text-red-500 text-sm">{{ errorMessage }}</div>
             <div class="flex flex-col p-4">
               <Button @click="register" label="Créer un compte" />
             </div>

@@ -3,11 +3,41 @@ import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
 import { ref } from 'vue'
+import { signInWithEmailAndPassword, getAuth } from 'firebase/auth'
+import router from '@/router'
 
 const email = ref('')
 const password = ref('')
+const errorMessage = ref('')
 
-const login = () => {}
+
+const login = () => {
+  const auth = getAuth();
+  signInWithEmailAndPassword(auth, email.value, password.value)
+    .then(() => {
+      console.log(auth.currentUser + " has been sign in successfully");
+      router.push('/')
+    })
+    .catch((error) => {
+      console.log(error.code + ": " + error.message);
+      switch (error.code) {
+        case "auth/invalid-email":
+          errorMessage.value = "Invalid email address";
+          break;
+        case "auth/user-not-found":
+          errorMessage.value = "No account with that email was found";
+          break;
+        case "auth/wrong-password":
+          errorMessage.value = "Incorrect password";
+          break;
+        default:
+          errorMessage.value = "Email or password is incorrect";
+          break;
+      }
+    });
+}
+
+
 const signInWithGoogle = () => {}
 </script>
 
@@ -28,6 +58,7 @@ const signInWithGoogle = () => {}
               <label for="password" class="text-primary">Password</label>
               <input type="password" id="password" v-model="password" class="border border-primary rounded" />
             </div>
+            <div class="text-red-500 text-sm">{{ errorMessage }}</div>
             <div class="flex flex-col p-4">
               <Button @click="login" label="Se connecter" />
             </div>
