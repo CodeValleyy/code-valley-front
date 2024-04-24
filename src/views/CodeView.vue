@@ -4,24 +4,21 @@ import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
 import Loading from '@/components/Loading.vue'
 import CodeEditor from '@/components/CodeEditor.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { fetchData } from '@/composables/code'
-
-const name = '"Nom du site"'
-
 const codeInput = ref('')
 const result = ref('')
 const isLoading = ref(false)
 const error = ref('')
-/*
 const languages = [
   ['rust', 'Rust'],
   ['python', 'Python'],
   ['lua', 'Lua'],
   ['javascript', 'JS']
 ]
-*/
-const languages = [['python', 'Python']]
+//const languages = [['python', 'Python']]
+
+const currentLanguage = ref(languages[0][0])
 
 const runCode = async () => {
   if (!codeInput || codeInput.value === '') return
@@ -29,7 +26,7 @@ const runCode = async () => {
   isLoading.value = true
   try {
     console.log(codeInput.value)
-    const language = 'python'
+    const language = currentLanguage.value
     const fetchedResult = await fetchData(language, codeInput.value)
     result.value = fetchedResult
   } catch (err: any) {
@@ -37,6 +34,10 @@ const runCode = async () => {
   } finally {
     isLoading.value = false
   }
+}
+
+const getLanguage = (language: string) => {
+  currentLanguage.value = language
 }
 </script>
 
@@ -56,6 +57,7 @@ const runCode = async () => {
             v-model="codeInput"
             :line-nums="true"
             :languages="languages"
+            @lang="getLanguage"
           />
           <Button @click="runCode()" label="Run Code" color="primary" class="w-fit self-end mt-2" />
         </div>
