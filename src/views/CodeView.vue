@@ -4,40 +4,9 @@ import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
 import Loading from '@/components/Loading.vue'
 import CodeEditor from '@/components/CodeEditor.vue'
-import { ref, watch } from 'vue'
-import { fetchData } from '@/composables/code'
-const codeInput = ref('')
-const result = ref('')
-const isLoading = ref(false)
-const error = ref('')
-const languages = [
-  ['python', 'Python'],
-  ['rust', 'Rust'],
-  ['lua', 'Lua'],
-  ['javascript', 'JS']
-]
+import { useCodeRunner } from '@/composables/useCodeRunner';
 
-const currentLanguage = ref(languages[0][0])
-
-const runCode = async () => {
-  if (!codeInput || codeInput.value === '') return
-
-  isLoading.value = true
-  try {
-    error.value = ''
-    const language = currentLanguage.value
-    const fetchedResult = await fetchData(language, codeInput.value)
-    result.value = fetchedResult || "Aucun résultat à afficher"
-  } catch (err: any) {
-    error.value = err || 'Une erreur est survenue'
-  } finally {
-    isLoading.value = false
-  }
-}
-
-const getLanguage = (language: string) => {
-  currentLanguage.value = language
-}
+const { codeInput, result, isLoading, error, languages, runCode, getLanguage } = useCodeRunner();
 </script>
 
 <template>
@@ -58,7 +27,7 @@ const getLanguage = (language: string) => {
             :languages="languages"
             @lang="getLanguage"
           />
-          <Button @click="runCode()" label="Run Code" color="primary" class="w-fit self-end mt-2" />
+          <Button @click="runCode" label="Run Code" color="primary" class="w-fit self-end mt-2" />
         </div>
 
         <div v-show="isLoading || error || result !== ''" class="w-3/12 h-full">
