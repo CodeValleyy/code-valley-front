@@ -11,12 +11,11 @@ const result = ref('')
 const isLoading = ref(false)
 const error = ref('')
 const languages = [
-  ['rust', 'Rust'],
   ['python', 'Python'],
+  ['rust', 'Rust'],
   ['lua', 'Lua'],
   ['javascript', 'JS']
 ]
-//const languages = [['python', 'Python']]
 
 const currentLanguage = ref(languages[0][0])
 
@@ -25,12 +24,12 @@ const runCode = async () => {
 
   isLoading.value = true
   try {
-    console.log(codeInput.value)
+    error.value = ''
     const language = currentLanguage.value
     const fetchedResult = await fetchData(language, codeInput.value)
-    result.value = fetchedResult
+    result.value = fetchedResult || "Aucun résultat à afficher"
   } catch (err: any) {
-    error.value = err
+    error.value = err || 'Une erreur est survenue'
   } finally {
     isLoading.value = false
   }
