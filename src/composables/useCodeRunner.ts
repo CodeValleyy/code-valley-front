@@ -3,6 +3,10 @@ import { fetchData } from '@/api/fetchData';
 import type { ExecuteCodeRequest } from '@/types';
 import { languages } from '@/config/languagesConfig';
 
+const transformNewlines = (str: string): string => {
+  return str.replace(/\r?\n/g, '<br>');
+};
+
 export function useCodeRunner() {
   const codeInput = ref<string>('');
   const result = ref<string>('');
@@ -21,6 +25,8 @@ export function useCodeRunner() {
       };
 
       const fetchedResult = await fetchData(executeCodeRequest);
+      result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
+
       result.value = fetchedResult || "Aucun résultat à afficher";
     } catch (err) {
       error.value = (err as Error).message || 'Une erreur est survenue';
