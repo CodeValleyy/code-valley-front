@@ -1,18 +1,13 @@
 import { ref } from 'vue';
 import { fetchData } from '@/api/fetchData';
 import type { ExecuteCodeRequest } from '@/types';
+import { languages } from '@/config/languagesConfig';
 
 export function useCodeRunner() {
   const codeInput = ref<string>('');
   const result = ref<string>('');
   const isLoading = ref<boolean>(false);
   const error = ref<string>('');
-  const languages = [
-    ['python',  'Python' ],
-    ['rust', 'Rust'],
-    ['lua', 'Lua' ],
-    ['javascript', 'JavaScript'],
-  ];
   const currentLanguage = ref<string>(languages[0][0]);
   const runCode = async () => {
     if (!codeInput.value.trim()) return;
