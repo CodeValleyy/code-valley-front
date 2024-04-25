@@ -15,10 +15,12 @@ export function useCodeRunner() {
     isLoading.value = true;
     error.value = '';
     try {
-      const fetchedResult = await fetchData({
+      const executeCodeRequest: ExecuteCodeRequest = {
         language: currentLanguage.value,
         code: codeInput.value
-      });
+      };
+
+      const fetchedResult = await fetchData(executeCodeRequest);
       result.value = fetchedResult || "Aucun résultat à afficher";
     } catch (err) {
       error.value = (err as Error).message || 'Une erreur est survenue';
@@ -28,6 +30,7 @@ export function useCodeRunner() {
   };
 
   const getLanguage = (language: string) => {
+    console.log(language);
     currentLanguage.value = language;
   };
 
