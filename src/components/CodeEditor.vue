@@ -15,5 +15,5 @@ export default {
 </script>
 
 <template>
-  <CodeEditor></CodeEditor>
+  <CodeEditor/>
 </template>
