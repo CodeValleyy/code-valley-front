@@ -37,9 +37,7 @@
           <div v-else-if="error" class="w-full h-fit rounded text-secondary">
             {{ error }}
           </div>
-          <div v-else class="w-full p-4 h-fit rounded bg-gray-300">
-            {{ result }}
-          </div>
+          <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
         </div>
       </div>
     </div>
@@ -64,7 +62,6 @@ const { codeInput, result, isLoading, error, runCode, currentLanguage, languages
 
 const dark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
-// Watch for changes in currentLanguage and update the editor's language mode
 const lang = computed(() => {
   switch (currentLanguage.value) {
     case 'python':
