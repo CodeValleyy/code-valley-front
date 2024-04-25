@@ -16,7 +16,7 @@ const { codeInput, result, isLoading, error, languages, runCode, getLanguage } =
       <div class="mb-4 text-2xl p-8 font-semibold">Page de code</div>
       <div class="flex justify-center h-96 w-11/12 items-start">
         <div class="w-7/12 h-full flex flex-col mr-6">
-          <div class="text-primary mb-2">Code :</div>
+          <div class="text-primary mb-2">Code :</div>  
           <CodeEditor
             class="mr-10"
             width="100%"
@@ -26,7 +26,9 @@ const { codeInput, result, isLoading, error, languages, runCode, getLanguage } =
             :line-nums="true"
             :languages="languages"
             @lang="getLanguage"
-          />
+            @keyup.ctrl.s="runCode"
+            spellcheck="false"
+            />
           <Button @click="runCode" label="Run Code" color="primary" class="w-fit self-end mt-2" />
         </div>
 
