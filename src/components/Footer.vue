@@ -1,23 +1,30 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const currentYear = ref(new Date().getFullYear())
+</script>
 
 <template>
   <div
-    class="w-full pt-8 pb-2 px-8 flex flex-col items-center justify-between shadow-lg bg-primary bottom-0 text-white text-xl"
+    class="w-full pt-4 pb-1 px-4 flex flex-col items-center justify-between shadow-lg bg-primary bottom-0 text-white text-xl"
   >
-    <div class="w-full flex mb-4">
-      <div class="flex flex-col mr-40">
-        <RouterLink to="/" class="mb-2 hover:underline">Accueil</RouterLink>
-        <RouterLink to="/help" class="mb-2 hover:underline">Aide</RouterLink>
-        <div class="mb-2 hover:underline">Ceci est un lien pour une page du site</div>
+    <!-- Utilisation de flex-row pour les liens -->
+    <div class="flex justify-around w-full mb-4">
+      <RouterLink to="/" class="hover:underline">Accueil</RouterLink>
+      <RouterLink to="/help" class="hover:underline">Aide</RouterLink>
+      <div class="hover:underline">Autre lien</div>
+    </div>
+    <!-- Noms des auteurs centrés -->
+    <div class="flex items-center justify-center mb-4 text-sm space-x-2">
+      <div class="mr-1"><a href="https://github.com/jabibamman" target="_blank">ABIB James</a></div>
+      <div class="mr-1">
+        <a href="https://github.com/chikatetsu" target="_blank">KIELT Ronan</a>
       </div>
-      <div class="flex flex-col mr-40">
-        <div class="mb-2 hover:underline">Ceci est un lien pour une page du site</div>
+      <div class="mr-1">
+        <a href="https://github.com/carlito0605" target="_blank">CRETOIS Charles</a>
       </div>
     </div>
-    <div class="flex items-center">
-      <div class="mr-2 text-sm">ABIB James;</div>
-      <div class="mr-2 text-sm">KIELT Ronan;</div>
-      <div class="mr-2 text-sm">CRETOIS Charles;</div>
-    </div>
+    <!-- Copyright -->
+    <div class="text-sm">© {{ currentYear }} Tous droits réservés.</div>
   </div>
 </template>
