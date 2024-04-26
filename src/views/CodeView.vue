@@ -19,7 +19,9 @@
               :dark="dark"
               :lang="lang"
               class="border"
-              @keyup.alt.s="runCode"
+              @keydown.tab.prevent.stop="tab"
+              @keydown.shift.tab.prevent.stop="tab"
+              @keydown.ctrl.s.prevent.stop="runCode"
             />
           </div>
           <Button
@@ -59,6 +61,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 
 const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
+const tab = () => {}
 
 const dark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -80,13 +83,6 @@ const lang = computed(() => {
 <style scoped>
 .min-h-screen {
   min-height: 100vh;
-}
-
-.code-editor-container {
-  height: 500px;
-  overflow-y: auto;
-  border: 1px solid grey;
-  border-radius: 4px;
 }
 
 .border {
