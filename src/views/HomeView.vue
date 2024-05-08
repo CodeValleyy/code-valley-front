@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 const name = 'Code Valley'
 
 const router = useRouter()
+
 const sendTo = (location: string) => {
   router.push(location)
 }
