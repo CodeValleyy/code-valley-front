@@ -16,7 +16,7 @@
     />
     <button @click="runCode">Run Code</button>
   </div>
-  
+
 </template>
 
 <script setup lang="ts">
