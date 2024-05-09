@@ -1,48 +1,38 @@
 <script setup lang="ts">
+import axios from 'axios'
+import { ref } from 'vue'
+import router from '@/router'
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
 import Button from '@/components/Button.vue'
-import { ref } from 'vue'
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import router from '@/router'
 
 const email = ref('')
+const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
 
+const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
 
-const register = () => {
+const register = async () => {
   if (password.value !== confirmPassword.value) {
-    errorMessage.value = "Passwords do not match";
-    return;
+    errorMessage.value = 'Les mots de passe ne correspondent pas'
+    return
   }
 
-  const auth = getAuth();
-  createUserWithEmailAndPassword(auth, email.value, password.value)
-    .then(() => {
-      console.log(auth.currentUser + " has been registered successfully");
-      router.push('/')
+  try {
+    const response = await axios.post(`${apiBaseUrl}/auth/register`, {
+      email: email.value,
+      username: username.value,
+      password: password.value
     })
-    .catch((error) => {
-      console.log(error.code + ": " + error.message);
-      switch (error.code) {
-        case "auth/invalid-email":
-          errorMessage.value = "Invalid email address";
-          break;
-        case "auth/email-already-in-use":
-          errorMessage.value = "Email already in use";
-          break;
-        case "auth/weak-password":
-          errorMessage.value = "Password is too weak";
-          break;
-        default:
-          errorMessage.value = "Email or password is incorrect";
-          break;
-      }
-    });
+    console.log('Registered:', response.data)
+    router.push('/')
+  } catch (error) {
+    console.error('Registration error:', error.response.data)
+    errorMessage.value = error.response.data.message || 'Problème lors de l’inscription'
+  }
 }
-
 
 const signInWithGoogle = () => {}
 </script>
@@ -57,16 +47,40 @@ const signInWithGoogle = () => {}
           <p class="text-lg text-center text-primary">Pour commencer, créer un compte</p>
           <div class="p-2">
             <div class="flex flex-col">
+              <label for="username" class="text-primary">Nom d'utilisateur</label>
+              <input
+                type="text"
+                id="username"
+                v-model="username"
+                class="border border-primary rounded"
+              />
+            </div>
+            <div class="flex flex-col">
               <label for="email" class="text-primary">Email</label>
-              <input type="email" id="email" v-model="email" class="border border-primary rounded" />
+              <input
+                type="email"
+                id="email"
+                v-model="email"
+                class="border border-primary rounded"
+              />
             </div>
             <div class="flex flex-col">
               <label for="password" class="text-primary">Password</label>
-              <input type="password" id="password" v-model="password" class="border border-primary rounded" />
+              <input
+                type="password"
+                id="password"
+                v-model="password"
+                class="border border-primary rounded"
+              />
             </div>
             <div class="flex flex-col">
               <label for="confirmPassword" class="text-primary">Confirm Password</label>
-              <input type="password" id="confirmPassword" v-model="confirmPassword" class="border border-primary rounded" />
+              <input
+                type="password"
+                id="confirmPassword"
+                v-model="confirmPassword"
+                class="border border-primary rounded"
+              />
             </div>
             <div class="text-red-500 text-sm">{{ errorMessage }}</div>
             <div class="flex flex-col p-4">
