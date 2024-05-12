@@ -30,7 +30,7 @@ const register = async () => {
     router.push('/')
   } catch (error) {
     console.error('Registration error:', error.response.data)
-    errorMessage.value = error.response.data.message || 'Problème lors de l’inscription'
+    errorMessage.value = error.response.data.message.toString() || 'Problème lors de l’inscription'
   }
 }
 

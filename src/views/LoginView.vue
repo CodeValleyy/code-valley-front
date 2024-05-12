@@ -8,6 +8,7 @@ import Button from '@/components/Button.vue'
 
 const email = ref('')
 const password = ref('')
+const otp = ref('')
 const errorMessage = ref('')
 
 const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
@@ -30,10 +31,26 @@ const login = async () => {
       email: email.value,
       password: password.value
     })
-    router.push('/')
+
+    let token = response.data.accessToken;
+
+    switch(response.status) {
+      case 202 :
+        document.getElementById('password')?.classList.add("invisible")
+        document.getElementById('email')?.classList.add("invisible")
+        document.getElementById('otp')?.classList.remove("invisible")
+        const response = await axios.post(`${apiBaseUrl}/auth/2fa/authenticate`,
+        {
+          twoFactorAuthenticationCode: otp.value,
+        },
+      )
+
+      default : 
+        router.push(`/?token=${token}`)
+    }
   } catch (error) {
     console.error('Login error:', error.response.data)
-    errorMessage.value = error.response.data.message || 'Email or password is incorrect'
+    errorMessage.value = error.response.data.message.toString() || 'Email or password is incorrect'
   }
 }
 
@@ -54,7 +71,7 @@ const signInWithGoogle = () => {
           <h1 class="text-4xl font-bold text-primary">Se connecter</h1>
           <p class="text-lg text-center text-primary">Déjà inscrit? Connectez-vous</p>
           <div class="p-2">
-            <div class="flex flex-col">
+            <div class="flex flex-col" id="email">
               <label for="email" class="text-primary">Email</label>
               <input
                 type="email"
@@ -63,12 +80,21 @@ const signInWithGoogle = () => {
                 class="border border-primary rounded"
               />
             </div>
-            <div class="flex flex-col">
+            <div class="flex flex-col" id="password">
               <label for="password" class="text-primary">Password</label>
               <input
                 type="password"
                 id="password"
                 v-model="password"
+                class="border border-primary rounded"
+              />
+            </div>
+            <div class="flex flex-col invisible" id="otp">
+              <label for="otp" class="text-primary">Code OTP</label>
+              <input
+                type="otp"
+                id="otp"
+                v-model="otp"
                 class="border border-primary rounded"
               />
             </div>
