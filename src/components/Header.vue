@@ -7,7 +7,7 @@
     </v-btn>
     <v-toolbar-items class="d-none d-md-flex">
       <v-btn
-        v-for="route in routes"
+        v-for="route in filteredRoutes"
         :key="route.location"
         :to="route.location"
         text
@@ -21,7 +21,7 @@
   <v-navigation-drawer v-model="drawer" app temporary class="d-md-none">
     <v-list>
       <v-list-item
-        v-for="route in routes"
+        v-for="route in filteredRoutes"
         :key="route.location"
         :to="route.location"
         @click="drawer = false"
@@ -33,18 +33,35 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 interface Route {
   location: string
   label: string
 }
 
-defineProps<{
-  routes: Route[]
-}>()
-
 const drawer = ref(false)
+
+const { getToken } = useAuth()
+const isAuthenticated = computed(() => !!getToken())
+
+const filteredRoutes = computed(() => {
+  const routes: Route[] = [
+    { location: '/', label: 'Accueil' },
+    { location: '/code', label: 'Code' },
+    { location: '/help', label: 'Aide' }
+  ]
+
+  if (isAuthenticated.value) {
+    routes.push({ location: '/profile', label: 'Profil' })
+  } else {
+    routes.push({ location: '/login', label: 'Se connecter' })
+    routes.push({ location: '/register', label: "S'inscrire" })
+  }
+
+  return routes
+})
 </script>
 
 <style scoped>

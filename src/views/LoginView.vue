@@ -50,6 +50,8 @@
 import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import router from '@/router'
+import { useAuth } from '@/composables/useAuth'
+const { setToken } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -86,6 +88,7 @@ const login = async () => {
       isOtpVisible.value = true
     } else {
       router.push(`/?token=${token.value}`)
+      setToken(token.value)
     }
   } catch (error) {
     console.error('Login error:', error.response.data)
@@ -104,6 +107,7 @@ const authenticateOtp = async () => {
       { headers: { Authorization: `Bearer ${token.value}` } }
     )
     token.value = response.data.accessToken
+    setToken(token.value)
     router.push(`/?token=${token.value}`)
   } catch (error) {
     console.error('OTP authentication error:', error.response.data)
