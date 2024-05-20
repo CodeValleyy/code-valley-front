@@ -1,10 +1,54 @@
+<template>
+  <v-container class="fill-height d-flex align-center justify-center">
+    <v-row class="justify-center">
+      <v-col cols="12" md="6" class="text-center">
+        <h1 class="mb-6 text-4xl font-bold text-primary">S'inscrire</h1>
+        <p class="text-lg text-center text-primary mb-4">Pour commencer, créer un compte</p>
+        <v-card class="pa-6">
+          <v-form>
+            <v-text-field
+              v-model="username"
+              label="Nom d'utilisateur"
+              outlined
+              class="mb-4"
+            ></v-text-field>
+            <v-text-field
+              v-model="email"
+              label="Email"
+              type="email"
+              outlined
+              class="mb-4"
+            ></v-text-field>
+            <v-text-field
+              v-model="password"
+              type="password"
+              label="Password"
+              outlined
+              class="mb-4"
+            ></v-text-field>
+            <v-text-field
+              v-model="confirmPassword"
+              type="password"
+              label="Confirm Password"
+              outlined
+              class="mb-4"
+            ></v-text-field>
+            <div class="text-red-500 text-sm mb-4">{{ errorMessage }}</div>
+            <v-btn color="primary" @click="register" class="mb-4 mr-4">Créer un compte</v-btn>
+            <v-btn color="secondary" @click="signInWithGoogle" class="mb-4">
+              Se connecter avec Google
+            </v-btn>
+          </v-form>
+        </v-card>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
 <script setup lang="ts">
 import axios from 'axios'
 import { ref } from 'vue'
 import router from '@/router'
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
-import Button from '@/components/Button.vue'
 
 const email = ref('')
 const username = ref('')
@@ -34,65 +78,13 @@ const register = async () => {
   }
 }
 
-const signInWithGoogle = () => {}
+const signInWithGoogle = () => {
+  // TODO : Logique de connexion avec Google
+}
 </script>
 
-<template>
-  <Header />
-  <div class="min-h-screen h-full flex flex-col justify-between">
-    <div class="w-full h-full text-xl pt-40 p-4 text-primary">
-      <div class="container mx-auto">
-        <div class="flex flex-col items-center">
-          <h1 class="text-4xl font-bold text-primary">S'inscrire</h1>
-          <p class="text-lg text-center text-primary">Pour commencer, créer un compte</p>
-          <div class="p-2">
-            <div class="flex flex-col">
-              <label for="username" class="text-primary">Nom d'utilisateur</label>
-              <input
-                type="text"
-                id="username"
-                v-model="username"
-                class="border border-primary rounded"
-              />
-            </div>
-            <div class="flex flex-col">
-              <label for="email" class="text-primary">Email</label>
-              <input
-                type="email"
-                id="email"
-                v-model="email"
-                class="border border-primary rounded"
-              />
-            </div>
-            <div class="flex flex-col">
-              <label for="password" class="text-primary">Password</label>
-              <input
-                type="password"
-                id="password"
-                v-model="password"
-                class="border border-primary rounded"
-              />
-            </div>
-            <div class="flex flex-col">
-              <label for="confirmPassword" class="text-primary">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                v-model="confirmPassword"
-                class="border border-primary rounded"
-              />
-            </div>
-            <div class="text-red-500 text-sm">{{ errorMessage }}</div>
-            <div class="flex flex-col p-4">
-              <Button @click="register" label="Créer un compte" />
-            </div>
-            <div class="flex flex-col p-4">
-              <Button @click="signInWithGoogle" label="Se connecter avec Google" />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <Footer />
-  </div>
-</template>
+<style scoped>
+.min-h-screen {
+  min-height: 100vh;
+}
+</style>

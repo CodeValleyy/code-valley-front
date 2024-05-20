@@ -1,49 +1,54 @@
+<template>
+  <v-app-bar app color="primary" dark>
+    <v-toolbar-title class="text-2xl font-poppins">CodeValley</v-toolbar-title>
+    <v-spacer></v-spacer>
+    <v-btn icon @click="drawer = !drawer" class="d-md-none">
+      <v-icon>mdi-menu</v-icon>
+    </v-btn>
+    <v-toolbar-items class="d-none d-md-flex">
+      <v-btn
+        v-for="route in routes"
+        :key="route.location"
+        :to="route.location"
+        text
+        class="text-white font-poppins mx-2"
+      >
+        {{ route.label }}
+      </v-btn>
+    </v-toolbar-items>
+  </v-app-bar>
+
+  <v-navigation-drawer v-model="drawer" app temporary class="d-md-none">
+    <v-list>
+      <v-list-item
+        v-for="route in routes"
+        :key="route.location"
+        :to="route.location"
+        @click="drawer = false"
+      >
+        <v-list-item-title>{{ route.label }}</v-list-item-title>
+      </v-list-item>
+    </v-list>
+  </v-navigation-drawer>
+</template>
+
 <script setup lang="ts">
-const routes = [
-  {
-    location: '/',
-    label: 'Accueil'
-  },
-  {
-    location: '/code',
-    label: 'Code'
-  },
-  {
-    location: '/help',
-    label: 'Aide'
-  },
-  {
-    location: '/register',
-    label: 'S\'inscrire'
-  },
-  {
-    location: '/login',
-    label: 'Se connecter'
-  }
-]
+import { ref } from 'vue'
+
+interface Route {
+  location: string
+  label: string
+}
+
+defineProps<{
+  routes: Route[]
+}>()
+
+const drawer = ref(false)
 </script>
 
-<template>
-  <div
-    class="w-full p-8 flex items-center shadow-md bg-white justify-between text-primary text-xl fixed font-semibol z-10"
-  >
-    <div class="flex">
-      <div class="mr-6 py-4 px-6 rounded hover:bg-gray-200 cursor-pointer" v-for="route in routes">
-        <RouterLink :to="`${route.location}`">
-          {{ route.label }}
-        </RouterLink>
-      </div>
-    </div>
-    <div class="flex items-center py-2 px-4 rounded hover:bg-gray-200 cursor-pointer">
-      <div class="mr-auto p-2">Profil</div>
-      <div>
-        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            d="M12 12q-1.65 0-2.825-1.175T8 8t1.175-2.825T12 4t2.825 1.175T16 8t-1.175 2.825T12 12m-8 8v-2.8q0-.85.438-1.562T5.6 14.55q1.55-.775 3.15-1.162T12 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T20 17.2V20z"
-          />
-        </svg>
-      </div>
-    </div>
-  </div>
-</template>
+<style scoped>
+.v-toolbar-title {
+  cursor: pointer;
+}
+</style>

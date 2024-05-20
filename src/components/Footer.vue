@@ -1,28 +1,35 @@
+<template>
+  <v-footer app inset class="py-0 px-4 border-t border-gray-200 bg-primary">
+    <v-container>
+      <v-row justify="center" class="flex-wrap">
+        <v-col class="text-center py-1" cols="12" sm="auto">
+          <div class="flex justify-center space-x-2 mb-2 text-sm flex-wrap">
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Terms</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Privacy</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Security</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Status</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Docs</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Contact</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1">Manage cookies</v-btn>
+            <v-btn text href="#" class="text-white bg-transparent px-2 py-1"
+              >Do not share my personal information</v-btn
+            >
+          </div>
+          <div class="text-sm text-white">© {{ currentYear }} Tous droits réservés.</div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-footer>
+</template>
+
 <script setup lang="ts">
 import { ref } from 'vue'
 
 const currentYear = ref(new Date().getFullYear())
 </script>
 
-<template>
-  <div
-    class="w-full pt-4 pb-1 px-4 flex flex-col items-center justify-between shadow-lg bg-primary bottom-0 text-white text-xl"
-  >
-    <div class="flex justify-around w-full mb-4">
-      <RouterLink to="/" class="hover:underline">Accueil</RouterLink>
-      <RouterLink to="/help" class="hover:underline">Aide</RouterLink>
-      <div class="hover:underline">Autre lien</div>
-    </div>
-    <div class="flex items-center justify-center mb-4 text-sm space-x-2">
-      <div class="mr-1"><a href="https://github.com/jabibamman" target="_blank">ABIB James</a></div>
-      <div class="mr-1">
-        <a href="https://github.com/chikatetsu" target="_blank">KIELT Ronan</a>
-      </div>
-      <div class="mr-1">
-        <a href="https://github.com/carlito0605" target="_blank">CRETOIS Charles</a>
-      </div>
-    </div>
-    <!-- Copyright -->
-    <div class="text-sm">© {{ currentYear }} Tous droits réservés.</div>
-  </div>
-</template>
+<style scoped>
+.v-footer {
+  background-color: var(--v-primary-base);
+}
+</style>
