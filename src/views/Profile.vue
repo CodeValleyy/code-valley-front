@@ -1,53 +1,36 @@
 <template>
-  <v-container class="fill-height d-flex align-center justify-center">
-    <v-row class="justify-center">
-      <v-col cols="12" md="6">
-        <v-card class="pa-6 text-center">
-          <v-avatar size="100" class="mb-4">
-            <img src="https://via.placeholder.com/100" alt="User Avatar" />
-          </v-avatar>
-          <h1 class="text-2xl font-bold mb-4">{{ userProfile.username }}</h1>
-          <p class="text-lg mb-4">{{ userProfile.email }}</p>
-          <p class="text-lg mb-4">
-            Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString() }}
-          </p>
-          <v-btn color="primary" @click="logout">Se déconnecter</v-btn>
-        </v-card>
+  <v-container class="fill-height d-flex align-center">
+    <v-row class="justify-center w-full">
+      <v-col cols="12" md="3">
+        <v-navigation-drawer app temporary>
+          <v-list>
+            <v-list-item
+              v-for="item in menuItems"
+              :key="item.title"
+              :to="item.route"
+              @click="drawer = false"
+            >
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-navigation-drawer>
+      </v-col>
+      <v-col cols="12" md="9">
+        <router-view />
       </v-col>
     </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import router from '@/router'
+import { ref } from 'vue'
 
-const { fetchProfile, getToken, logout } = useAuth()
+const drawer = ref(false)
 
-const userProfile = ref({
-  username: '',
-  email: '',
-  createdAt: ''
-})
-
-onMounted(async () => {
-  if (!getToken()) {
-    router.push('/login')
-    return
-  }
-
-  try {
-    const profile = await fetchProfile()
-    userProfile.value = profile
-  } catch (error) {
-    console.error('Error fetching profile:', error)
-  }
-})
+const menuItems = [
+  { title: 'Profil', route: '/profile' },
+  { title: 'Paramètres', route: '/profile/settings' },
+  { title: 'Changer le mot de passe', route: '/profile/settings/change-password' },
+  { title: "Changer l'email", route: '/profile/settings/change-email' }
+]
 </script>
-
-<style scoped>
-.min-h-screen {
-  min-height: 100vh;
-}
-</style>

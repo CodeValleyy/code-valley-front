@@ -63,7 +63,6 @@ import { useCodeRunner } from '@/composables/useCodeRunner'
 const routes = ref([
   { location: '/', label: 'Accueil' },
   { location: '/code', label: 'Code' },
-  { location: '/help', label: 'Aide' },
   { location: '/register', label: "S'inscrire" },
   { location: '/login', label: 'Se connecter' }
 ])

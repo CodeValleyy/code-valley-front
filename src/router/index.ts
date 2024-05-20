@@ -31,10 +31,29 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () => import('../views/Profile.vue'),
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: '',
+        component: () => import('../views/ProfileOverview.vue')
+      },
+      {
+        path: 'settings',
+        component: () => import('../views/ProfileSettings.vue'),
+        children: [
+          {
+            path: 'change-password',
+            component: () => import('../views/ChangePassword.vue')
+          },
+          {
+            path: 'change-email',
+            component: () => import('../views/ChangeEmail.vue')
+          }
+        ]
+      }
+    ]
   }
 ]
-
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes

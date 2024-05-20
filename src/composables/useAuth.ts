@@ -24,7 +24,6 @@ const fetchProfile = async () => {
 
 const logout = async () => {
     try {
-        console.log('Logging out..., token:', token.value);
         await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`, {
             headers: { Authorization: `Bearer ${token.value}` },
         });

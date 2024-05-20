@@ -49,8 +49,7 @@ const isAuthenticated = computed(() => !!getToken())
 const filteredRoutes = computed(() => {
   const routes: Route[] = [
     { location: '/', label: 'Accueil' },
-    { location: '/code', label: 'Code' },
-    { location: '/help', label: 'Aide' }
+    { location: '/code', label: 'Code' }
   ]
 
   if (isAuthenticated.value) {
