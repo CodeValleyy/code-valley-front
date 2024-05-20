@@ -23,7 +23,7 @@ import { onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 
-const { fetchProfile, getToken } = useAuth()
+const { fetchProfile, getToken, logout } = useAuth()
 
 const userProfile = ref({
   username: '',
@@ -44,11 +44,6 @@ onMounted(async () => {
     console.error('Error fetching profile:', error)
   }
 })
-
-const logout = () => {
-  localStorage.removeItem('token')
-  router.push('/login')
-}
 </script>
 
 <style scoped>

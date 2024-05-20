@@ -22,8 +22,24 @@ const fetchProfile = async () => {
     }
 };
 
+const logout = async () => {
+    try {
+        console.log('Logging out..., token:', token.value);
+        await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`, {
+            headers: { Authorization: `Bearer ${token.value}` },
+        });
+    } catch (error) {
+        console.error('Error logging out:', error);
+        throw error;
+    } finally {
+        token.value = '';
+        localStorage.removeItem('token');
+    }
+}
+
 export const useAuth = () => ({
     setToken,
     getToken,
+    logout,
     fetchProfile,
 });
