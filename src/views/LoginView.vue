@@ -29,7 +29,13 @@
               class="mb-4"
             ></v-text-field>
             <div class="text-red-500 text-sm mb-4">{{ errorMessage }}</div>
-            <v-btn color="primary" @click="login" class="mb-4 mr-4">Se connecter</v-btn>
+            <v-btn
+              color="primary"
+              @click="isOtpVisible ? authenticateOtp() : login()"
+              class="mb-4 mr-4"
+            >
+              Se connecter
+            </v-btn>
             <v-btn color="secondary" @click="signInWithGoogle" class="mb-4">
               Se connecter avec Google
             </v-btn>
@@ -54,6 +60,7 @@ const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
 
 const authUrl = ref('')
 const isOtpVisible = ref(false)
+let token = ref('')
 
 onMounted(async () => {
   try {
@@ -67,32 +74,40 @@ onMounted(async () => {
 
 const login = async () => {
   try {
+    errorMessage.value = ''
     const response = await axios.post(`${apiBaseUrl}/auth/login`, {
       email: email.value,
       password: password.value
     })
 
-    let token = response.data.accessToken
+    token.value = response.data.accessToken
 
-    switch (response.status) {
-      case 202:
-        isOtpVisible.value = true
-        const otpResponse = await axios.post(
-          `${apiBaseUrl}/auth/2fa/authenticate`,
-          {
-            twoFactorAuthenticationCode: otp.value
-          },
-          { headers: { Authorization: `Bearer ${token}` } }
-        )
-        token = otpResponse.data.accessToken
-        router.push(`/?token=${token}`)
-        break
-      default:
-        router.push(`/?token=${token}`)
+    if (response.status === 202) {
+      isOtpVisible.value = true
+    } else {
+      router.push(`/?token=${token.value}`)
     }
   } catch (error) {
     console.error('Login error:', error.response.data)
     errorMessage.value = error.response.data.message.toString() || 'Email or password is incorrect'
+  }
+}
+
+const authenticateOtp = async () => {
+  try {
+    errorMessage.value = ''
+    const response = await axios.post(
+      `${apiBaseUrl}/auth/2fa/authenticate`,
+      {
+        twoFactorAuthenticationCode: otp.value
+      },
+      { headers: { Authorization: `Bearer ${token.value}` } }
+    )
+    token.value = response.data.accessToken
+    router.push(`/?token=${token.value}`)
+  } catch (error) {
+    console.error('OTP authentication error:', error.response.data)
+    errorMessage.value = error.response.data.message.toString() || 'Incorrect OTP'
   }
 }
 
