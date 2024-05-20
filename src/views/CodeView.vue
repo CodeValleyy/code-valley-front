@@ -1,64 +1,72 @@
 <template>
-  <Header />
-  <div class="min-h-screen h-full flex flex-col justify-between">
-    <div class="w-full h-full pt-40 p-4 flex flex-col items-center mb-20">
-      <div class="mb-4 text-2xl p-8 font-semibold">Page de code</div>
-      <div class="flex justify-center h-full w-11/12 items-start">
-        <div class="w-7/12 h-full flex flex-col mr-6">
-          <div class="text-primary mb-2">Langage :</div>
-          <select v-model="currentLanguage" class="mb-4">
-            <option v-for="language in languages" :key="language[0]" :value="language[0]">
-              {{ language[1] }}
-            </option>
-          </select>
-          <div class="text-primary mb-2">Code :</div>
-          <div class="code-editor-container">
-            <code-mirror
-              v-model="codeInput"
-              basic
-              :dark="dark"
-              :lang="lang"
-              class="border"
-              @keydown.tab.prevent.stop="tab"
-              @keydown.shift.tab.prevent.stop="tab"
-              @keydown.ctrl.s.prevent.stop="runCode"
-            />
-          </div>
-          <Button
-            @click="runCode"
-            label="Run Code"
-            primary
-            size="large"
-            class="w-fit self-end mt-2"
-          />
-        </div>
-        <div v-show="isLoading || error || result !== ''" class="w-3/12 h-full">
-          <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
-          <div v-show="isLoading" class="text-backgroundColor mb-2">Compilation :</div>
-          <Loading v-if="isLoading" />
-          <div v-else-if="error" class="w-full h-fit rounded text-secondary">
-            {{ error }}
-          </div>
-          <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
-        </div>
-      </div>
-    </div>
-    <Footer />
-  </div>
+  <v-app>
+    <v-main class="bg-backgroundColor min-h-screen">
+      <v-container class="fill-height">
+        <v-row class="justify-center">
+          <v-col cols="12" md="10" class="text-center">
+            <h1 class="mb-6 text-4xl font-bold text-primary">Page de code</h1>
+          </v-col>
+        </v-row>
+        <v-row class="justify-center">
+          <v-col cols="12" md="10">
+            <v-card class="pa-6">
+              <v-row>
+                <v-col cols="12" md="6">
+                  <v-select
+                    v-model="currentLanguage"
+                    :items="languages"
+                    item-text="name"
+                    item-value="id"
+                    label="Langage"
+                    class="mb-4"
+                  ></v-select>
+                  <CodeMirror
+                    v-model="codeInput"
+                    basic
+                    :extensions="[lang]"
+                    :theme="dark ? 'dark' : 'light'"
+                    height="300px"
+                    class="mb-4"
+                    @keydown.tab.prevent.stop="tab"
+                    @keydown.shift.tab.prevent.stop="tab"
+                    @keydown.ctrl.s.prevent.stop="runCode"
+                  />
+                  <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
+                </v-col>
+                <v-col cols="12" md="6" v-show="isLoading || error || result !== ''">
+                  <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
+                  <div v-show="isLoading" class="text-backgroundColor mb-2">Compilation :</div>
+                  <Loading v-if="isLoading" />
+                  <div v-else-if="error" class="w-full h-fit rounded text-secondary">
+                    {{ error }}
+                  </div>
+                  <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
+                </v-col>
+              </v-row>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-main>
+  </v-app>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
-import Button from '@/components/Button.vue'
+import { computed, ref } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
-//import { lua } '@codemirror/lang-lua';
 import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
+
+const routes = ref([
+  { location: '/', label: 'Accueil' },
+  { location: '/code', label: 'Code' },
+  { location: '/help', label: 'Aide' },
+  { location: '/register', label: "S'inscrire" },
+  { location: '/login', label: 'Se connecter' }
+])
 
 const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
 const tab = () => {}
@@ -71,7 +79,6 @@ const lang = computed(() => {
       return python()
     case 'rust':
       return rust()
-    //case 'lua': return "lua()";
     case 'javascript':
       return javascript()
     default:
@@ -83,9 +90,5 @@ const lang = computed(() => {
 <style scoped>
 .min-h-screen {
   min-height: 100vh;
-}
-
-.border {
-  border: 1px solid grey;
 }
 </style>

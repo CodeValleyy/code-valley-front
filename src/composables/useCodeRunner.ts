@@ -4,44 +4,44 @@ import type { ExecuteCodeRequest } from '@/types';
 import { languages } from '@/config/languagesConfig';
 
 const transformNewlines = (str: string): string => {
-  return str.replace(/\r?\n/g, '<br>');
+    return str.replace(/\r?\n/g, '<br>');
 };
 
 export function useCodeRunner() {
-  const codeInput = ref<string>('');
-  const result = ref<string>('');
-  const isLoading = ref<boolean>(false);
-  const error = ref<string>('');
-  const currentLanguage = ref<string>(languages[0][0]);
-  const runCode = async () => {
-    if (!codeInput.value.trim()) return;
+    const codeInput = ref<string>('');
+    const result = ref<string>('');
+    const isLoading = ref<boolean>(false);
+    const error = ref<string>('');
+    const currentLanguage = ref<string>(languages[0]);
+    const runCode = async () => {
+        if (!codeInput.value.trim()) return;
 
-    isLoading.value = true;
-    error.value = '';
-    try {
-      const executeCodeRequest: ExecuteCodeRequest = {
-        language: currentLanguage.value,
-        code: codeInput.value
-      };
+        isLoading.value = true;
+        error.value = '';
+        try {
+            const executeCodeRequest: ExecuteCodeRequest = {
+                language: currentLanguage.value,
+                code: codeInput.value
+            };
 
-      const fetchedResult = await fetchData(executeCodeRequest);
-      result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
+            const fetchedResult = await fetchData(executeCodeRequest);
+            result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
 
-      result.value = fetchedResult || "Aucun résultat à afficher";
-    } catch (err) {
-      error.value = (err as Error).message || 'Une erreur est survenue';
-    } finally {
-      isLoading.value = false;
-    }
-  };
+            result.value = fetchedResult || "Aucun résultat à afficher";
+        } catch (err) {
+            error.value = (err as Error).message || 'Une erreur est survenue';
+        } finally {
+            isLoading.value = false;
+        }
+    };
 
-  const getLanguage = (language: string) => {
-    console.log(language);
-    currentLanguage.value = language;
-  };
+    const getLanguage = (language: string) => {
+        console.log(language);
+        currentLanguage.value = language;
+    };
 
 
-  return {
-    codeInput, result, isLoading, error, languages, currentLanguage, runCode, getLanguage
-  };
+    return {
+        codeInput, result, isLoading, error, languages, currentLanguage, runCode, getLanguage
+    };
 }

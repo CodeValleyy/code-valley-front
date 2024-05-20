@@ -1,8 +1,46 @@
+<template>
+  <v-container class="w-full max-w-full" fluid>
+    <v-row align="center" justify="center">
+      <v-col class="text-center">
+        <h1 class="mb-6 text-4xl font-bold text-primary">Bienvenue sur {{ name }}</h1>
+        <v-btn color="primary" class="mb-8 px- py-1 text-lg font-medium rounded-full align-middle" @click="sendTo('/code')">
+          Démarrer
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row class="mb-12">
+      <v-col cols="12" md="6" class="text-center md:text-left">
+        <h2 class="font-bold text-primary text-2xl mb-6">Notre Mission</h2>
+        <p class="mb-4 text-lg leading-relaxed">
+          {{ name }} est une plateforme collaborative pour développeurs, offrant des outils pour
+          coder, partager et évoluer ensemble. Rejoignez notre communauté et transformez vos idées
+          en projets concrets.
+        </p>
+        <ul class="list-disc list-inside text-lg mb-6">
+          <li class="mb-2">Gestion de versions avancée</li>
+          <li class="mb-2">Suivi des problèmes et documentation en ligne</li>
+          <li class="mb-2">Intégration continue et workflows automatisés</li>
+        </ul>
+        <p class="text-lg font-semibold">
+          Prêt à améliorer votre processus de développement ?
+          <strong class="text-primary">Rejoignez-nous dès maintenant.</strong>
+        </p>
+      </v-col>
+      <v-col cols="8" md="4" class="flex justify-center md:justify-end">
+        <v-img
+          :src="homeImage"
+          alt="Code Valley"
+          class="rounded-lg shadow-lg w-full max-h-full"
+          style="object-fit: contain; height: 100%; max-width: 100%"
+        ></v-img>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
 <script setup lang="ts">
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
-import Button from '@/components/Button.vue'
 import { useRouter } from 'vue-router'
+import homeImage from '@/assets/home.webp'
 
 const name = 'Code Valley'
 
@@ -13,43 +51,8 @@ const sendTo = (location: string) => {
 }
 </script>
 
-<template>
-  <Header />
-  <div class="min-h-screen h-full flex flex-col justify-between">
-    <div class="w-full h-full pt-40 p-4 flex flex-col items-center">
-      <h1 class="mb-4 text-2xl p-8 font-semibold">Bienvenue sur {{ name }}</h1>
-      <Button label="Démarrer" size="xl" @click="sendTo('/code')"></Button>
-      <section class="mt-6 flex justify-center p-4 w-11/12 items-center">
-        <div class="w-5/12 p-4">
-          <h2 class="font-bold text-primary mr-4 text-xl mb-4">Notre Mission</h2>
-          <p>
-            {{ name }} est une plateforme collaborative pour développeurs, offrant des outils pour
-            coder, partager et évoluer ensemble. Rejoignez notre communauté et transformez vos idées
-            en projets concrets.
-          </p>
-          <ul class="mt-4">
-            <li>Gestion de versions avancée</li>
-            <li>Suivi des problèmes et documentation en ligne</li>
-            <li>Intégration continue et workflows automatisés</li>
-          </ul>
-          <p>
-            Prêt à améliorer votre processus de développement ?
-            <strong>Rejoignez-nous dès maintenant.</strong>
-          </p>
-        </div>
-        <div
-          class="bg-gray-300 rounded ml-4 w-5/12 p-4 text-center h-30 flex flex-col justify-center"
-        >
-          <!-- Image or dynamic content goes here -->
-          <img
-            src="@/assets/home.webp"
-            alt="Code Valley"
-            class="rounded"
-            style="width: 100%; height: 100%; object-fit: cover"
-          />
-        </div>
-      </section>
-    </div>
-  </div>
-  <Footer />
-</template>
+<style scoped>
+.text-primary {
+  color: #902de0;
+}
+</style>
