@@ -3,9 +3,10 @@
     <v-row>
       <v-col cols="12" sm="10" md="8" lg="10 ">
         <v-card class="pa-6 text-center relative">
-          <v-btn icon @click="goBack" class="absolute top-4 left-4 text-primary">
+          <v-btn icon @click="goBack" class="absolute top-4 left-4 mx-2">
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn>
+
           <h1 class="text-2xl font-bold mb-4">Paramètres du Profil</h1>
           <router-link to="/profile/settings/change-password">
             <v-btn class="mb-4" block>Changer le mot de passe</v-btn>
@@ -64,8 +65,8 @@ onMounted(async () => {
 
   try {
     await userStore.fetchUserProfile(token)
-    console.log('Profile:', userStore.user.isTwoFactorAuthenticationEnabled)
   } catch (error) {
+    logout()
     console.error('Error fetching profile:', error)
   }
 })

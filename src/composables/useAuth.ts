@@ -27,6 +27,7 @@ const fetchProfile = async () => {
     }
 };
 
+
 const logout = async () => {
     try {
         await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`, {

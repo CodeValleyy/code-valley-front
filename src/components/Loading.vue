@@ -1,12 +1,9 @@
 <template>
   <v-btn
     disabled
-    class="text-primary focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center"
+    class="text-background focus:ring-4 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center"
   >
-    <v-icon class="inline w-6 h-6 me-3 animate-spin" aria-hidden="true" role="status">
-      mdi-loading
-    </v-icon>
-    <div class="text-xl">Compilation...</div>
+    <v-icon class="inline w-6 h-6 me-3 animate-spin" aria-hidden="true"> mdi-loading </v-icon>
   </v-btn>
 </template>
 

@@ -47,6 +47,7 @@ onMounted(async () => {
     const profile = await fetchProfile()
     userProfile.value = profile
   } catch (error) {
+    logout()
     console.error('Error fetching profile:', error)
   }
 })
