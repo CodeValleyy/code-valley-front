@@ -9,7 +9,7 @@ export const useUserStore = defineStore('user', {
     actions: {
         async fetchUserProfile(token: string) {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/profile`, {
+                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/me`, {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 this.user = response.data;

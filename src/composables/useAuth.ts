@@ -15,9 +15,9 @@ const resetToken = () => {
 
 const getToken = () => token.value;
 
-const fetchProfile = async () => {
+const fetchMe = async () => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/profile`, {
+        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/me`, {
             headers: { Authorization: `Bearer ${token.value}` },
         });
         return response.data;
@@ -27,6 +27,17 @@ const fetchProfile = async () => {
     }
 };
 
+const fetchProfile = async (userId: number) => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/profile/${userId}`, {
+            headers: { Authorization: `Bearer ${token.value}` },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+    }
+}
 
 const logout = async () => {
     try {
@@ -46,6 +57,7 @@ export const useAuth = () => ({
     setToken,
     getToken,
     logout,
+    fetchMe,
     fetchProfile,
     resetToken,
 });

@@ -40,7 +40,7 @@ import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import FriendList from '@/components/FriendList.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
-const { fetchProfile, getToken, resetToken } = useAuth()
+const { fetchMe, getToken, resetToken } = useAuth()
 const friendsCount = ref(0)
 const showFriendsModal = ref(false)
 const loading = ref(true)
@@ -64,7 +64,7 @@ onMounted(async () => {
   }
 
   try {
-    const profile = await fetchProfile()
+    const profile = await fetchMe()
     userProfile.value = profile
     await friendshipStore.fetchFriends()
     await friendshipStore.fetchFriendRequests()
