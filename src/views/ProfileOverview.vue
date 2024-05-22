@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-row class="justify-center">
-      <v-col cols="12" md="6">
+    <v-row>
+      <v-col cols="12" md="8" lg="10">
         <v-card class="pa-6 text-center">
           <v-avatar size="100" class="mb-4">
             <img src="https://via.placeholder.com/100" alt="User Avatar" />

@@ -1,7 +1,7 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-row class="justify-center">
-      <v-col cols="12" sm="10" md="8" lg="6">
+    <v-row>
+      <v-col cols="12" sm="10" md="8" lg="10 ">
         <v-card class="pa-6 text-center relative">
           <v-btn icon @click="goBack" class="absolute top-4 left-4 text-primary">
             <v-icon>mdi-arrow-left</v-icon>

@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height d-flex align-center">
-    <v-row class="justify-center w-full">
+    <v-row class="flex justify-center w-full">
       <v-col cols="12" md="3">
         <v-navigation-drawer app temporary>
           <v-list>
