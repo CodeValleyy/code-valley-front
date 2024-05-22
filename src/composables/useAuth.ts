@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
-const token = ref(localStorage.getItem('token') || '');
+const token = ref(localStorage.getItem('token') ?? '');
 
 const setToken = (newToken: string) => {
     token.value = newToken;

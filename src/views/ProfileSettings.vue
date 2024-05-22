@@ -66,7 +66,7 @@ onMounted(async () => {
     await userStore.fetchUserProfile(token)
     console.log('Profile:', userStore.user.isTwoFactorAuthenticationEnabled)
   } catch (error) {
-    logout()
+    console.error('Error fetching profile:', error)
   }
 })
 

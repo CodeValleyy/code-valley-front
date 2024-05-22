@@ -21,6 +21,7 @@ const routes = [
   {
     path: '/code',
     name: 'code',
+    meta: { requiresAuth: true },
     component: CodeView
   },
   {

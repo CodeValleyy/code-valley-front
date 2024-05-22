@@ -4,7 +4,7 @@ import * as User from '@/types/User';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        user: null as User | null,
+        user: null,
     }),
     actions: {
         async fetchUserProfile(token: string) {
