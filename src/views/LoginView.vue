@@ -3,7 +3,6 @@
     <v-row class="justify-center">
       <v-col cols="12" md="6" class="text-center">
         <h1 class="mb-6 text-4xl font-bold text-primary">Se connecter</h1>
-        <p class="text-lg text-center text-primary mb-4">Déjà inscrit? Connectez-vous</p>
         <v-card class="pa-6">
           <v-form>
             <v-text-field
@@ -40,6 +39,7 @@
               Se connecter avec Google
             </v-btn>
           </v-form>
+          <p class="text-lg text-center text-primary mb-4">Vous n'avez pas de compte ? <router-link to="/register" class="text-secondary underline">Inscrivez-vous</router-link></p>
         </v-card>
       </v-col>
     </v-row>
