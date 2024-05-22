@@ -11,9 +11,13 @@
           <p class="text-lg mb-4">
             Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString() }}
           </p>
-          <v-btn color="primary" @click="logout">Se déconnecter</v-btn>
-          <v-btn icon class="absolute top-0 right-0" @click="goToSettings">
+          <v-btn @click="goToFriendsList">Amis ({{ friendsCount }})</v-btn>
+
+          <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
             <v-icon>mdi-cog</v-icon>
+          </v-btn>
+          <v-btn icon class="absolute right-2" @click="logout">
+            <v-icon>mdi-logout</v-icon>
           </v-btn>
         </v-card>
       </v-col>
@@ -24,8 +28,12 @@
 import { onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
+import { useFriendshipStore } from '@/stores/useFriendshipStore'
 
 const { fetchProfile, getToken, resetToken } = useAuth()
+const friendsCount = ref(0)
+
+const friendshipStore = useFriendshipStore()
 
 const userProfile = ref({
   username: '',
@@ -37,6 +45,10 @@ const goToSettings = () => {
   router.push('/profile/settings')
 }
 
+const goToFriendsList = () => {
+  router.push('/friends')
+}
+
 onMounted(async () => {
   if (!getToken()) {
     logout()
@@ -46,6 +58,8 @@ onMounted(async () => {
   try {
     const profile = await fetchProfile()
     userProfile.value = profile
+    await friendshipStore.fetchFriends()
+    friendsCount.value = friendshipStore.friends.length
   } catch (error) {
     logout()
     console.error('Error fetching profile:', error)

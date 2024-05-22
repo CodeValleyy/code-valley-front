@@ -2,7 +2,8 @@
   <v-container class="fill-height d-flex align-center justify-center">
     <v-row class="justify-center">
       <v-col cols="12" md="6" class="text-center">
-        <h1 class="mb-6 text-4xl font-bold text-primary">S'inscrire</h1>
+        <h1 class="mb-8 text-4xl font-bold text-primary">Bienvenue sur Code Valley</h1>
+
         <v-card class="pa-6">
           <v-form>
             <v-text-field
@@ -38,9 +39,11 @@
               Se connecter avec Google
             </v-btn>
           </v-form>
-          <p class="text-lg text-center text-primary mb-4">Déjà inscris ? <router-link to="/login" class="text-secondary underline">Connectez-vous</router-link></p>
+          <p class="text-lg text-center text-primary mb-4">
+            Déjà inscris ?
+            <router-link to="/login" class="text-secondary underline">Connectez-vous</router-link>
+          </p>
         </v-card>
-        
       </v-col>
     </v-row>
   </v-container>

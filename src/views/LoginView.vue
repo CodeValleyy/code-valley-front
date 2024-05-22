@@ -89,13 +89,7 @@ onMounted(async () => {
     const googleResponse = await axios.get(`${apiBaseUrl}/auth/google`, { withCredentials: true })
     googleAuthUrl.value = googleResponse.data.url
 
-    const microsoftResponse = await axios.get(`${apiBaseUrl}/auth/microsoft`, {
-      withCredentials: true
-    })
-    microsoftAuthUrl.value = microsoftResponse.data.url
-
     console.log('Google auth URL:', googleAuthUrl.value)
-    console.log('Microsoft auth URL:', microsoftAuthUrl.value)
   } catch (error) {
     console.error('Failed to fetch auth URLs:', error)
   }
