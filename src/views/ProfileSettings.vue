@@ -42,7 +42,7 @@ import { useUserStore } from '@/stores/userStore'
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth'
 import router from '@/router'
 
-const { getToken } = useAuth()
+const { getToken, resetToken } = useAuth()
 const userStore = useUserStore()
 
 const {
@@ -58,7 +58,7 @@ const {
 onMounted(async () => {
   const token = getToken()
   if (!token) {
-    router.push('/login')
+    logout()
     return
   }
 
@@ -66,9 +66,14 @@ onMounted(async () => {
     await userStore.fetchUserProfile(token)
     console.log('Profile:', userStore.user.isTwoFactorAuthenticationEnabled)
   } catch (error) {
-    console.error('Error fetching profile:', error)
+    logout()
   }
 })
+
+const logout = () => {
+  resetToken()
+  router.push('/login')
+}
 
 const goBack = () => {
   router.back()

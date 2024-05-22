@@ -1,5 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import HomeView from '@/views/HomeView.vue'
+import CodeView from '@/views/CodeView.vue'
+import LoginView from '@/views/LoginView.vue'
+import RegisterView from '@/views/RegisterView.vue'
+import ProfileOverview from '@/views/ProfileOverview.vue'
+import ProfileSettings from '@/views/ProfileSettings.vue'
+import ChangePassword from '@/views/ChangePassword.vue'
+import ChangeEmail from '@/views/ChangeEmail.vue'
+
 import { useAuth } from '@/composables/useAuth'
 
 const { getToken } = useAuth()
@@ -13,41 +21,40 @@ const routes = [
   {
     path: '/code',
     name: 'code',
-    component: () => import('../views/CodeView.vue')
+    component: CodeView
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('../views/LoginView.vue'),
+    component: LoginView,
     meta: { requiresGuest: true }
   },
   {
     path: '/register',
     name: 'register',
-    component: () => import('../views/RegisterView.vue'),
+    component: RegisterView,
     meta: { requiresGuest: true }
   },
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('../views/Profile.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         path: '',
-        component: () => import('../views/ProfileOverview.vue')
+        component: ProfileOverview
       },
       {
         path: 'settings',
-        component: () => import('../views/ProfileSettings.vue'),
+        component: ProfileSettings,
         children: [
           {
             path: 'change-password',
-            component: () => import('../views/ChangePassword.vue')
+            component: ChangePassword
           },
           {
             path: 'change-email',
-            component: () => import('../views/ChangeEmail.vue')
+            component: ChangeEmail
           }
         ]
       }

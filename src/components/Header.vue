@@ -35,6 +35,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import router from '@/router'
 
 interface Route {
   location: string
@@ -47,13 +48,11 @@ const { getToken } = useAuth()
 const isAuthenticated = computed(() => !!getToken())
 
 const filteredRoutes = computed(() => {
-  const routes: Route[] = [
-    { location: '/', label: 'Accueil' },
-    { location: '/code', label: 'Code' }
-  ]
+  const routes: Route[] = [{ location: '/', label: 'Accueil' }]
 
   if (isAuthenticated.value) {
     routes.push({ location: '/profile', label: 'Profil' })
+    router.push({ location: '/code', label: 'Code' })
   } else {
     routes.push({ location: '/login', label: 'Se connecter' })
     routes.push({ location: '/register', label: "S'inscrire" })

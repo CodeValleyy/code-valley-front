@@ -8,6 +8,11 @@ const setToken = (newToken: string) => {
     localStorage.setItem('token', newToken);
 };
 
+const resetToken = () => {
+    token.value = '';
+    localStorage.removeItem('token');
+}
+
 const getToken = () => token.value;
 
 const fetchProfile = async () => {
@@ -41,4 +46,5 @@ export const useAuth = () => ({
     getToken,
     logout,
     fetchProfile,
+    resetToken,
 });
