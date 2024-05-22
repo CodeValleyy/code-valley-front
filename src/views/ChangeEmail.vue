@@ -41,7 +41,6 @@ const changeEmail = async () => {
         headers: { Authorization: `Bearer ${getToken()}` }
       }
     )
-    // Handle success (e.g., show a success message, redirect)
   } catch (error) {
     console.error('Error changing email:', error.response.data)
     errorMessage.value = error.response.data.message

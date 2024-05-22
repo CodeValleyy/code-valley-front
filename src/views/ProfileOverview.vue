@@ -3,35 +3,47 @@
     <v-row>
       <v-col cols="12" md="8" lg="10">
         <v-card class="pa-6 text-center">
-          <v-avatar size="100" class="mb-4">
-            <img src="https://via.placeholder.com/100" alt="User Avatar" />
-          </v-avatar>
-          <h1 class="text-2xl font-bold mb-4">{{ userProfile.username }}</h1>
-          <p class="text-lg mb-4">{{ userProfile.email }}</p>
-          <p class="text-lg mb-4">
-            Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString() }}
-          </p>
-          <v-btn @click="goToFriendsList">Amis ({{ friendsCount }})</v-btn>
+          <LoadingSpinner v-if="loading" />
+          <template v-else>
+            <v-avatar size="100" class="mb-4">
+              <img src="https://via.placeholder.com/100" alt="User Avatar" />
+            </v-avatar>
+            <h1 class="text-2xl font-bold mb-4">{{ userProfile.username }}</h1>
+            <p class="text-lg mb-4">{{ userProfile.email }}</p>
+            <p class="text-lg mb-4">
+              Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString() }}
+            </p>
+            <v-btn @click="showFriendsModal = true">Amis ({{ friendsCount }})</v-btn>
 
-          <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
-            <v-icon>mdi-cog</v-icon>
-          </v-btn>
-          <v-btn icon class="absolute right-2" @click="logout">
-            <v-icon>mdi-logout</v-icon>
-          </v-btn>
+            <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
+              <v-icon>mdi-cog</v-icon>
+            </v-btn>
+            <v-btn icon class="absolute right-2" @click="logout">
+              <v-icon>mdi-logout</v-icon>
+            </v-btn>
+          </template>
         </v-card>
       </v-col>
     </v-row>
+
+    <v-dialog v-model="showFriendsModal" max-width="600">
+      <FriendList @close="showFriendsModal = false" />
+    </v-dialog>
   </v-container>
 </template>
+
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
+import FriendList from '@/components/FriendList.vue'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const { fetchProfile, getToken, resetToken } = useAuth()
 const friendsCount = ref(0)
+const showFriendsModal = ref(false)
+const loading = ref(true)
 
 const friendshipStore = useFriendshipStore()
 
@@ -45,10 +57,6 @@ const goToSettings = () => {
   router.push('/profile/settings')
 }
 
-const goToFriendsList = () => {
-  router.push('/friends')
-}
-
 onMounted(async () => {
   if (!getToken()) {
     logout()
@@ -59,10 +67,13 @@ onMounted(async () => {
     const profile = await fetchProfile()
     userProfile.value = profile
     await friendshipStore.fetchFriends()
+    await friendshipStore.fetchFriendRequests()
     friendsCount.value = friendshipStore.friends.length
   } catch (error) {
     logout()
     console.error('Error fetching profile:', error)
+  } finally {
+    loading.value = false
   }
 })
 
@@ -71,7 +82,6 @@ const logout = () => {
   router.push('/login')
 }
 </script>
-
 <style scoped>
 .min-h-screen {
   min-height: 100vh;

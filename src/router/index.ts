@@ -7,6 +7,7 @@ import ProfileOverview from '@/views/ProfileOverview.vue'
 import ProfileSettings from '@/views/ProfileSettings.vue'
 import ChangePassword from '@/views/ChangePassword.vue'
 import ChangeEmail from '@/views/ChangeEmail.vue'
+import FriendList from '@/components/FriendList.vue'
 
 import { useAuth } from '@/composables/useAuth'
 

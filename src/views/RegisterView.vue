@@ -74,7 +74,6 @@ const register = async () => {
       username: username.value,
       password: password.value
     })
-    console.log('Registered:', response.data)
     router.push('/')
   } catch (error) {
     console.error('Registration error:', error.response.data)

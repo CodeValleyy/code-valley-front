@@ -17,6 +17,16 @@ export const useFriendshipStore = defineStore('friendship', {
                 console.error('Error fetching friends:', error);
             }
         },
+        async fetchFriendRequests() {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/requests`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                this.friendRequests = response.data;
+            } catch (error) {
+                console.error('Error fetching friend requests:', error);
+            }
+        },
         async sendFriendRequest(receiverId: number) {
             try {
                 await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/send/${receiverId}`, {}, {
