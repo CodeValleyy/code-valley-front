@@ -41,18 +41,20 @@ const fetchProfile = async (userId: number) => {
 
 const logout = async () => {
     try {
-        await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`, {
-            headers: { Authorization: `Bearer ${token.value}` },
-        });
+        await axios.post(
+            `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`,
+            {},
+            {
+                headers: { Authorization: `Bearer ${token.value}` },
+            }
+        );
     } catch (error) {
         console.error('Error logging out:', error);
         throw error;
     } finally {
-        token.value = '';
-        localStorage.removeItem('token');
+        resetToken();
     }
 }
-
 export const useAuth = () => ({
     setToken,
     getToken,

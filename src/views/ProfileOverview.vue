@@ -18,7 +18,7 @@
             <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
               <v-icon>mdi-cog</v-icon>
             </v-btn>
-            <v-btn icon class="absolute right-2" @click="logout">
+            <v-btn icon class="absolute right-2" @click="handleLogout">
               <v-icon>mdi-logout</v-icon>
             </v-btn>
           </template>
@@ -33,14 +33,14 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import FriendList from '@/components/FriendList.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 
-const { fetchMe, getToken, resetToken } = useAuth()
+const { fetchMe, getToken, logout } = useAuth()
 const friendsCount = ref(0)
 const showFriendsModal = ref(false)
 const loading = ref(true)
@@ -59,7 +59,7 @@ const goToSettings = () => {
 
 onMounted(async () => {
   if (!getToken()) {
-    logout()
+    logoutAndRedirect()
     return
   }
 
@@ -70,15 +70,19 @@ onMounted(async () => {
     await friendshipStore.fetchFriendRequests()
     friendsCount.value = friendshipStore.friends.length
   } catch (error) {
-    logout()
+    logoutAndRedirect()
     console.error('Error fetching profile:', error)
   } finally {
     loading.value = false
   }
 })
+const handleLogout = async () => {
+  await logoutAndRedirect()
+}
 
-const logout = () => {
-  resetToken()
+const logoutAndRedirect = async () => {
+  await logout()
+  await nextTick()
   router.push('/login')
 }
 </script>

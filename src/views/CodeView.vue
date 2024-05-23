@@ -2,7 +2,6 @@
   <v-container>
     <v-row class="justify-center mt-4">
       <h1 class="mb-6 text-4xl font-bold text-primary">🦖 Code</h1>
-
     </v-row>
     <v-row class="justify-center">
       <v-col cols="14" md="12">
@@ -63,7 +62,6 @@ const routes = ref([
 ])
 
 const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
-const tab = () => {}
 
 const dark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
@@ -79,7 +77,19 @@ const lang = computed(() => {
       return python()
   }
 })
+
+const tab = (e: KeyboardEvent) => {
+  const cm = e.target as HTMLTextAreaElement
+  const start = cm.selectionStart
+  const end = cm.selectionEnd
+
+  const insert = '  '
+  cm.value = cm.value.substring(0, start) + insert + cm.value.substring(end)
+
+  cm.selectionStart = cm.selectionEnd = start + insert.length
+}
 </script>
+
 
 <style scoped>
 .min-h-screen {
