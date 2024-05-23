@@ -2,11 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import CodeView from '@/views/CodeView.vue'
 import LoginView from '@/views/LoginView.vue'
+import NewsFeed from '@/views/NewsFeed.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import ProfileOverview from '@/views/ProfileOverview.vue'
 import ProfileSettings from '@/views/ProfileSettings.vue'
 import ChangePassword from '@/views/ChangePassword.vue'
 import ChangeEmail from '@/views/ChangeEmail.vue'
+import SearchView from '@/views/SearchView.vue'
+import NotificationsView from '@/views/NotificationsView.vue'
 
 import { useAuth } from '@/composables/useAuth'
 
@@ -16,8 +19,28 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView
+    component: HomeView,
+    meta: { requiresGuest: true }
   },
+  {
+    path: '/newsfeed',
+    name: 'newsfeed',
+    meta: { requiresAuth: true },
+    component: NewsFeed
+  },
+  {
+    path: '/search',
+    name: 'search',
+    meta: { requiresAuth: true },
+    component: SearchView
+  },
+  {
+    path: '/notifications',
+    name: 'notifications',
+    meta: { requiresAuth: true },
+    component: NotificationsView
+  },
+
   {
     path: '/code',
     name: 'code',

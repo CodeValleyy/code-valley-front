@@ -47,12 +47,14 @@ const { getToken } = useAuth()
 const isAuthenticated = computed(() => !!getToken())
 
 const filteredRoutes = computed(() => {
-  const routes: Route[] = [{ location: '/', label: 'Accueil' }]
+  const routes: Route[] = []
 
   if (isAuthenticated.value) {
+    routes.push({ location: '/newsfeed', label: 'Accueil' })
     routes.push({ location: '/code', label: 'Code' })
     routes.push({ location: '/profile', label: 'Profil' })
   } else {
+    routes.push({ location: '/', label: 'Accueil' })
     routes.push({ location: '/login', label: 'Se connecter' })
     routes.push({ location: '/register', label: "S'inscrire" })
   }
