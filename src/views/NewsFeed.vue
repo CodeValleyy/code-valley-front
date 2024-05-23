@@ -19,8 +19,16 @@
             </v-list-item-content>
             <span>{{ post.likes }} likes</span>
             <v-list-item-action>
-              <v-btn icon @click="likePost(post.id)" class="mr-2 text-xs" size="25">
-                <v-icon class="small-icon">mdi-heart</v-icon>
+              <v-btn
+                icon
+                @click="toggleLike(post)"
+                :class="{ liked: post.userHasLiked }"
+                class="mr-2 text-xs"
+                size="25"
+              >
+                <v-icon class="small-icon">{{
+                  post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up'
+                }}</v-icon>
               </v-btn>
               <v-btn icon @click="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
                 <v-icon class="small-icon">mdi-comment</v-icon>
@@ -75,15 +83,19 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString('fr-FR', options)
 }
 
-const likePost = async (postId: number) => {
-  await postStore.likePost(postId)
+const toggleLike = async (post) => {
+  console.log(`Toggle like on post ${post.userHasLiked}`)
+  if (post.userHasLiked) {
+    await postStore.unlikePost(post.id)
+  } else {
+    await postStore.likePost(post.id)
+  }
 }
 
 const commentOnPost = async (postId: number) => {
   console.log(`Comment on post ${postId}`)
 }
 </script>
-
 <style scoped>
 .post-item {
   border-bottom: 1px solid #e0e0e0;
@@ -104,5 +116,17 @@ const commentOnPost = async (postId: number) => {
 
 .v-list-item-avatar {
   margin-right: 16px;
+}
+
+.action-btn {
+  margin-right: 8px;
+}
+
+.small-icon {
+  font-size: 18px;
+}
+
+.liked .small-icon {
+  color: red;
 }
 </style>
