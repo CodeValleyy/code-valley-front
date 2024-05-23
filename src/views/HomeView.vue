@@ -41,9 +41,9 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import homeImage from '@/assets/home.webp'
+import packageJson from '../../package.json'
 
-const name = 'Code Valley'
-
+const name = packageJson.displayName
 const router = useRouter()
 
 const sendTo = (location: string) => {
