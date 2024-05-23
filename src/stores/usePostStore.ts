@@ -42,5 +42,25 @@ export const usePostStore = defineStore('post', {
                 console.error('Error deleting post:', error);
             }
         },
+        async likePost(postId: number) {
+            try {
+                await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts/${postId}/like`, {}, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                this.fetchPosts();
+            } catch (error) {
+                console.error('Error liking post:', error);
+            }
+        },
+        async unlikePost(postId: number) {
+            try {
+                await axios.delete(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts/${postId}/like`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                this.fetchPosts();
+            } catch (error) {
+                console.error('Error unliking post:', error);
+            }
+        },
     },
 });

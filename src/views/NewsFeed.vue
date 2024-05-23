@@ -17,6 +17,15 @@
               >
               <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
             </v-list-item-content>
+            <span>{{ post.likes }} likes</span>
+            <v-list-item-action>
+              <v-btn icon @click="likePost(post.id)" class="mr-2 text-xs" size="25">
+                <v-icon class="small-icon">mdi-heart</v-icon>
+              </v-btn>
+              <v-btn icon @click="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
+                <v-icon class="small-icon">mdi-comment</v-icon>
+              </v-btn>
+            </v-list-item-action>
           </v-list-item>
           <v-divider
             v-if="!isLastItem(index)"
@@ -64,6 +73,14 @@ const isLastItem = (index: number) => {
 const formatDate = (dateString: string) => {
   const options = { year: 'numeric', month: 'long', day: 'numeric' }
   return new Date(dateString).toLocaleDateString('fr-FR', options)
+}
+
+const likePost = async (postId: number) => {
+  await postStore.likePost(postId)
+}
+
+const commentOnPost = async (postId: number) => {
+  console.log(`Comment on post ${postId}`)
 }
 </script>
 
