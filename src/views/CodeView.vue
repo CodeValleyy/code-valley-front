@@ -1,12 +1,11 @@
 <template>
-  <v-container class="fill-height">
-    <h1 class="mb-6 text-4xl font-bold text-primary">Page de code</h1>
+  <v-container>
+    <v-row class="justify-center mt-4">
+      <h1 class="mb-6 text-4xl font-bold text-primary">🦖 Code</h1>
 
-    <v-row class="justify-center">
-      <v-col cols="12" md="10" class="text-center"> </v-col>
     </v-row>
     <v-row class="justify-center">
-      <v-col cols="12" md="10">
+      <v-col cols="14" md="12">
         <v-card class="pa-6">
           <v-row>
             <v-col cols="12" md="6">
@@ -31,7 +30,7 @@
               />
               <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
             </v-col>
-            <v-col cols="12" md="6" v-show="isLoading || error || result !== ''">
+            <v-col cols="8" md="4" v-show="isLoading || error || result !== ''">
               <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
               <div v-show="isLoading" class="text-backgroundColor mb-2">Compilation :</div>
               <Loading v-if="isLoading" />
