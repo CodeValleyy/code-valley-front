@@ -3,7 +3,11 @@
     <v-row align="center" justify="center">
       <v-col class="text-center">
         <h1 class="mb-6 text-4xl font-bold text-primary">Bienvenue sur {{ name }}</h1>
-        <v-btn color="primary" class="mb-8 px- py-1 text-lg font-medium rounded-full align-middle" @click="sendTo('/code')">
+        <v-btn
+          color="primary"
+          class="mb-8 px- py-1 text-lg font-medium rounded-full align-middle"
+          @click="sendTo('/code')"
+        >
           Démarrer
         </v-btn>
       </v-col>
@@ -39,16 +43,29 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import homeImage from '@/assets/home.webp'
 import packageJson from '../../package.json'
+import { useAuth } from '@/composables/useAuth'
+import { onMounted } from 'vue'
+const { setToken } = useAuth()
 
 const name = packageJson.displayName
 const router = useRouter()
+const route = useRoute()
 
 const sendTo = (location: string) => {
   router.push(location)
 }
+
+onMounted(() => {
+  const token = route.query.token as string
+  console.log(token)
+  if (token) {
+    setToken(token)
+    sendTo('/newsfeed')
+  }
+})
 </script>
 
 <style scoped>
