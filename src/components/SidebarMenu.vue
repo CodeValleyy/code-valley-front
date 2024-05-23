@@ -5,7 +5,6 @@
     :permanent="!isMobile"
     :temporary="isMobile"
     color="primary"
-    @click="isMobile && (drawer = false)"
   >
     <v-list dense>
       <v-list-item
@@ -14,6 +13,7 @@
         :to="item.to"
         class="d-flex align-center"
         :exact="item.exact"
+        @click="isMobile && (drawer = false)"
       >
         <v-list-item-icon>
           <v-icon>{{ item.icon }}</v-icon>
@@ -31,10 +31,11 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 
+const router = useRouter()
 const { getToken } = useAuth()
 
 const isAuthenticated = computed(() => !!getToken())
-const drawer = ref(false)
+const drawer = ref(true)
 
 const menuItems = computed(() => {
   const items = [
@@ -56,10 +57,14 @@ const isMobile = ref(window.innerWidth <= 600)
 
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 600
+  if (!isMobile.value) {
+    drawer.value = true
+  }
 }
 
 onMounted(() => {
   window.addEventListener('resize', handleResize)
+  handleResize()
 })
 
 onBeforeUnmount(() => {
