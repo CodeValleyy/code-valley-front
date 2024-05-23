@@ -6,7 +6,10 @@
           <LoadingSpinner v-if="loading" />
           <template v-else>
             <v-avatar size="100" class="mb-4">
-              <img src="https://via.placeholder.com/100" alt="User Avatar" />
+              <img
+                src="https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg"
+                alt="User Avatar"
+              />
             </v-avatar>
             <h1 class="text-2xl font-bold mb-4">{{ userProfile.username }}</h1>
             <p class="text-lg mb-4">{{ userProfile.email }}</p>

@@ -19,14 +19,18 @@ const emit = defineEmits(['close'])
 
 const { getToken, logout, fetchMe } = useAuth()
 const router = useRouter()
-const userAvatar = ref('https://via.placeholder.com/50')
+const userAvatar = ref(
+  'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+)
 const username = ref('')
 
 const fetchUserProfile = async () => {
   try {
     const user = await fetchMe()
     username.value = user.username
-    userAvatar.value = user.avatar || 'https://via.placeholder.com/50'
+    userAvatar.value =
+      user.avatar ||
+      'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
   } catch (error) {
     console.error('Error fetching user profile:', error)
   }
