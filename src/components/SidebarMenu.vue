@@ -23,19 +23,39 @@
         </v-list-item-content>
       </v-list-item>
     </v-list>
+    <v-spacer></v-spacer>
+    <v-btn @click="postModal = true" class="mx-4 my-2" color="blue">Poster</v-btn>
+    <v-list-item class="align-center" @click="userProfileModal = true">
+      <v-list-item-avatar size="50">
+        <v-img :src="userAvatar" alt="User Avatar" />
+      </v-list-item-avatar>
+      <v-list-item-content>
+        <v-list-item-title>{{ username }}</v-list-item-title>
+      </v-list-item-content>
+    </v-list-item>
+
+    <v-dialog v-model="postModal" max-width="600">
+      <PostModal @close="postModal = false" />
+    </v-dialog>
+    <v-dialog v-model="userProfileModal" max-width="400">
+      <UserProfileModal @close="userProfileModal = false" />
+    </v-dialog>
   </v-navigation-drawer>
 </template>
-
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import PostModal from '@/components/PostModal.vue'
+import UserProfileModal from '@/components/UserProfileModal.vue'
 
-const router = useRouter()
-const { getToken } = useAuth()
+const { getToken, fetchMe } = useAuth()
 
 const isAuthenticated = computed(() => !!getToken())
 const drawer = ref(true)
+const postModal = ref(false)
+const userProfileModal = ref(false)
+const userAvatar = ref('https://via.placeholder.com/50')
+const username = ref('')
 
 const menuItems = computed(() => {
   const items = [
@@ -62,9 +82,22 @@ const handleResize = () => {
   }
 }
 
+const fetchUserProfile = async () => {
+  try {
+    const user = await fetchMe()
+    username.value = user.username
+    userAvatar.value = user.avatar || 'https://via.placeholder.com/50'
+  } catch (error) {
+    console.error('Error fetching user profile:', error)
+  }
+}
+
 onMounted(() => {
   window.addEventListener('resize', handleResize)
   handleResize()
+  if (isAuthenticated.value) {
+    fetchUserProfile()
+  }
 })
 
 onBeforeUnmount(() => {

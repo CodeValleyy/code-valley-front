@@ -11,11 +11,12 @@
     </v-card-actions>
   </v-card>
 </template>
-
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
+
+const emit = defineEmits(['close', 'new-post'])
 
 const { getToken } = useAuth()
 const content = ref('')
@@ -36,6 +37,8 @@ const postContent = async () => {
     })
     content.value = ''
     file.value = null
+    emit('close')
+    emit('new-post')
   } catch (error) {
     console.error('Error posting content:', error)
   }
