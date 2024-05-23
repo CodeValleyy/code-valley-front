@@ -5,7 +5,13 @@
       <v-list>
         <v-list-item v-for="friend in friends" :key="friend.id">
           <v-list-item-content>{{ friend.username }}</v-list-item-content>
-          <v-btn @click="sendFriendRequest(friend.id)" color="primary">Ajouter</v-btn>
+          <v-btn
+            @click="sendFriendRequest(friend.id)"
+            size="small"
+            color="primary"
+            class="ml-4 rounded"
+            >Ajouter</v-btn
+          >
         </v-list-item>
       </v-list>
     </v-card-text>
@@ -14,38 +20,20 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
-import { useAuth } from '@/composables/useAuth'
+import { useFriendshipStore } from '@/stores/useFriendshipStore'
 
-const { getToken } = useAuth()
 const friends = ref([])
 
+const friendshipStore = useFriendshipStore()
+
 const fetchFriendSuggestions = async () => {
-  try {
-    const response = await axios.get(
-      `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/suggestions`,
-      {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      }
-    )
-    friends.value = response.data
-  } catch (error) {
-    console.error('Error fetching friend suggestions:', error)
-  }
+  await friendshipStore.fetchFriendSuggestions()
+  friends.value = friendshipStore.friendSuggestions
 }
 
 const sendFriendRequest = async (friendId: number) => {
-  try {
-    await axios.post(
-      `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/send/${friendId}`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${getToken()}` }
-      }
-    )
-  } catch (error) {
-    console.error('Error sending friend request:', error)
-  }
+  await friendshipStore.sendFriendRequest(friendId)
+  await fetchFriendSuggestions()
 }
 
 onMounted(fetchFriendSuggestions)

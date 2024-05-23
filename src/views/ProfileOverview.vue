@@ -14,7 +14,7 @@
             <h1 class="text-2xl font-bold mb-4">{{ userProfile.username }}</h1>
             <p class="text-lg mb-4">{{ userProfile.email }}</p>
             <p class="text-lg mb-4">
-              Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString() }}
+              Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString('fr-FR') }}
             </p>
             <v-btn @click="showFriendsModal = true">Amis ({{ friendsCount }})</v-btn>
 
