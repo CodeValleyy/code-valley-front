@@ -4,7 +4,8 @@ import axios from 'axios';
 export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
         friends: [],
-        friendRequests: []
+        friendRequests: [],
+        friendSuggestions: []
     }),
     actions: {
         async fetchFriends() {
@@ -64,6 +65,16 @@ export const useFriendshipStore = defineStore('friendship', {
                 this.fetchFriends();
             } catch (error) {
                 console.error('Error removing friend:', error);
+            }
+        },
+        async fetchFriendSuggestions() {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/suggestions`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                this.friendSuggestions = response.data;
+            } catch (error) {
+                console.error('Error fetching friend suggestions:', error);
             }
         }
     }
