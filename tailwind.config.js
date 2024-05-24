@@ -4,10 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        secondary: '#e07e2d',
         primary: '#902de0',
         primaryHover: '#6a21a6',
-        backgroundColor: '#ededed'
+        secondary: '#e07e2d',
+
+        backgroundColor: '#ededed',
+        textPrimary: '#1a1a1a',
+        textSecondary: '#4a4a4a',
+
+        darkBackground: '#1a1a1a',
+        darkTextPrimary: '#ededed',
+        darkTextSecondary: '#a8a8a8',
+        darkPrimary: '#7158e0',
+        darkSecondary: '#d98b2d'
       },
       fontFamily: {
         sans: ['Graphik', 'sans-serif'],
@@ -16,5 +25,6 @@ export default {
       }
     }
   },
-  plugins: []
+  plugins: [],
+  darkMode: 'class'
 }

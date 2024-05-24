@@ -1,23 +1,23 @@
-<script setup lang="ts"></script>
-
 <template>
-  <div
-    class="w-full pt-8 pb-2 px-8 flex flex-col items-center justify-between shadow-lg bg-primary bottom-0 text-white text-xl"
-  >
-    <div class="w-full flex mb-4">
-      <div class="flex flex-col mr-40">
-        <RouterLink to="/" class="mb-2 hover:underline">Accueil</RouterLink>
-        <RouterLink to="/help" class="mb-2 hover:underline">Aide</RouterLink>
-        <div class="mb-2 hover:underline">Ceci est un lien pour une page du site</div>
-      </div>
-      <div class="flex flex-col mr-40">
-        <div class="mb-2 hover:underline">Ceci est un lien pour une page du site</div>
-      </div>
-    </div>
-    <div class="flex items-center">
-      <div class="mr-2 text-sm">ABIB James;</div>
-      <div class="mr-2 text-sm">KIELT Ronan;</div>
-      <div class="mr-2 text-sm">CRETOIS Charles;</div>
-    </div>
-  </div>
+  <v-footer app inset class="py-0 px-4 border-t border-gray-200 bg-primary">
+    <v-container>
+      <v-row justify="center" class="flex-wrap">
+        <v-col class="text-center py-1" cols="12" sm="auto">
+          <div class="text-sm text-white">© {{ currentYear }} Tous droits réservés.</div>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-footer>
 </template>
+
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const currentYear = ref(new Date().getFullYear())
+</script>
+
+<style scoped>
+.v-footer {
+  background-color: var(--v-primary-base);
+}
+</style>

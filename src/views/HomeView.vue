@@ -1,50 +1,75 @@
-<script setup lang="ts">
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
-import Button from '@/components/Button.vue'
+<template>
+  <v-container class="w-full max-w-full" fluid>
+    <v-row align="center" justify="center">
+      <v-col class="text-center">
+        <h1 class="mb-6 text-4xl font-bold text-primary">Bienvenue sur {{ name }}</h1>
+        <v-btn
+          color="primary"
+          class="mb-8 px- py-1 text-lg font-medium rounded-full align-middle"
+          @click="sendTo('/code')"
+        >
+          Démarrer
+        </v-btn>
+      </v-col>
+    </v-row>
+    <v-row class="mb-12">
+      <v-col cols="12" md="6" class="text-center md:text-left">
+        <h2 class="font-bold text-primary text-2xl mb-6">Notre Mission</h2>
+        <p class="mb-4 text-lg leading-relaxed">
+          {{ name }} est une plateforme collaborative pour développeurs, offrant des outils pour
+          coder, partager et évoluer ensemble. Rejoignez notre communauté et transformez vos idées
+          en projets concrets.
+        </p>
+        <ul class="list-disc list-inside text-lg mb-6">
+          <li class="mb-2">Gestion de versions avancée</li>
+          <li class="mb-2">Suivi des problèmes et documentation en ligne</li>
+          <li class="mb-2">Intégration continue et workflows automatisés</li>
+        </ul>
+        <p class="text-lg font-semibold">
+          Prêt à améliorer votre processus de développement ?
+          <strong class="text-primary">Rejoignez-nous dès maintenant.</strong>
+        </p>
+      </v-col>
+      <v-col cols="8" md="4" class="flex justify-center md:justify-end">
+        <v-img
+          :src="homeImage"
+          alt="Code Valley"
+          class="rounded-lg shadow-lg w-full max-h-full"
+          style="object-fit: contain; height: 100%; max-width: 100%"
+        ></v-img>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
 
-const name = '"Nom du site"'
+<script setup lang="ts">
+import { useRouter, useRoute } from 'vue-router'
+import homeImage from '@/assets/home.webp'
+import packageJson from '../../package.json'
+import { useAuth } from '@/composables/useAuth'
+import { onMounted } from 'vue'
+const { setToken } = useAuth()
+
+const name = packageJson.displayName
+const router = useRouter()
+const route = useRoute()
+
+const sendTo = (location: string) => {
+  router.push(location)
+}
+
+onMounted(() => {
+  const token = route.query.token as string
+  console.log(token)
+  if (token) {
+    setToken(token)
+    sendTo('/newsfeed')
+  }
+})
 </script>
 
-<template>
-  <Header />
-  <div class="min-h-screen h-full flex flex-col justify-between">
-    <div class="w-full h-full pt-40 p-4 flex flex-col items-center">
-      <div class="mb-4 text-2xl p-8 font-semibold">Bienvenue sur {{ name }}</div>
-      <Button label="Getting Started" size="xl"></Button>
-      <div class="mt-6 flex justify-center p-4 w-11/12 items-center">
-        <div class="w-5/12 p-4">
-          <div class="font-bold text-primary mr-4 text-xl mb-4">Ce que nous faisons</div>
-          <div class="text-justify">
-            Chez {{ name }}, notre mission est de fournir une plateforme collaborative où les
-            développeurs du monde entier peuvent construire, partager et travailler ensemble sur des
-            projets logiciels. <br /><br />
-            Nous croyons en un monde où le développement de logiciels est ouvert, transparent et
-            accessible à tous ceux qui veulent contribuer. Nous offrons un espace où les
-            développeurs peuvent héberger leurs codes sources, collaborer avec d'autres personnes,
-            suivre les modifications apportées à leurs projets et coordonner leurs efforts de
-            développement. <br />
-            Que vous soyez un développeur individuel, une petite équipe ou une grande entreprise,
-            {{ name }} fournit les outils nécessaires pour rendre votre processus de développement
-            plus efficace et plus transparent. <br /><br />
-            Nos fonctionnalités incluent la gestion avancée des versions, le suivi des problèmes, la
-            documentation en ligne, l'intégration continue, les workflows automatisés et bien plus
-            encore. Avec {{ name }}, vous pouvez créer des logiciels de meilleure qualité plus
-            rapidement et plus facilement, tout en favorisant la collaboration et l'innovation.
-            <br />
-            Que vous soyez un débutant ou un expert en développement, {{ name }} est là pour vous
-            aider à réussir dans vos projets logiciels. Rejoignez notre communauté mondiale de
-            millions de développeurs et découvrez ce que vous pouvez accomplir ensemble sur
-            {{ name }}.
-          </div>
-        </div>
-        <div
-          class="bg-gray-300 rounded ml-4 w-5/12 p-4 text-center h-20 flex flex-col justify-center"
-        >
-          Image
-        </div>
-      </div>
-    </div>
-    <Footer />
-  </div>
-</template>
+<style scoped>
+.text-primary {
+  color: #902de0;
+}
+</style>
