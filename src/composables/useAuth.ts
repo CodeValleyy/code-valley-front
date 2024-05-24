@@ -67,6 +67,24 @@ const getGoogleAuthUrl = async () => {
     }
 }
 
+const uploadAvatar = async (file) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+        const response = await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/avatar`, formData, {
+            headers: {
+                Authorization: `Bearer ${token.value}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error uploading avatar:', error);
+        throw error;
+    }
+};
+
 export const useAuth = () => ({
     setToken,
     getToken,
@@ -74,5 +92,5 @@ export const useAuth = () => ({
     fetchMe,
     fetchProfile,
     resetToken,
-    getGoogleAuthUrl,
+    uploadAvatar,
 });
