@@ -10,3 +10,4 @@ export interface ExecuteCodeResponse {
 
 
 export * from './User';
+export * from './Post';

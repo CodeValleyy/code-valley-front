@@ -33,6 +33,15 @@
               <v-btn icon @click="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
                 <v-icon class="small-icon">mdi-comment</v-icon>
               </v-btn>
+              <v-btn
+                v-if="post.isOwner"
+                icon
+                @click="confirmDelete(post)"
+                class="mr-2 text-xs"
+                size="25"
+              >
+                <v-icon class="small-icon">mdi-delete</v-icon>
+              </v-btn>
             </v-list-item-action>
           </v-list-item>
           <v-divider
@@ -47,21 +56,42 @@
         <FriendSuggestions />
       </v-col>
     </v-row>
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card>
+        <v-card-title class="headline">Confirmer la suppression</v-card-title>
+        <v-card-text>Voulez-vous vraiment supprimer ce post ?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="deleteDialog = false">Annuler</v-btn>
+          <v-btn color="red darken-1" text @click="deletePost">Supprimer</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue'
 import { usePostStore } from '@/stores/usePostStore'
+import { useAuth } from '@/composables/useAuth'
 import PostComposer from '@/components/PostComposer.vue'
 import FriendSuggestions from '@/components/FriendSuggestions.vue'
+import { Post } from '@/types'
 
 const postStore = usePostStore()
-const posts = ref([])
+const posts: Post[] = ref([])
+const deleteDialog = ref(false)
+const postToDelete = ref(null)
+const { fetchMe } = useAuth()
+
+const me = await fetchMe()
 
 const fetchPosts = async () => {
   await postStore.fetchPosts()
-  posts.value = postStore.posts
+  posts.value = postStore.posts.map((post) => ({
+    ...post,
+    isOwner: post.userId === me.id
+  }))
 }
 
 onMounted(fetchPosts)
@@ -69,7 +99,10 @@ onMounted(fetchPosts)
 watch(
   () => postStore.posts,
   (newPosts) => {
-    posts.value = newPosts
+    posts.value = newPosts.map((post) => ({
+      ...post,
+      isOwner: post.userId === me.id
+    }))
   },
   { deep: true }
 )
@@ -84,7 +117,6 @@ const formatDate = (dateString: string) => {
 }
 
 const toggleLike = async (post) => {
-  console.log(`Toggle like on post ${post.userHasLiked}`)
   if (post.userHasLiked) {
     await postStore.unlikePost(post.id)
   } else {
@@ -95,7 +127,20 @@ const toggleLike = async (post) => {
 const commentOnPost = async (postId: number) => {
   console.log(`Comment on post ${postId}`)
 }
+
+const confirmDelete = (post) => {
+  postToDelete.value = post
+  deleteDialog.value = true
+}
+
+const deletePost = async () => {
+  if (postToDelete.value) {
+    await postStore.deletePost(postToDelete.value.id)
+    deleteDialog.value = false
+  }
+}
 </script>
+
 <style scoped>
 .post-item {
   border-bottom: 1px solid #e0e0e0;

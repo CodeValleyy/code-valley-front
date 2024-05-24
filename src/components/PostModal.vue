@@ -15,26 +15,20 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
+import { usePostStore } from '@/stores/usePostStore'
 
 const emit = defineEmits(['close', 'new-post'])
 
 const { getToken } = useAuth()
 const content = ref('')
 const file = ref(null)
+const postStore = usePostStore()
 
 const postContent = async () => {
   if (!content.value) return
 
   try {
-    const formData = new FormData()
-    formData.append('content', content.value)
-    if (file.value) {
-      formData.append('file', file.value)
-    }
-
-    await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts`, formData, {
-      headers: { Authorization: `Bearer ${getToken()}`, 'Content-Type': 'multipart/form-data' }
-    })
+    await postStore.createPost(content.value)
     content.value = ''
     file.value = null
     emit('close')

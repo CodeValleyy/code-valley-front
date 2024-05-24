@@ -92,6 +92,7 @@ onMounted(async () => {
     console.log('Google auth URL:', googleAuthUrl.value)
   } catch (error) {
     console.error('Failed to fetch auth URLs:', error)
+    errorMessage.value = 'Failed to fetch auth URLs'
   }
 })
 
@@ -145,6 +146,7 @@ const signInWithGoogle = () => {
     window.location.href = googleAuthUrl.value
   } else {
     console.error('No Google auth URL available')
+    errorMessage.value = 'Google auth is not available'
   }
 }
 
@@ -153,6 +155,7 @@ const signInWithMicrosoft = () => {
     window.location.href = microsoftAuthUrl.value
   } else {
     console.error('No Microsoft auth URL available')
+    errorMessage.value = 'Microsoft auth is not available'
   }
 }
 </script>
