@@ -5,7 +5,8 @@ export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
         friends: [],
         friendRequests: [],
-        friendSuggestions: []
+        friendSuggestions: [],
+        sentFriendRequests: []
     }),
     actions: {
         async fetchFriends() {
@@ -35,6 +36,25 @@ export const useFriendshipStore = defineStore('friendship', {
                 });
             } catch (error) {
                 console.error('Error sending friend request:', error);
+            }
+        },
+        async cancelSentRequest(requestId: number) {
+            try {
+                await axios.delete(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/requests/${requestId}`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+            } catch (error) {
+                console.error('Error canceling friend request:', error);
+            }
+        },
+        async fetchSentFriendRequests() {
+            try {
+                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/sent-requests`, {
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+                });
+                this.sentFriendRequests = response.data;
+            } catch (error) {
+                console.error('Error fetching pending requests:', error);
             }
         },
         async acceptFriendRequest(requestId: number) {
