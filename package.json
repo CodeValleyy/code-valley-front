@@ -1,6 +1,7 @@
 {
   "name": "code-valley-front",
-  "version": "0.0.0",
+  "displayName": "Code Valley",
+  "version": "1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -32,6 +33,7 @@
     "vuetify": "3.6.0-beta.0.0"
   },
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.2",
     "@playwright/test": "^1.44.0",
     "@rushstack/eslint-patch": "^1.10.3",
     "@tsconfig/node20": "^20.1.4",

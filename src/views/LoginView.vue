@@ -3,7 +3,7 @@
     <v-row class="justify-center">
       <v-col cols="12" md="6" class="text-center">
         <h1 class="mb-6 text-4xl font-bold text-primary">Se connecter</h1>
-        <p class="text-lg text-center text-primary mb-4">Déjà inscrit? Connectez-vous</p>
+        <v-divider class="mb-6"></v-divider>
         <v-card class="pa-6">
           <v-form>
             <v-text-field
@@ -36,10 +36,28 @@
             >
               Se connecter
             </v-btn>
-            <v-btn color="secondary" @click="signInWithGoogle" class="mb-4">
-              Se connecter avec Google
-            </v-btn>
+            <v-divider class="my-4"></v-divider>
+            <p class="text-sm mb-4">Ou connectez-vous avec</p>
+            <div class="d-flex justify-center mb-4">
+              <v-btn icon @click="signInWithGoogle" class="mx-2">
+                <v-icon left>mdi-google</v-icon>
+              </v-btn>
+
+              <v-btn icon @click="signInWithMicrosoft" class="mx-2">
+                <v-icon left>mdi-microsoft</v-icon>
+              </v-btn>
+
+              <v-btn icon class="mx-2">
+                <v-icon left>mdi-apple</v-icon>
+              </v-btn>
+            </div>
           </v-form>
+          <p class="text-sm text-center text-primary mb-4">
+            Vous n'avez pas de compte ?
+            <router-link to="/register" class="text-secondary underline">
+              Inscrivez-vous
+            </router-link>
+          </p>
         </v-card>
       </v-col>
     </v-row>
@@ -48,10 +66,11 @@
 
 <script setup lang="ts">
 import axios from 'axios'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, nextTick } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
-const { setToken } = useAuth()
+
+const { setToken, getGoogleAuthUrl } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -60,17 +79,18 @@ const errorMessage = ref('')
 
 const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
 
-const authUrl = ref('')
+const googleAuthUrl = ref('')
+const microsoftAuthUrl = ref('')
 const isOtpVisible = ref(false)
 let token = ref('')
 
 onMounted(async () => {
   try {
-    const response = await axios.get(`${apiBaseUrl}/auth/google`, { withCredentials: true })
-    authUrl.value = response.data.url
-    console.log('Google auth URL:', authUrl.value)
+    const googleResponse = await getGoogleAuthUrl()
+    googleAuthUrl.value = googleResponse.url
   } catch (error) {
-    console.error('Failed to fetch Google auth URL:', error)
+    console.error('Failed to fetch auth URLs:', error)
+    errorMessage.value = 'Failed to fetch auth URLs'
   }
 })
 
@@ -86,13 +106,17 @@ const login = async () => {
 
     if (response.status === 202) {
       isOtpVisible.value = true
-    } else {
-      router.push(`/?token=${token.value}`)
-      setToken(token.value)
+      return
     }
+
+    setToken(token.value)
+    await nextTick()
+    router.push(`/?token=${token.value}`)
   } catch (error) {
     console.error('Login error:', error.response.data)
     errorMessage.value = error.response.data.message.toString() || 'Email or password is incorrect'
+  } finally {
+    password.value = ''
   }
 }
 
@@ -116,10 +140,20 @@ const authenticateOtp = async () => {
 }
 
 const signInWithGoogle = () => {
-  if (authUrl.value) {
-    window.location.href = authUrl.value
+  if (googleAuthUrl.value) {
+    window.location.href = googleAuthUrl.value
   } else {
-    console.error('No auth URL available')
+    console.error('No Google auth URL available')
+    errorMessage.value = 'Google auth is not available'
+  }
+}
+
+const signInWithMicrosoft = () => {
+  if (microsoftAuthUrl.value) {
+    window.location.href = microsoftAuthUrl.value
+  } else {
+    console.error('No Microsoft auth URL available')
+    errorMessage.value = 'Microsoft auth is not available'
   }
 }
 </script>
