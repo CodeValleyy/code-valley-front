@@ -36,7 +36,6 @@ export function useCodeRunner() {
     };
 
     const getLanguage = (language: string) => {
-        console.log(language);
         currentLanguage.value = language;
     };
 

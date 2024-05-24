@@ -7,3 +7,7 @@ export interface ExecuteCodeResponse {
     output: string;
     error?: string;
 }
+
+
+export * from './User';
+export * from './Post';

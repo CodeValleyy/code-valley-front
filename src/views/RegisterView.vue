@@ -2,8 +2,8 @@
   <v-container class="fill-height d-flex align-center justify-center">
     <v-row class="justify-center">
       <v-col cols="12" md="6" class="text-center">
-        <h1 class="mb-6 text-4xl font-bold text-primary">S'inscrire</h1>
-        <p class="text-lg text-center text-primary mb-4">Pour commencer, créer un compte</p>
+        <h1 class="mb-8 text-4xl font-bold text-primary">Bienvenue sur Code Valley</h1>
+
         <v-card class="pa-6">
           <v-form>
             <v-text-field
@@ -39,6 +39,10 @@
               Se connecter avec Google
             </v-btn>
           </v-form>
+          <p class="text-lg text-center text-primary mb-4">
+            Déjà inscris ?
+            <router-link to="/login" class="text-secondary underline">Connectez-vous</router-link>
+          </p>
         </v-card>
       </v-col>
     </v-row>
@@ -47,16 +51,29 @@
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import router from '@/router'
+import { useAuth } from '@/composables/useAuth'
 
+const { getGoogleAuthUrl } = useAuth()
 const email = ref('')
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
+const googleAuthUrl = ref('')
 
 const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
+
+onMounted(async () => {
+  try {
+    const googleResponse = await getGoogleAuthUrl()
+    googleAuthUrl.value = googleResponse.url
+  } catch (error) {
+    console.error('Failed to fetch auth URLs:', error)
+    errorMessage.value = 'Failed to fetch auth URLs'
+  }
+})
 
 const register = async () => {
   if (password.value !== confirmPassword.value) {
@@ -70,8 +87,7 @@ const register = async () => {
       username: username.value,
       password: password.value
     })
-    console.log('Registered:', response.data)
-    router.push('/')
+    router.push('/?token=' + response.data.accessToken)
   } catch (error) {
     console.error('Registration error:', error.response.data)
     errorMessage.value = error.response.data.message.toString() || 'Problème lors de l’inscription'
@@ -79,7 +95,12 @@ const register = async () => {
 }
 
 const signInWithGoogle = () => {
-  // TODO : Logique de connexion avec Google
+  if (googleAuthUrl.value) {
+    window.location.href = googleAuthUrl.value
+  } else {
+    console.error('No Google auth URL available')
+    errorMessage.value = 'Google auth is not available'
+  }
 }
 </script>
 
