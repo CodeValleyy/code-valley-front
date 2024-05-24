@@ -19,9 +19,7 @@ const emit = defineEmits(['close'])
 
 const { getToken, logout, fetchMe } = useAuth()
 const router = useRouter()
-const userAvatar = ref(
-  'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
-)
+const userAvatar = ref()
 const username = ref('')
 
 const fetchUserProfile = async () => {
