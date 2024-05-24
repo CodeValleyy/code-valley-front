@@ -70,7 +70,7 @@ import { onMounted, ref, nextTick } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
 
-const { setToken } = useAuth()
+const { setToken, getGoogleAuthUrl } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -86,10 +86,8 @@ let token = ref('')
 
 onMounted(async () => {
   try {
-    const googleResponse = await axios.get(`${apiBaseUrl}/auth/google`, { withCredentials: true })
-    googleAuthUrl.value = googleResponse.data.url
-
-    console.log('Google auth URL:', googleAuthUrl.value)
+    const googleResponse = await getGoogleAuthUrl()
+    googleAuthUrl.value = googleResponse.url
   } catch (error) {
     console.error('Failed to fetch auth URLs:', error)
     errorMessage.value = 'Failed to fetch auth URLs'

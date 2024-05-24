@@ -56,11 +56,23 @@ const logout = async () => {
         resetToken();
     }
 }
+
+const getGoogleAuthUrl = async () => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/google`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Google Auth URL:', error);
+        throw error;
+    }
+}
+
 export const useAuth = () => ({
     setToken,
     getToken,
     logout,
     fetchMe,
     fetchProfile,
-    resetToken
+    resetToken,
+    getGoogleAuthUrl,
 });

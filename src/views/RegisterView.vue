@@ -51,16 +51,29 @@
 
 <script setup lang="ts">
 import axios from 'axios'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import router from '@/router'
+import { useAuth } from '@/composables/useAuth'
 
+const { getGoogleAuthUrl } = useAuth()
 const email = ref('')
 const username = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
+const googleAuthUrl = ref('')
 
 const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
+
+onMounted(async () => {
+  try {
+    const googleResponse = await getGoogleAuthUrl()
+    googleAuthUrl.value = googleResponse.url
+  } catch (error) {
+    console.error('Failed to fetch auth URLs:', error)
+    errorMessage.value = 'Failed to fetch auth URLs'
+  }
+})
 
 const register = async () => {
   if (password.value !== confirmPassword.value) {
@@ -82,7 +95,12 @@ const register = async () => {
 }
 
 const signInWithGoogle = () => {
-  // TODO : Logique de connexion avec Google
+  if (googleAuthUrl.value) {
+    window.location.href = googleAuthUrl.value
+  } else {
+    console.error('No Google auth URL available')
+    errorMessage.value = 'Google auth is not available'
+  }
 }
 </script>
 
