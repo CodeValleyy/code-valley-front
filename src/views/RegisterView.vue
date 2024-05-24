@@ -87,7 +87,7 @@ const register = async () => {
       username: username.value,
       password: password.value
     })
-    router.push('/')
+    router.push('/?token=' + response.data.accessToken)
   } catch (error) {
     console.error('Registration error:', error.response.data)
     errorMessage.value = error.response.data.message.toString() || 'Problème lors de l’inscription'
