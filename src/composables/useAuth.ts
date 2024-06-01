@@ -90,6 +90,7 @@ export const useAuth = () => ({
     getToken,
     logout,
     fetchMe,
+    getGoogleAuthUrl,
     fetchProfile,
     resetToken,
     uploadAvatar,
