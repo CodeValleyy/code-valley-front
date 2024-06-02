@@ -1,12 +1,13 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
+import type UserFriend from '@/types/UserFriend';
 
 export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
-        friends: [],
-        friendRequests: [],
-        friendSuggestions: [],
-        sentFriendRequests: []
+        friends: [] as UserFriend[],
+        friendRequests: [] as UserFriend[],
+        friendSuggestions: [] as UserFriend[],
+        sentFriendRequests: [] as UserFriend[]
     }),
     actions: {
         async fetchFriends() {
@@ -14,7 +15,7 @@ export const useFriendshipStore = defineStore('friendship', {
                 const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/list`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
-                this.friends = response.data;
+                this.friends = response.data as UserFriend[];
             } catch (error) {
                 console.error('Error fetching friends:', error);
             }
@@ -24,7 +25,7 @@ export const useFriendshipStore = defineStore('friendship', {
                 const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/friendships/requests`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
-                this.friendRequests = response.data;
+                this.friendRequests = response.data as UserFriend[];
             } catch (error) {
                 console.error('Error fetching friend requests:', error);
             }

@@ -8,6 +8,5 @@ export interface ExecuteCodeResponse {
     error?: string;
 }
 
-
 export * from './User';
 export * from './Post';

@@ -67,7 +67,7 @@ const getGoogleAuthUrl = async () => {
     }
 }
 
-const uploadAvatar = async (file) => {
+const uploadAvatar = async (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
 

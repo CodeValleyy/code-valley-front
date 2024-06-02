@@ -75,9 +75,10 @@ const logoutAndRedirect = async () => {
   router.push('/login')
 }
 
-const postAvatar = async (event) => {
-  const file = event.target.files[0]
-  if (file) {
+const postAvatar = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target && target.files && target.files[0]) {
+    const file = target.files[0]
     try {
       const response = await uploadAvatar(file)
       userAvatar.value = response.avatarUrl
@@ -86,6 +87,7 @@ const postAvatar = async (event) => {
     }
   }
 }
+
 
 onMounted(async () => {
   if (!getToken()) {

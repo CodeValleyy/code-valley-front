@@ -54,6 +54,7 @@ import axios from 'axios'
 import { onMounted, ref } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
+import type { AxiosError } from 'axios'
 
 const { getGoogleAuthUrl } = useAuth()
 const email = ref('')
@@ -89,8 +90,27 @@ const register = async () => {
     })
     router.push('/?token=' + response.data.accessToken)
   } catch (error) {
-    console.error('Registration error:', error.response.data)
-    errorMessage.value = error.response.data.message.toString() || 'Problème lors de l’inscription'
+    const axiosError = error as AxiosError
+
+    if (axiosError.response?.status === 409) {
+      errorMessage.value = 'Cet email est déjà utilisé'
+      return
+    }
+
+    if (axiosError.response?.status === 400) {
+      errorMessage.value = 'Veuillez remplir tous les champs'
+      return
+    }
+
+    if (axiosError.response?.status === 500) {
+      errorMessage.value = 'Problème lors de l’inscription'
+      return
+    }
+
+    if (axiosError.response) {
+      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Une erreur inattendue est survenue'
+      return
+    }
   }
 }
 

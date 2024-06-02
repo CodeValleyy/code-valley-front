@@ -1,4 +1,4 @@
-export default interface Post {
+export interface Post {
     id: number;
     content: string;
     userId: number;
@@ -7,4 +7,5 @@ export default interface Post {
     avatar: string;
     likes: number;
     userHasLiked: boolean;
+    isOwner?: boolean;
 }

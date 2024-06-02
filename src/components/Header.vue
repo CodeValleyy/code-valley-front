@@ -10,7 +10,6 @@
         v-for="route in filteredRoutes"
         :key="route.location"
         :to="route.location"
-        text
         class="text-white font-poppins mx-2"
       >
         {{ route.label }}
