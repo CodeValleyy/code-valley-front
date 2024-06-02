@@ -1,7 +1,7 @@
 {
   "name": "code-valley-front",
   "displayName": "Code Valley",
-  "version": "1.0",
+  "version": "1.2.1",
   "private": true,
   "type": "module",
   "scripts": {

@@ -1,10 +1,10 @@
 import { defineStore } from 'pinia';
 import axios from 'axios';
-import * as User from '@/types/User';
+import type { User } from '@/types';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
-        user: null,
+        user: null as User | null,
     }),
     actions: {
         async fetchUserProfile(token: string) {

@@ -47,7 +47,7 @@
       </v-container>
     </v-card-text>
     <v-card-actions>
-      <v-btn text @click="$emit('close')">Fermer</v-btn>
+      <v-btn @click="$emit('close')">Fermer</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -56,12 +56,13 @@ import { ref, onMounted, watch } from 'vue'
 
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import type UserFriend from '@/types/UserFriend'
 
 const emit = defineEmits(['close'])
 const friendshipStore = useFriendshipStore()
-const friends = ref([])
-const friendRequests = ref([])
-const sentFriendRequests = ref([])
+const friends = ref([] as UserFriend[])
+const friendRequests = ref([] as UserFriend[])
+const sentFriendRequests = ref([] as UserFriend[])
 const loading = ref(true)
 
 const updateLists = () => {

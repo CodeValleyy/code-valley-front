@@ -38,6 +38,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
+import type { AxiosError } from 'node_modules/axios/index.cjs';
 
 const { getToken } = useAuth()
 
@@ -64,8 +65,29 @@ const changePassword = async () => {
       }
     )
   } catch (error) {
-    console.error('Error changing password:', error.response.data)
-    errorMessage.value = error.response.data.message
+    const axiosError = error as AxiosError
+    if (axiosError.response?.status === 401) {
+      errorMessage.value = 'Mot de passe actuel incorrect'
+      return
+    }
+
+    if (axiosError.response?.status === 400) {
+      errorMessage.value = 'Le nouveau mot de passe doit être différent de l\'ancien'
+      return
+    }
+
+    if (axiosError.response?.status === 409) {
+      errorMessage.value = 'Le mot de passe actuel est incorrect'
+      return
+    }
+
+    if (axiosError.response?.status === 422) {
+      errorMessage.value = 'Le mot de passe doit contenir au moins 8 caractères'
+      return
+    }
+
+    console.error('Error changing password:', axiosError.response?.data)
+    errorMessage.value = (axiosError.response?.data as { message: string })?.message;
   }
 }
 </script>

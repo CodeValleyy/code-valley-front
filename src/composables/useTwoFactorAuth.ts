@@ -2,6 +2,7 @@ import { ref, computed } from 'vue'
 import axios from 'axios'
 import { useAuth } from './useAuth'
 import { useUserStore } from '@/stores/userStore'
+import type { AxiosError } from 'axios'
 
 export const useTwoFactorAuth = () => {
     const { getToken } = useAuth()
@@ -36,10 +37,24 @@ export const useTwoFactorAuth = () => {
                 qrCodeUrl.value = generateResponse.data
                 showQrCodeModal.value = true
             } else {
-                userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: false })
+                if (userStore.user) {
+                    userStore.setUser(
+                        {
+                            ...userStore.user,
+                            isTwoFactorAuthenticationEnabled: !isTwoFactorEnabled.value
+                        }
+                    )
+                }
             }
         } catch (error) {
-            console.error(`Error toggling 2FA: ${error.response.data}`)
+            const axiosError = error as AxiosError
+
+            if (axiosError.response?.status === 400) {
+                otpCode.value = ''
+                return
+            }
+
+            console.error(`Error toggling 2FA: ${axiosError.response?.data}`)
         }
     }
 
@@ -53,10 +68,17 @@ export const useTwoFactorAuth = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 }
             )
-            userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: true })
+            if (userStore.user) {
+                userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: true })
+            }
             showQrCodeModal.value = false
         } catch (error) {
-            console.error('Error authenticating 2FA:', error.response.data)
+            const axiosError = error as AxiosError
+            otpCode.value = ''
+            if (axiosError.response?.status === 400) {
+                return
+            }
+            console.error('Error authenticating 2FA:', axiosError.response?.data)
         }
     }
 

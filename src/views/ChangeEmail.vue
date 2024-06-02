@@ -24,6 +24,7 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
+import type { AxiosError } from 'node_modules/axios/index.cjs';
 
 const { getToken } = useAuth()
 
@@ -42,8 +43,25 @@ const changeEmail = async () => {
       }
     )
   } catch (error) {
-    console.error('Error changing email:', error.response.data)
-    errorMessage.value = error.response.data.message
+    const axiosError = error as AxiosError
+
+    if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
+      errorMessage.value = 'Vous devez être connecté pour changer votre email'
+      return
+    }
+
+    if (axiosError.response?.status === 400) {
+      errorMessage.value = 'Cet email est déjà utilisé'
+      return
+    }
+
+    if (axiosError.response?.status === 404) {
+      errorMessage.value = 'Utilisateur non trouvé'
+      return
+    }
+
+    console.error('Error changing email:', axiosError.response?.data)
+    errorMessage.value = (axiosError.response?.data as { message: string })?.message;
   }
 }
 </script>

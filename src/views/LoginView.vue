@@ -69,6 +69,7 @@ import axios from 'axios'
 import { onMounted, ref, nextTick } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
+import type { AxiosError } from 'axios'
 
 const { setToken, getGoogleAuthUrl } = useAuth()
 
@@ -113,8 +114,14 @@ const login = async () => {
     await nextTick()
     router.push(`/?token=${token.value}`)
   } catch (error) {
-    console.error('Login error:', error.response.data)
-    errorMessage.value = error.response.data.message.toString() || 'Email or password is incorrect'
+    const axiosError = error as AxiosError
+    if (axiosError.response) {
+      console.error('Login error:', axiosError.response.data)
+      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Email or password is incorrect'
+    } else {
+      console.error('Login error:', error)
+      errorMessage.value = 'An unexpected error occurred'
+    }
   } finally {
     password.value = ''
   }
@@ -134,8 +141,14 @@ const authenticateOtp = async () => {
     setToken(token.value)
     router.push(`/?token=${token.value}`)
   } catch (error) {
-    console.error('OTP authentication error:', error.response.data)
-    errorMessage.value = error.response.data.message.toString() || 'Incorrect OTP'
+    const axiosError = error as AxiosError
+    if (axiosError.response) {
+      console.error('OTP authentication error:', axiosError.response.data)
+      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Incorrect OTP'
+    } else {
+      console.error('OTP authentication error:', error)
+      errorMessage.value = 'An unexpected error occurred'
+    }
   }
 }
 
