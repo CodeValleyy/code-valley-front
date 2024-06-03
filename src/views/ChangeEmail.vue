@@ -24,7 +24,8 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
-import type { AxiosError } from 'node_modules/axios/index.cjs';
+import type { AxiosError } from 'node_modules/axios/index.cjs'
+import axiosInstance from '@/config/axiosInstance'
 
 const { getToken } = useAuth()
 
@@ -33,8 +34,8 @@ const errorMessage = ref('')
 
 const changeEmail = async () => {
   try {
-    await axios.post(
-      `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/change-email`,
+    await axiosInstance.post(
+      '/auth/change-email',
       {
         email: newEmail.value
       },
@@ -61,7 +62,7 @@ const changeEmail = async () => {
     }
 
     console.error('Error changing email:', axiosError.response?.data)
-    errorMessage.value = (axiosError.response?.data as { message: string })?.message;
+    errorMessage.value = (axiosError.response?.data as { message: string })?.message
   }
 }
 </script>

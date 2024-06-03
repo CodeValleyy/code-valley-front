@@ -1,5 +1,5 @@
+import axiosInstance from '@/config/axiosInstance';
 import { defineStore } from 'pinia';
-import axios from 'axios';
 
 export interface CreatePostDto {
     content: string;
@@ -12,9 +12,7 @@ export const usePostStore = defineStore('post', {
     actions: {
         async fetchPosts() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
+                const response = await axiosInstance.get('/posts');
                 this.posts = response.data;
             } catch (error) {
                 console.error('Error fetching posts:', error);
@@ -22,11 +20,7 @@ export const usePostStore = defineStore('post', {
         },
         async createPost(content: string) {
             try {
-                await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts`, {
-                    content
-                }, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
+                await axiosInstance.post('/posts', { content });
                 this.fetchPosts();
             } catch (error) {
                 console.error('Error creating post:', error);
@@ -34,9 +28,7 @@ export const usePostStore = defineStore('post', {
         },
         async deletePost(postId: number) {
             try {
-                await axios.delete(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts/${postId}`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
+                await axiosInstance.delete(`/posts/${postId}`);
                 this.fetchPosts();
             } catch (error) {
                 console.error('Error deleting post:', error);
@@ -44,9 +36,7 @@ export const usePostStore = defineStore('post', {
         },
         async likePost(postId: number) {
             try {
-                await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts/${postId}/like`, {}, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
+                await axiosInstance.post(`/posts/${postId}/like`);
                 this.fetchPosts();
             } catch (error) {
                 console.error('Error liking post:', error);
@@ -54,9 +44,7 @@ export const usePostStore = defineStore('post', {
         },
         async unlikePost(postId: number) {
             try {
-                await axios.delete(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/posts/${postId}/like`, {
-                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-                });
+                await axiosInstance.delete(`/posts/${postId}/like`);
                 this.fetchPosts();
             } catch (error) {
                 console.error('Error unliking post:', error);

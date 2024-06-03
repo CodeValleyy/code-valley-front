@@ -38,7 +38,8 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useAuth } from '@/composables/useAuth'
-import type { AxiosError } from 'node_modules/axios/index.cjs';
+import type { AxiosError } from 'node_modules/axios/index.cjs'
+import axiosInstance from '@/config/axiosInstance'
 
 const { getToken } = useAuth()
 
@@ -54,8 +55,8 @@ const changePassword = async () => {
   }
 
   try {
-    await axios.post(
-      `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/change-password`,
+    await axiosInstance.post(
+      '/auth/change-password',
       {
         currentPassword: currentPassword.value,
         newPassword: newPassword.value
@@ -72,7 +73,7 @@ const changePassword = async () => {
     }
 
     if (axiosError.response?.status === 400) {
-      errorMessage.value = 'Le nouveau mot de passe doit être différent de l\'ancien'
+      errorMessage.value = "Le nouveau mot de passe doit être différent de l'ancien"
       return
     }
 
@@ -87,7 +88,7 @@ const changePassword = async () => {
     }
 
     console.error('Error changing password:', axiosError.response?.data)
-    errorMessage.value = (axiosError.response?.data as { message: string })?.message;
+    errorMessage.value = (axiosError.response?.data as { message: string })?.message
   }
 }
 </script>

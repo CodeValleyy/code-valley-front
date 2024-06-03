@@ -64,7 +64,7 @@ onMounted(async () => {
   }
 
   try {
-    await userStore.fetchUserProfile(token)
+    await userStore.fetchUserProfile()
   } catch (error) {
     logout()
     console.error('Error fetching profile:', error)
