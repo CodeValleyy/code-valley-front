@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useAuth } from './useAuth'
 import { useUserStore } from '@/stores/userStore'
 import type { AxiosError } from 'axios'
+import axiosInstance from '@/config/axiosInstance'
 
 export const useTwoFactorAuth = () => {
     const { getToken } = useAuth()
@@ -15,73 +16,50 @@ export const useTwoFactorAuth = () => {
     const isTwoFactorEnabled = computed(() => userStore.isTwoFactorEnabled)
 
     const toggle2FA = async () => {
-        const endpoint = isTwoFactorEnabled.value ? 'turn-off' : 'turn-on'
+        const endpoint = isTwoFactorEnabled.value ? 'turn-off' : 'turn-on';
         try {
-            const token = getToken()
-            await axios.post(
-                `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/2fa/${endpoint}`,
-                {},
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            )
+            await axiosInstance.post(`/auth/2fa/${endpoint}`);
 
             if (!isTwoFactorEnabled.value) {
-                const generateResponse = await axios.post(
-                    `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/2fa/generate`,
-                    {},
-                    {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }
-                )
-                qrCodeUrl.value = generateResponse.data
-                showQrCodeModal.value = true
+                const generateResponse = await axiosInstance.post('/auth/2fa/generate');
+                qrCodeUrl.value = generateResponse.data;
+                showQrCodeModal.value = true;
             } else {
                 if (userStore.user) {
-                    userStore.setUser(
-                        {
-                            ...userStore.user,
-                            isTwoFactorAuthenticationEnabled: !isTwoFactorEnabled.value
-                        }
-                    )
+                    userStore.setUser({
+                        ...userStore.user,
+                        isTwoFactorAuthenticationEnabled: !isTwoFactorEnabled.value
+                    });
                 }
             }
         } catch (error) {
-            const axiosError = error as AxiosError
-
+            const axiosError = error as AxiosError;
             if (axiosError.response?.status === 400) {
-                otpCode.value = ''
-                return
+                otpCode.value = '';
+                return;
             }
-
-            console.error(`Error toggling 2FA: ${axiosError.response?.data}`)
+            console.error(`Error toggling 2FA: ${axiosError.response?.data}`);
         }
-    }
+    };
 
     const authenticate2FA = async () => {
         try {
-            const token = getToken()
-            await axios.post(
-                `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/2fa/authenticate`,
-                { twoFactorAuthenticationCode: otpCode.value },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            )
+            await axiosInstance.post('/auth/2fa/authenticate', {
+                twoFactorAuthenticationCode: otpCode.value
+            });
             if (userStore.user) {
-                userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: true })
+                userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: true });
             }
-            showQrCodeModal.value = false
+            showQrCodeModal.value = false;
         } catch (error) {
-            const axiosError = error as AxiosError
-            otpCode.value = ''
+            const axiosError = error as AxiosError;
+            otpCode.value = '';
             if (axiosError.response?.status === 400) {
-                return
+                return;
             }
-            console.error('Error authenticating 2FA:', axiosError.response?.data)
+            console.error('Error authenticating 2FA:', axiosError.response?.data);
         }
-    }
-
+    };
     const handleModalClose = async (value: boolean) => {
         if (!value && !isTwoFactorEnabled.value) {
             await toggle2FA()

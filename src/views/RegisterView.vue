@@ -55,6 +55,7 @@ import { onMounted, ref } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
 import type { AxiosError } from 'axios'
+import axiosInstance from '@/config/axiosInstance'
 
 const { getGoogleAuthUrl } = useAuth()
 const email = ref('')
@@ -63,8 +64,6 @@ const password = ref('')
 const confirmPassword = ref('')
 const errorMessage = ref('')
 const googleAuthUrl = ref('')
-
-const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
 
 onMounted(async () => {
   try {
@@ -83,7 +82,7 @@ const register = async () => {
   }
 
   try {
-    const response = await axios.post(`${apiBaseUrl}/auth/register`, {
+    const response = await axiosInstance.post('/auth/register', {
       email: email.value,
       username: username.value,
       password: password.value
@@ -108,7 +107,9 @@ const register = async () => {
     }
 
     if (axiosError.response) {
-      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Une erreur inattendue est survenue'
+      errorMessage.value =
+        (axiosError.response.data as { message: string }).message ||
+        'Une erreur inattendue est survenue'
       return
     }
   }

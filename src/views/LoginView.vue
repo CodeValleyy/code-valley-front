@@ -70,6 +70,7 @@ import { onMounted, ref, nextTick } from 'vue'
 import router from '@/router'
 import { useAuth } from '@/composables/useAuth'
 import type { AxiosError } from 'axios'
+import axiosInstance from '@/config/axiosInstance'
 
 const { setToken, getGoogleAuthUrl } = useAuth()
 
@@ -77,9 +78,6 @@ const email = ref('')
 const password = ref('')
 const otp = ref('')
 const errorMessage = ref('')
-
-const apiBaseUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL
-
 const googleAuthUrl = ref('')
 const microsoftAuthUrl = ref('')
 const isOtpVisible = ref(false)
@@ -98,7 +96,7 @@ onMounted(async () => {
 const login = async () => {
   try {
     errorMessage.value = ''
-    const response = await axios.post(`${apiBaseUrl}/auth/login`, {
+    const response = await axiosInstance.post('/auth/login', {
       email: email.value,
       password: password.value
     })
@@ -117,7 +115,9 @@ const login = async () => {
     const axiosError = error as AxiosError
     if (axiosError.response) {
       console.error('Login error:', axiosError.response.data)
-      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Email or password is incorrect'
+      errorMessage.value =
+        (axiosError.response.data as { message: string }).message ||
+        'Email or password is incorrect'
     } else {
       console.error('Login error:', error)
       errorMessage.value = 'An unexpected error occurred'
@@ -130,8 +130,8 @@ const login = async () => {
 const authenticateOtp = async () => {
   try {
     errorMessage.value = ''
-    const response = await axios.post(
-      `${apiBaseUrl}/auth/2fa/authenticate`,
+    const response = await axiosInstance.post(
+      '/auth/2fa/authenticate',
       {
         twoFactorAuthenticationCode: otp.value
       },
@@ -144,7 +144,8 @@ const authenticateOtp = async () => {
     const axiosError = error as AxiosError
     if (axiosError.response) {
       console.error('OTP authentication error:', axiosError.response.data)
-      errorMessage.value = (axiosError.response.data as { message: string }).message || 'Incorrect OTP'
+      errorMessage.value =
+        (axiosError.response.data as { message: string }).message || 'Incorrect OTP'
     } else {
       console.error('OTP authentication error:', error)
       errorMessage.value = 'An unexpected error occurred'

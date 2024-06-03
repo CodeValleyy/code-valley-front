@@ -1,17 +1,15 @@
 import { defineStore } from 'pinia';
-import axios from 'axios';
 import type { User } from '@/types';
+import axiosInstance from '@/config/axiosInstance';
 
 export const useUserStore = defineStore('user', {
     state: () => ({
         user: null as User | null,
     }),
     actions: {
-        async fetchUserProfile(token: string) {
+        async fetchUserProfile() {
             try {
-                const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/me`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
+                const response = await axiosInstance.get('/auth/me');
                 this.user = response.data;
             } catch (error) {
                 console.error('Error fetching profile:', error);

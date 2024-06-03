@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-import axios from 'axios';
+import axiosInstance from '@/config/axiosInstance';
 
 const token = ref(localStorage.getItem('token') ?? '');
 
@@ -7,7 +7,6 @@ const setToken = (newToken: string) => {
     token.value = newToken;
     localStorage.setItem('token', newToken);
 };
-
 
 const resetToken = () => {
     token.value = '';
@@ -18,9 +17,7 @@ const getToken = () => token.value;
 
 const fetchMe = async () => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/me`, {
-            headers: { Authorization: `Bearer ${token.value}` },
-        });
+        const response = await axiosInstance.get('/auth/me');
         return response.data;
     } catch (error) {
         console.error('Error fetching profile:', error);
@@ -30,9 +27,7 @@ const fetchMe = async () => {
 
 const fetchProfile = async (userId: number) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/profile/${userId}`, {
-            headers: { Authorization: `Bearer ${token.value}` },
-        });
+        const response = await axiosInstance.get(`/auth/profile/${userId}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching profile:', error);
@@ -42,13 +37,7 @@ const fetchProfile = async (userId: number) => {
 
 const logout = async () => {
     try {
-        await axios.post(
-            `${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/logout`,
-            {},
-            {
-                headers: { Authorization: `Bearer ${token.value}` },
-            }
-        );
+        await axiosInstance.post('/auth/logout');
     } catch (error) {
         console.error('Error logging out:', error);
         throw error;
@@ -59,7 +48,7 @@ const logout = async () => {
 
 const getGoogleAuthUrl = async () => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/google`);
+        const response = await axiosInstance.get('/auth/google');
         return response.data;
     } catch (error) {
         console.error('Error fetching Google Auth URL:', error);
@@ -72,9 +61,8 @@ const uploadAvatar = async (file: File) => {
     formData.append('file', file);
 
     try {
-        const response = await axios.post(`${import.meta.env.VITE_APP_USER_MANAGEMENT_URL}/auth/avatar`, formData, {
+        const response = await axiosInstance.post('/auth/avatar', formData, {
             headers: {
-                Authorization: `Bearer ${token.value}`,
                 'Content-Type': 'multipart/form-data'
             }
         });
