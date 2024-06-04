@@ -100,7 +100,7 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ name: 'login' })
   } else if (to.meta.requiresGuest && isAuthenticated) {
-    next({ name: 'profile' })
+    next({ name: 'newsfeed' })
   } else {
     next()
   }

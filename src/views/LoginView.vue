@@ -29,6 +29,7 @@
               class="mb-4"
             ></v-text-field>
             <div class="text-red-500 text-sm mb-4">{{ errorMessage }}</div>
+            <div class="text-green-500 text-sm mb-4">{{ successMessage }}</div>
             <v-btn
               color="primary"
               @click="isOtpVisible ? authenticateOtp() : login()"
@@ -78,12 +79,17 @@ const email = ref('')
 const password = ref('')
 const otp = ref('')
 const errorMessage = ref('')
+const successMessage = ref('')
 const googleAuthUrl = ref('')
 const microsoftAuthUrl = ref('')
 const isOtpVisible = ref(false)
 let token = ref('')
 
 onMounted(async () => {
+  const info = router.currentRoute.value.query.info
+  if (info === 'login_needed') {
+    successMessage.value = 'Inscription réussie. Connectez-vous pour continuer.'
+  }
   try {
     const googleResponse = await getGoogleAuthUrl()
     googleAuthUrl.value = googleResponse.url
@@ -96,6 +102,7 @@ onMounted(async () => {
 const login = async () => {
   try {
     errorMessage.value = ''
+    successMessage.value = ''
     const response = await axiosInstance.post('/auth/login', {
       email: email.value,
       password: password.value
@@ -130,6 +137,7 @@ const login = async () => {
 const authenticateOtp = async () => {
   try {
     errorMessage.value = ''
+    successMessage.value = ''
     const response = await axiosInstance.post(
       '/auth/2fa/authenticate',
       {

@@ -60,8 +60,11 @@ const sendTo = (location: string) => {
 
 onMounted(() => {
   const token = route.query.token as string
-  console.log(token)
   if (token) {
+    if (token === "login_needed") {
+      sendTo('/login?info=login_needed')
+      return;
+    }
     setToken(token)
     sendTo('/newsfeed')
   }
