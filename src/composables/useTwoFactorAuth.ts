@@ -1,16 +1,16 @@
+import { useAuth } from './useAuth';
 import { ref, computed } from 'vue'
-import axios from 'axios'
-import { useAuth } from './useAuth'
 import { useUserStore } from '@/stores/userStore'
 import type { AxiosError } from 'axios'
 import axiosInstance from '@/config/axiosInstance'
 
 export const useTwoFactorAuth = () => {
-    const { getToken } = useAuth()
     const userStore = useUserStore()
+    const useAuthStore = useAuth()
 
     const showQrCodeModal = ref(false)
     const qrCodeUrl = ref('')
+    const setupKey = ref('')
     const otpCode = ref('')
 
     const isTwoFactorEnabled = computed(() => userStore.isTwoFactorEnabled)
@@ -22,15 +22,14 @@ export const useTwoFactorAuth = () => {
 
             if (!isTwoFactorEnabled.value) {
                 const generateResponse = await axiosInstance.post('/auth/2fa/generate');
-                qrCodeUrl.value = generateResponse.data;
+                qrCodeUrl.value = generateResponse.data.qrCodeUrl;
+                setupKey.value = generateResponse.data.setupKey;
                 showQrCodeModal.value = true;
-            } else {
-                if (userStore.user) {
-                    userStore.setUser({
-                        ...userStore.user,
-                        isTwoFactorAuthenticationEnabled: !isTwoFactorEnabled.value
-                    });
-                }
+            } else if (userStore.user) {
+                userStore.setUser({
+                    ...userStore.user,
+                    isTwoFactorAuthenticationEnabled: !isTwoFactorEnabled.value
+                });
             }
         } catch (error) {
             const axiosError = error as AxiosError;
@@ -44,11 +43,12 @@ export const useTwoFactorAuth = () => {
 
     const authenticate2FA = async () => {
         try {
-            await axiosInstance.post('/auth/2fa/authenticate', {
+            const login2fa = await axiosInstance.post('/auth/2fa/authenticate', {
                 twoFactorAuthenticationCode: otpCode.value
             });
             if (userStore.user) {
                 userStore.setUser({ ...userStore.user, isTwoFactorAuthenticationEnabled: true });
+                useAuthStore.setToken(login2fa.data.accessToken);
             }
             showQrCodeModal.value = false;
         } catch (error) {
@@ -60,6 +60,7 @@ export const useTwoFactorAuth = () => {
             console.error('Error authenticating 2FA:', axiosError.response?.data);
         }
     };
+
     const handleModalClose = async (value: boolean) => {
         if (!value && !isTwoFactorEnabled.value) {
             await toggle2FA()
@@ -69,6 +70,7 @@ export const useTwoFactorAuth = () => {
     return {
         showQrCodeModal,
         qrCodeUrl,
+        setupKey,
         otpCode,
         isTwoFactorEnabled,
         toggle2FA,

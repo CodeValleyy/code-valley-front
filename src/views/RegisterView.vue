@@ -82,12 +82,12 @@ const register = async () => {
   }
 
   try {
-    const response = await axiosInstance.post('/auth/register', {
+    await axiosInstance.post('/auth/register', {
       email: email.value,
       username: username.value,
       password: password.value
     })
-    router.push('/?token=' + response.data.accessToken)
+    router.push('/?token=login_needed')
   } catch (error) {
     const axiosError = error as AxiosError
 

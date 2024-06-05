@@ -28,6 +28,9 @@
         <v-card-text>
           <p>Utilisez votre application d'authentification pour scanner le QR code ci-dessous :</p>
           <v-img :src="qrCodeUrl" aspect-ratio="1"></v-img>
+          <p>ou entrez la clé ci-dessous :</p>
+          <p class="text-primary">{{ setupKey }}</p>
+          <v-btn @click="copySetupKey" color="primary" class="mt-2">Copier la clé</v-btn>
           <v-text-field v-model="otpCode" label="Code OTP" outlined class="mt-4"></v-text-field>
           <v-btn color="primary" @click="authenticate2FA" class="mt-2">Vérifier le Code</v-btn>
         </v-card-text>
@@ -49,6 +52,7 @@ const userStore = useUserStore()
 const {
   showQrCodeModal,
   qrCodeUrl,
+  setupKey,
   otpCode,
   isTwoFactorEnabled,
   toggle2FA,
@@ -70,6 +74,10 @@ onMounted(async () => {
     console.error('Error fetching profile:', error)
   }
 })
+
+const copySetupKey = () => {
+  navigator.clipboard.writeText(setupKey.value)
+}
 
 const logout = () => {
   resetToken()

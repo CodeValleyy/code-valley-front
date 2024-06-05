@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "176.134.7.134:3000/:path*"
+      "source": "/url/:path*",
+      "destination": "https://user-management.code-valley.xyz/:path*"
     }
   ]
 }
