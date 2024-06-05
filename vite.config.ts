@@ -18,7 +18,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/url': {
-        target: 'http://127.0.0.1:3000',
+        target: 'https://user-management.code-valley.xyz',
         changeOrigin: true,
         secure: false,
         rewrite: (path) => path.replace(/^\/url/, '')

@@ -1,13 +1,13 @@
 import type { ExecuteCodeRequest, ExecuteCodeResponse } from "@/types";
 
 export async function fetchData(requestDto: ExecuteCodeRequest): Promise<string> {
-    const apiUrl = import.meta.env.VITE_APP_DYNO_CODE_URL;
+    const apiUrl = import.meta.env.VITE_APP_USER_MANAGEMENT_URL;
     if (!apiUrl) {
         throw new Error('API URL is not defined');
     }
     const endpoint = 'execute';
     try {
-        const response = await fetch(`${apiUrl}/${endpoint}`, {
+        const response = await fetch(`${apiUrl}/code/${endpoint}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
