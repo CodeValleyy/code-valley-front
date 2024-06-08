@@ -56,12 +56,12 @@ import { ref, onMounted, watch } from 'vue'
 
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
-import type UserFriend from '@/types/UserFriend'
+import type { FriendshipPendingDTO, UserFriend } from '@/types/FriendshipTypes'
 
 const emit = defineEmits(['close'])
 const friendshipStore = useFriendshipStore()
 const friends = ref([] as UserFriend[])
-const friendRequests = ref([] as UserFriend[])
+const friendRequests = ref([] as FriendshipPendingDTO[])
 const sentFriendRequests = ref([] as UserFriend[])
 const loading = ref(true)
 

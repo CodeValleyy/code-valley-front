@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
-import type UserFriend from '@/types/UserFriend';
+import type { UserFriend } from '@/types/FriendshipTypes'
 
 const friends = ref([] as UserFriend[])
 
@@ -29,7 +29,7 @@ const friendshipStore = useFriendshipStore()
 
 const fetchFriendSuggestions = async () => {
   await friendshipStore.fetchFriendSuggestions()
-  friends.value = friendshipStore.friendSuggestions;
+  friends.value = friendshipStore.friendSuggestions
 }
 
 const sendFriendRequest = async (friendId: number) => {
