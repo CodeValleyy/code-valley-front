@@ -1,13 +1,13 @@
 import { defineStore } from 'pinia';
-import type UserFriend from '@/types/UserFriend';
 import axiosInstance from '@/config/axiosInstance';
+import type { FriendshipPendingDTO, FriendshipSentDTO, UserFriend } from '@/types/FriendshipTypes';
 
 export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
         friends: [] as UserFriend[],
-        friendRequests: [] as UserFriend[],
+        friendRequests: [] as FriendshipPendingDTO[],
         friendSuggestions: [] as UserFriend[],
-        sentFriendRequests: [] as UserFriend[]
+        sentFriendRequests: [] as FriendshipSentDTO[]
     }),
     actions: {
         async fetchFriends() {
@@ -21,7 +21,7 @@ export const useFriendshipStore = defineStore('friendship', {
         async fetchFriendRequests() {
             try {
                 const response = await axiosInstance.get('/friendships/requests');
-                this.friendRequests = response.data as UserFriend[];
+                this.friendRequests = response.data as FriendshipPendingDTO[];
             } catch (error) {
                 console.error('Error fetching friend requests:', error);
             }
@@ -43,7 +43,7 @@ export const useFriendshipStore = defineStore('friendship', {
         async fetchSentFriendRequests() {
             try {
                 const response = await axiosInstance.get('/friendships/sent-requests');
-                this.sentFriendRequests = response.data;
+                this.sentFriendRequests = response.data as FriendshipSentDTO[];
             } catch (error) {
                 console.error('Error fetching pending requests:', error);
             }
