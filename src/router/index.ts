@@ -60,8 +60,9 @@ const routes = [
     meta: { requiresGuest: true }
   },
   {
-    path: '/profile',
+    path: '/profile/:userId?',
     name: 'profile',
+    component: ProfileOverview,
     meta: { requiresAuth: true },
     children: [
       {

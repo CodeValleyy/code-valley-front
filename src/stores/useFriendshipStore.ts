@@ -7,7 +7,8 @@ export const useFriendshipStore = defineStore('friendship', {
         friends: [] as UserFriend[],
         friendRequests: [] as FriendshipPendingDTO[],
         friendSuggestions: [] as UserFriend[],
-        sentFriendRequests: [] as FriendshipSentDTO[]
+        sentFriendRequests: [] as FriendshipSentDTO[],
+        isFollowing: false,
     }),
     actions: {
         async fetchFriends() {
@@ -16,6 +17,22 @@ export const useFriendshipStore = defineStore('friendship', {
                 this.friends = response.data as UserFriend[];
             } catch (error) {
                 console.error('Error fetching friends:', error);
+            }
+        },
+        async fetchFriendsByUserId(userId: number) {
+            try {
+                const response = await axiosInstance.get('/friendships/list/' + userId);
+                this.friends = response.data as UserFriend[];
+            } catch (error) {
+                console.error('Error fetching friends:', error);
+            }
+        },
+        async fetchFriendshipFollowing(currentUserId: number, targetUserId: number) {
+            try {
+                const response = await axiosInstance.get(`/friendships/following/${currentUserId}/${targetUserId}`);
+                this.isFollowing = response.data as boolean;
+            } catch (error) {
+                console.error('Error fetching friendship following:', error);
             }
         },
         async fetchFriendRequests() {
@@ -79,6 +96,13 @@ export const useFriendshipStore = defineStore('friendship', {
             } catch (error) {
                 console.error('Error fetching friend suggestions:', error);
             }
-        }
+        },
+        async toggleFollowUser(targetUserId: number) {
+            if (this.isFollowing) {
+                await this.removeFriend(targetUserId);
+            } else {
+                await this.sendFriendRequest(targetUserId);
+            }
+        },
     }
 });
