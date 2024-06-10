@@ -91,9 +91,9 @@ export const useFriendshipStore = defineStore('friendship', {
                 console.error('Error removing friend:', error);
             }
         },
-        async fetchFriendSuggestions() {
+        async fetchFriendSuggestions(limit: number, offset: number) {
             try {
-                const response = await axiosInstance.get('/friendships/suggestions');
+                const response = await axiosInstance.get(`/friendships/suggestions?limit=${limit}&offset=${offset}`);
                 this.friendSuggestions = response.data;
             } catch (error) {
                 console.error('Error fetching friend suggestions:', error);
