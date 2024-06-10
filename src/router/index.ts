@@ -65,7 +65,24 @@ const routes = [
     component: ProfileOverview,
     meta: { requiresAuth: true },
   },
-
+  {
+    path: '/settings',
+    name: 'profile-settings',
+    component: ProfileSettings,
+    meta: { requiresAuth: true },
+    children: [
+      {
+        path: 'change-password',
+        name: 'change-password',
+        component: ChangePassword
+      },
+      {
+        path: 'change-email',
+        name: 'change-email',
+        component: ChangeEmail
+      }
+    ]
+  },
   {
     path: '/:pathMatch(.*)*',
     redirect: { name: 'home' }

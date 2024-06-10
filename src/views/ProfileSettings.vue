@@ -42,12 +42,10 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
-import { useUserStore } from '@/stores/userStore'
 import { useTwoFactorAuth } from '@/composables/useTwoFactorAuth'
 import router from '@/router'
 
 const { getToken, resetToken } = useAuth()
-const userStore = useUserStore()
 
 const {
   showQrCodeModal,
@@ -78,7 +76,7 @@ const logout = () => {
 }
 
 const goBack = () => {
-  router.back()
+  router.push('/profile')
 }
 </script>
 

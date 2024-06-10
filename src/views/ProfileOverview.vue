@@ -8,7 +8,7 @@
             <v-avatar size="100" class="mb-4" @mouseover="hover = true" @mouseleave="hover = false">
               <img :src="userAvatar" alt="User Avatar" />
               <input
-                v-if="hover && profile.value.id === me.id"
+                v-if="hover && profile.id === me.id"
                 type="file"
                 @change="postAvatar"
                 class="avatar-upload"
@@ -88,7 +88,7 @@
       <FriendList
         @close="showFollowingsModal = false"
         :type="'following'"
-        :isCurrentUser="profile.value.id === me.id"
+        :isCurrentUser="profile.id === me.id"
         :userId="profile.id"
         @update-count="updateCount"
       />
