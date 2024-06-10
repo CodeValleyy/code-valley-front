@@ -250,11 +250,10 @@ const fetchUserData = async (username?: string) => {
       isFollowing.value = friendshipStore.isFollowing
     }
 
-    await friendshipStore.fetchFollowings(profile.value.id)
-    await friendshipStore.fetchFollowers(profile.value.id)
+    const counts = await friendshipStore.fetchFollowersAndFollowingsCount(profile.value.id)
+    followers.value = counts.followers
+    followings.value = counts.followings
 
-    followers.value = friendshipStore.followers.length
-    followings.value = friendshipStore.followings.length
     friendRequests.value = friendshipStore.friendRequests
     sentFriendRequests.value = friendshipStore.sentFriendRequests
 
