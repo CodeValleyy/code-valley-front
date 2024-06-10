@@ -27,7 +27,7 @@
       <v-btn icon @click="commentOnPost" class="mr-2 text-xs" size="25">
         <v-icon class="small-icon">mdi-comment</v-icon>
       </v-btn>
-      <v-btn v-if="post.isOwner" icon @click="confirmDelete" class="mr-2 text-xs" size="25">
+      <v-btn icon @click="confirmDelete" class="mr-2 text-xs" size="25">
         <v-icon class="small-icon">mdi-delete</v-icon>
       </v-btn>
     </v-list-item-action>

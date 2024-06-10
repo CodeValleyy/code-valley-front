@@ -88,7 +88,7 @@
       <FriendList
         @close="showFollowingsModal = false"
         :type="'following'"
-        :isCurrentUser="profile.id === me.id"
+        :isCurrentUser="profile.value.id === me.id"
         :userId="profile.id"
         @update-count="updateCount"
       />
