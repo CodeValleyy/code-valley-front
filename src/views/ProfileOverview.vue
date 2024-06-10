@@ -8,7 +8,7 @@
             <v-avatar size="100" class="mb-4" @mouseover="hover = true" @mouseleave="hover = false">
               <img :src="userAvatar" alt="User Avatar" />
               <input
-                v-if="hover"
+                v-if="hover && profile.id === me.id"
                 type="file"
                 @change="postAvatar"
                 class="avatar-upload"
@@ -20,49 +20,140 @@
             <p class="text-lg mb-4">
               Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString('fr-FR') }}
             </p>
-            <v-btn @click="showFriendsModal = true">Amis ({{ friendsCount }})</v-btn>
-            <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
+            <v-divider class="my-4"></v-divider>
+
+            <v-btn @click="toggleFollow" v-if="profile.id !== me.id">
+              {{ isFollowing ? 'Unfollow' : 'Follow' }}</v-btn
+            >
+            <v-divider class="my-4"></v-divider>
+
+            <div
+              class="inline-block text-center bg-white bg-opacity-50 p-2 rounded cursor-pointer mr-5"
+              @click="showFollowersModal = true"
+            >
+              <div class="text-2xl font-bold">{{ followers }}</div>
+              <div class="text-sm text-gray-700">Followers</div>
+            </div>
+
+            <div class="inline-block text-center bg-white bg-opacity-50 p-2 rounded mr-5">
+              <div class="text-2xl font-bold">{{ userPosts.length }}</div>
+              <div class="text-sm text-gray-700">Posts</div>
+            </div>
+
+            <div
+              class="inline-block text-center bg-white bg-opacity-50 p-2 rounded cursor-pointer"
+              @click="showFollowingsModal = true"
+            >
+              <div class="text-2xl font-bold">{{ followings }}</div>
+              <div class="text-sm text-gray-700">Following</div>
+            </div>
+            <v-btn
+              icon
+              class="absolute top-3 right-3"
+              @click="goToSettings"
+              v-if="profile.id === me.id"
+            >
               <v-icon>mdi-cog</v-icon>
             </v-btn>
-            <v-btn icon class="absolute right-2" @click="handleLogout">
+            <v-btn icon class="absolute right-2" @click="handleLogout" v-if="profile.id === me.id">
               <v-icon>mdi-logout</v-icon>
             </v-btn>
           </template>
         </v-card>
+
+        <v-divider class="my-4"></v-divider>
+        <v-list>
+          <template v-for="(post, index) in userPosts" :key="post.id">
+            <PostItem :post="post" @refreshPosts="fetchUserPosts" @deletePost="confirmDelete" />
+            <v-divider
+              v-if="!isLastItem(index)"
+              :key="`divider-${index}`"
+              class="post-divider"
+            ></v-divider>
+          </template>
+        </v-list>
       </v-col>
     </v-row>
 
-    <v-dialog v-model="showFriendsModal" max-width="600">
-      <FriendList @close="showFriendsModal = false" />
+    <v-dialog v-model="showFollowersModal" max-width="600">
+      <FriendList
+        @close="showFollowersModal = false"
+        :type="'followers'"
+        :isCurrentUser="profile.id === me.id"
+        :userId="profile.id"
+        @update-count="updateCount"
+      />
+    </v-dialog>
+    <v-dialog v-model="showFollowingsModal" max-width="600">
+      <FriendList
+        @close="showFollowingsModal = false"
+        :type="'following'"
+        :isCurrentUser="profile.id === me.id"
+        :userId="profile.id"
+        @update-count="updateCount"
+      />
+    </v-dialog>
+    <v-dialog v-model="deleteDialog" max-width="400">
+      <v-card>
+        <v-card-title class="headline">Confirmer la suppression</v-card-title>
+        <v-card-text>Voulez-vous vraiment supprimer ce post ?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text="Annuler" @click="deleteDialog = false">Annuler</v-btn>
+          <v-btn color="red darken-1" text="Supprimer" @click="deletePost">Supprimer</v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
-import router from '@/router'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
+import { usePostStore } from '@/stores/usePostStore'
 import FriendList from '@/components/FriendList.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import PostItem from '@/components/PostItem.vue'
+import router from '@/router'
+import type { Post } from '@/types'
+import { useUserStore } from '@/stores/userStore'
+import type { UserFriend } from '@/types/FriendshipTypes'
 
-const { fetchMe, getToken, logout, uploadAvatar } = useAuth()
-const friendsCount = ref(0)
-const showFriendsModal = ref(false)
+const route = useRoute()
+
+const { fetchMe, getToken, logout, uploadAvatar, fetchProfile } = useAuth()
+const followers = ref(0)
+const followings = ref(0)
+const showFollowersModal = ref(false)
+const showFollowingsModal = ref(false)
 const loading = ref(true)
-const userAvatar = ref()
+const userAvatar = ref('')
 const hover = ref(false)
+const isFollowing = ref(false)
+const userPosts = ref([] as Post[])
+const deleteDialog = ref(false)
+const postToDelete = ref<Post | null>(null)
 
 const friendshipStore = useFriendshipStore()
+const postStore = usePostStore()
+const userStore = useUserStore()
 
+const friendRequests = ref([] as UserFriend[])
+const sentFriendRequests = ref([] as UserFriend[])
+
+const me = (await userStore.user) || (await fetchMe())
+const profile = ref()
 const userProfile = ref({
   username: '',
   email: '',
   createdAt: ''
 })
 
-const goToSettings = () => {
-  router.push('/profile/settings')
+const goToSettings = async () => {
+  await nextTick()
+  router.push({ name: 'profile-settings', params: { userId: me.id } })
 }
 
 const handleLogout = async () => {
@@ -88,38 +179,100 @@ const postAvatar = async (event: Event) => {
   }
 }
 
+const toggleFollow = async () => {
+  if (profile.value !== null) {
+    await friendshipStore.toggleFollowUser(profile.value.id)
+    isFollowing.value = friendshipStore.isFollowing
+  }
+}
 
-onMounted(async () => {
+const fetchUserPosts = async () => {
+  if (postStore.posts.length === 0) {
+    await postStore.fetchPosts()
+  }
+  userPosts.value = postStore.posts.filter((post) => post.userId === profile.value.id)
+}
+
+const confirmDelete = (post: Post) => {
+  postToDelete.value = post
+  deleteDialog.value = true
+}
+
+const deletePost = async () => {
+  if (postToDelete.value) {
+    await postStore.deletePost(postToDelete.value.id)
+    deleteDialog.value = false
+    await fetchUserPosts()
+  }
+}
+
+const isLastItem = (index: number) => {
+  return index === userPosts.value.length - 1
+}
+
+const updateCount = (type: string, count: number) => {
+  if (type === 'followers') {
+    followers.value = count
+  } else if (type === 'following') {
+    followings.value = count
+  }
+}
+
+const fetchUserData = async (username?: string) => {
   if (!getToken()) {
     logoutAndRedirect()
     return
   }
 
+  fetchUserPosts()
+
   try {
-    const profile = await fetchMe()
-    userProfile.value = profile
-    userAvatar.value = profile.avatar || 'https://via.placeholder.com/100'
-    await friendshipStore.fetchFriends()
-    await friendshipStore.fetchFriendRequests()
-    friendsCount.value = friendshipStore.friends.length
+    if (!username) {
+      profile.value = me
+    } else {
+      profile.value = await fetchProfile(username)
+    }
+
+    userProfile.value = profile.value
+    userAvatar.value = profile.value.avatar || 'https://via.placeholder.com/100'
+
+    if (profile.value.id !== me.id) {
+      await friendshipStore.fetchFriendshipFollowing(me.id, profile.value.id)
+      isFollowing.value = friendshipStore.isFollowing
+    }
+
+    await friendshipStore.fetchFollowings(profile.value.id)
+    await friendshipStore.fetchFollowers(profile.value.id)
+
+    followers.value = friendshipStore.followers.length
+    followings.value = friendshipStore.followings.length
+    friendRequests.value = friendshipStore.friendRequests
+    sentFriendRequests.value = friendshipStore.sentFriendRequests
+
+    await fetchUserPosts()
   } catch (error) {
-    logoutAndRedirect()
+    router.push('/')
     console.error('Error fetching profile:', error)
   } finally {
     loading.value = false
   }
-})
-</script>
+}
 
-<style scoped>
-.min-h-screen {
-  min-height: 100vh;
-}
-.avatar-upload {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-</style>
+onMounted(() => {
+  let username = route.params.username
+  if (Array.isArray(username)) {
+    username = username[0]
+  }
+  fetchUserData(username)
+})
+
+watch(
+  () => route.params.username,
+  (newUsername) => {
+    if (Array.isArray(newUsername)) {
+      newUsername = newUsername[0]
+    }
+    fetchUserData(newUsername)
+  }
+)
+</script>

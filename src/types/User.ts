@@ -6,4 +6,5 @@ export interface User {
     lastLoginAt: string;
     isTwoFactorAuthenticationEnabled: boolean;
     twoFactorAuthenticationSecret?: string;
+    avatar: string;
 }

@@ -60,27 +60,26 @@ const routes = [
     meta: { requiresGuest: true }
   },
   {
-    path: '/profile',
+    path: '/profile/:username?',
     name: 'profile',
+    component: ProfileOverview,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/settings',
+    name: 'profile-settings',
+    component: ProfileSettings,
     meta: { requiresAuth: true },
     children: [
       {
-        path: '',
-        component: ProfileOverview
+        path: 'change-password',
+        name: 'change-password',
+        component: ChangePassword
       },
       {
-        path: 'settings',
-        component: ProfileSettings,
-        children: [
-          {
-            path: 'change-password',
-            component: ChangePassword
-          },
-          {
-            path: 'change-email',
-            component: ChangeEmail
-          }
-        ]
+        path: 'change-email',
+        name: 'change-email',
+        component: ChangeEmail
       }
     ]
   },
