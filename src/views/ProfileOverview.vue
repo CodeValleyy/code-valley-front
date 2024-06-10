@@ -8,7 +8,7 @@
             <v-avatar size="100" class="mb-4" @mouseover="hover = true" @mouseleave="hover = false">
               <img :src="userAvatar" alt="User Avatar" />
               <input
-                v-if="hover"
+                v-if="hover && userId === me.id"
                 type="file"
                 @change="postAvatar"
                 class="avatar-upload"
@@ -20,15 +20,42 @@
             <p class="text-lg mb-4">
               Inscrit depuis le {{ new Date(userProfile.createdAt).toLocaleDateString('fr-FR') }}
             </p>
+            <v-divider class="my-4"></v-divider>
 
-            <v-btn @click="showFriendsModal = true">Amis ({{ friendsCount }})</v-btn>
             <v-btn @click="toggleFollow" v-if="userId !== me.id">
               {{ isFollowing ? 'Unfollow' : 'Follow' }}</v-btn
             >
-            <v-btn icon class="absolute top-3 right-3" @click="goToSettings">
+            <v-divider class="my-4"></v-divider>
+
+            <div
+              class="inline-block text-center bg-white bg-opacity-50 p-2 rounded cursor-pointer mr-5"
+              @click="showFollowersModal = true"
+            >
+              <div class="text-2xl font-bold">{{ followers }}</div>
+              <div class="text-sm text-gray-700">Followers</div>
+            </div>
+
+            <div class="inline-block text-center bg-white bg-opacity-50 p-2 rounded mr-5">
+              <div class="text-2xl font-bold">{{ userPosts.length }}</div>
+              <div class="text-sm text-gray-700">Posts</div>
+            </div>
+
+            <div
+              class="inline-block text-center bg-white bg-opacity-50 p-2 rounded cursor-pointer"
+              @click="showFollowingsModal = true"
+            >
+              <div class="text-2xl font-bold">{{ followings }}</div>
+              <div class="text-sm text-gray-700">Following</div>
+            </div>
+            <v-btn
+              icon
+              class="absolute top-3 right-3"
+              @click="goToSettings"
+              v-if="userId === me.id"
+            >
               <v-icon>mdi-cog</v-icon>
             </v-btn>
-            <v-btn icon class="absolute right-2" @click="handleLogout">
+            <v-btn icon class="absolute right-2" @click="handleLogout" v-if="userId === me.id">
               <v-icon>mdi-logout</v-icon>
             </v-btn>
           </template>
@@ -48,8 +75,22 @@
       </v-col>
     </v-row>
 
-    <v-dialog v-model="showFriendsModal" max-width="600">
-      <FriendList @close="showFriendsModal = false" />
+    <v-dialog v-model="showFollowersModal" max-width="600">
+      <FriendList
+        @close="showFollowersModal = false"
+        :type="'followers'"
+        :isCurrentUser="userId === me.id"
+        :userId="userId"
+      />
+    </v-dialog>
+    <v-dialog v-model="showFollowingsModal" max-width="600">
+      <FriendList
+        @close="showFollowingsModal = false"
+        :requests="sentFriendRequests"
+        :type="'following'"
+        :isCurrentUser="userId === me.id"
+        :userId="userId"
+      />
     </v-dialog>
     <v-dialog v-model="deleteDialog" max-width="400">
       <v-card>
@@ -64,6 +105,7 @@
     </v-dialog>
   </v-container>
 </template>
+
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
@@ -76,13 +118,16 @@ import PostItem from '@/components/PostItem.vue'
 import router from '@/router'
 import type { Post } from '@/types'
 import { useUserStore } from '@/stores/userStore'
+import type { UserFriend } from '@/types/FriendshipTypes'
 
 const route = useRoute()
 const userId = ref<number>(0)
 
 const { fetchMe, getToken, logout, uploadAvatar, fetchProfile } = useAuth()
-const friendsCount = ref(0)
-const showFriendsModal = ref(false)
+const followers = ref(0)
+const followings = ref(0)
+const showFollowersModal = ref(false)
+const showFollowingsModal = ref(false)
 const loading = ref(true)
 const userAvatar = ref('')
 const hover = ref(false)
@@ -95,6 +140,9 @@ const friendshipStore = useFriendshipStore()
 const postStore = usePostStore()
 const userStore = useUserStore()
 
+const friendRequests = ref([] as UserFriend[])
+const sentFriendRequests = ref([] as UserFriend[])
+
 const me = (await userStore.user) || (await fetchMe())
 
 const userProfile = ref({
@@ -103,8 +151,9 @@ const userProfile = ref({
   createdAt: ''
 })
 
-const goToSettings = () => {
-  router.push('/profile/settings')
+const goToSettings = async () => {
+  await nextTick()
+  router.push({ name: 'profile-settings', params: { userId: me.id } })
 }
 
 const handleLogout = async () => {
@@ -138,6 +187,9 @@ const toggleFollow = async () => {
 }
 
 const fetchUserPosts = async () => {
+  if (postStore.posts.length === 0) {
+    await postStore.fetchPosts()
+  }
   userPosts.value = postStore.posts.filter((post) => post.userId === userId.value)
 }
 
@@ -164,10 +216,13 @@ onMounted(async () => {
     return
   }
 
+  fetchUserPosts()
+
   try {
     userId.value = route.params.userId ? Number(route.params.userId) : me.id
 
     const profile = await fetchProfile(userId.value)
+
     userProfile.value = profile
     userAvatar.value = profile.avatar || 'https://via.placeholder.com/100'
 
@@ -176,12 +231,16 @@ onMounted(async () => {
       isFollowing.value = friendshipStore.isFollowing
     }
 
-    await friendshipStore.fetchFriendsByUserId(userId.value)
-    friendsCount.value = friendshipStore.friends.length
+    await friendshipStore.fetchFollowings(userId.value)
+    await friendshipStore.fetchFollowers(userId.value)
+    followers.value = friendshipStore.followers.length
+    followings.value = friendshipStore.followings.length
+    friendRequests.value = friendshipStore.friendRequests
+    sentFriendRequests.value = friendshipStore.sentFriendRequests
 
     await fetchUserPosts()
   } catch (error) {
-    logoutAndRedirect()
+    router.push('/')
     console.error('Error fetching profile:', error)
   } finally {
     loading.value = false
@@ -199,6 +258,25 @@ onMounted(async () => {
   height: 100%;
   opacity: 0;
   cursor: pointer;
+}
+.post-divider {
+  margin: 0;
+}
+
+.friends-count-container {
+  display: inline-block;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5); /* Fond transparent */
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.friends-count {
+  font-size: 24px;
+  font-weight: bold;
+}
+.friends-text {
+  font-size: 14px;
 }
 .post-divider {
   margin: 0;

@@ -66,13 +66,6 @@ onMounted(async () => {
     logout()
     return
   }
-
-  try {
-    await userStore.fetchUserProfile()
-  } catch (error) {
-    logout()
-    console.error('Error fetching profile:', error)
-  }
 })
 
 const copySetupKey = () => {

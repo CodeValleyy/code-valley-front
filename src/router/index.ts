@@ -66,11 +66,8 @@ const routes = [
     meta: { requiresAuth: true },
     children: [
       {
-        path: '',
-        component: ProfileOverview
-      },
-      {
         path: 'settings',
+        name: 'profile-settings',
         component: ProfileSettings,
         children: [
           {
