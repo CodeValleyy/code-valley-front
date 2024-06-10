@@ -15,7 +15,7 @@
         </v-list-item>
       </v-list>
       <div>
-        <v-btn @click="previousPage" :disabled="offset === 0">Précédent</v-btn>
+        <v-btn @click="previousPage" :disabled="offset === 0" class="mr-2">Précédent</v-btn>
         <v-btn @click="nextPage" :disabled="friends.length < limit">Suivant</v-btn>
       </div>
     </v-card-text>
@@ -28,7 +28,7 @@ import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
 
 const friends = ref([] as UserFriend[])
-const limit = ref(10)
+const limit = ref(5)
 const offset = ref(0)
 
 const friendshipStore = useFriendshipStore()
