@@ -63,7 +63,7 @@ const props = defineProps({
 
 const title = ref(props.type === 'followers' ? 'Followers' : 'Following')
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'update-count'])
 const friendshipStore = useFriendshipStore()
 const userStore = useUserStore()
 
@@ -120,6 +120,8 @@ const removeFriend = async (friendId: number) => {
     followings.value = followings.value.filter((f) => f.id !== friendId)
     displayList.value = followings.value
   }
+  emit('update-count', 'followers', followers.value.length)
+  emit('update-count', 'following', followings.value.length)
 }
 
 const followBack = async (friend: UserFriend) => {

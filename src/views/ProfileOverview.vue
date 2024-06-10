@@ -81,15 +81,16 @@
         :type="'followers'"
         :isCurrentUser="userId === me.id"
         :userId="userId"
+        @update-count="updateCount"
       />
     </v-dialog>
     <v-dialog v-model="showFollowingsModal" max-width="600">
       <FriendList
         @close="showFollowingsModal = false"
-        :requests="sentFriendRequests"
         :type="'following'"
         :isCurrentUser="userId === me.id"
         :userId="userId"
+        @update-count="updateCount"
       />
     </v-dialog>
     <v-dialog v-model="deleteDialog" max-width="400">
@@ -210,6 +211,14 @@ const isLastItem = (index: number) => {
   return index === userPosts.value.length - 1
 }
 
+const updateCount = (type: string, count: number) => {
+  if (type === 'followers') {
+    followers.value = count
+  } else if (type === 'following') {
+    followings.value = count
+  }
+}
+
 onMounted(async () => {
   if (!getToken()) {
     logoutAndRedirect()
@@ -247,38 +256,3 @@ onMounted(async () => {
   }
 })
 </script>
-
-<style scoped>
-.min-h-screen {
-  min-height: 100vh;
-}
-.avatar-upload {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-}
-.post-divider {
-  margin: 0;
-}
-
-.friends-count-container {
-  display: inline-block;
-  text-align: center;
-  background-color: rgba(255, 255, 255, 0.5); /* Fond transparent */
-  padding: 10px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-.friends-count {
-  font-size: 24px;
-  font-weight: bold;
-}
-.friends-text {
-  font-size: 14px;
-}
-.post-divider {
-  margin: 0;
-}
-</style>
