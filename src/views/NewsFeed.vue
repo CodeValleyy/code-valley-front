@@ -6,7 +6,7 @@
         <v-divider class="my-4"></v-divider>
         <v-list>
           <template v-for="(post, index) in posts" :key="post.id">
-            <v-list-item class="post-item">
+            <v-list-item class="post-item" @click="viewPost(post.id)">
               <v-list-item-avatar>
                 <router-link :to="`/profile/${post.username}`">
                   <v-avatar>
@@ -27,7 +27,7 @@
               <v-list-item-action>
                 <v-btn
                   icon
-                  @click="toggleLike(post)"
+                  @click.stop="toggleLike(post)"
                   :class="{ liked: post.userHasLiked }"
                   class="mr-2 text-xs"
                   size="25"
@@ -36,13 +36,13 @@
                     {{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
                   </v-icon>
                 </v-btn>
-                <v-btn icon @click="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
+                <v-btn icon @click.stop="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
                   <v-icon class="small-icon">mdi-comment</v-icon>
                 </v-btn>
                 <v-btn
                   v-if="post.isOwner"
                   icon
-                  @click="confirmDelete(post)"
+                  @click.stop="confirmDelete(post)"
                   class="mr-2 text-xs"
                   size="25"
                 >
@@ -78,12 +78,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/usePostStore'
 import { useAuth } from '@/composables/useAuth'
 import PostComposer from '@/components/PostComposer.vue'
 import FriendSuggestions from '@/components/FriendSuggestions.vue'
 import type { Post } from '@/types'
 
+const router = useRouter()
 const postStore = usePostStore()
 const posts: Ref<Post[]> = ref([])
 const deleteDialog = ref(false)
@@ -145,6 +147,10 @@ const deletePost = async () => {
     deleteDialog.value = false
   }
 }
+
+const viewPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId } })
+}
 </script>
 
 <style scoped>
@@ -179,5 +185,10 @@ const deletePost = async () => {
 
 .liked .small-icon {
   color: red;
+}
+
+.username-link {
+  text-decoration: none;
+  color: inherit;
 }
 </style>

@@ -9,6 +9,7 @@ export interface CreatePostDto {
 export const usePostStore = defineStore('post', {
     state: () => ({
         posts: [] as Post[],
+        currentPost: null as Post | null,
     }),
     actions: {
         async fetchPosts() {
@@ -17,6 +18,16 @@ export const usePostStore = defineStore('post', {
                 this.posts = response.data;
             } catch (error) {
                 console.error('Error fetching posts:', error);
+            }
+        },
+        async fetchPost(postId: number): Promise<Post> {
+            try {
+                const response = await axiosInstance.get(`/posts/${postId}`);
+                const post = response.data;
+                return post;
+            } catch (error) {
+                console.error('Error fetching post:', error);
+                throw error;
             }
         },
         async createPost(content: string) {
