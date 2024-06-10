@@ -89,7 +89,7 @@
         @close="showFollowingsModal = false"
         :type="'following'"
         :isCurrentUser="userId === me.id"
-        :userId="userId"
+        :userId="profile.id"
         @update-count="updateCount"
       />
     </v-dialog>
@@ -145,7 +145,7 @@ const friendRequests = ref([] as UserFriend[])
 const sentFriendRequests = ref([] as UserFriend[])
 
 const me = (await userStore.user) || (await fetchMe())
-
+const profile = ref()
 const userProfile = ref({
   username: '',
   email: '',
@@ -182,7 +182,7 @@ const postAvatar = async (event: Event) => {
 
 const toggleFollow = async () => {
   if (userId.value !== null) {
-    await friendshipStore.toggleFollowUser(userId.value)
+    await friendshipStore.toggleFollowUser(profile.value.id)
     isFollowing.value = friendshipStore.isFollowing
   }
 }
@@ -191,7 +191,7 @@ const fetchUserPosts = async () => {
   if (postStore.posts.length === 0) {
     await postStore.fetchPosts()
   }
-  userPosts.value = postStore.posts.filter((post) => post.userId === userId.value)
+  userPosts.value = postStore.posts.filter((post) => post.userId === profile.value.id)
 }
 
 const confirmDelete = (post: Post) => {
@@ -228,20 +228,20 @@ onMounted(async () => {
   fetchUserPosts()
 
   try {
-    userId.value = route.params.userId ? Number(route.params.userId) : me.id
+    userId.value = route.params.userId ? route.params.userId : me.id
 
-    const profile = await fetchProfile(userId.value)
+    profile.value = await fetchProfile(userId.value)
 
-    userProfile.value = profile
-    userAvatar.value = profile.avatar || 'https://via.placeholder.com/100'
+    userProfile.value = profile.value
+    userAvatar.value = profile.value.avatar || 'https://via.placeholder.com/100'
 
     if (userId.value !== me.id) {
-      await friendshipStore.fetchFriendshipFollowing(me.id, userId.value)
+      await friendshipStore.fetchFriendshipFollowing(me.id, profile.value.id)
       isFollowing.value = friendshipStore.isFollowing
     }
 
-    await friendshipStore.fetchFollowings(userId.value)
-    await friendshipStore.fetchFollowers(userId.value)
+    await friendshipStore.fetchFollowings(profile.value.id)
+    await friendshipStore.fetchFollowers(profile.value.id)
     followers.value = friendshipStore.followers.length
     followings.value = friendshipStore.followings.length
     friendRequests.value = friendshipStore.friendRequests

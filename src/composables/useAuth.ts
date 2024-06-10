@@ -25,9 +25,22 @@ const fetchMe = async () => {
     }
 };
 
-const fetchProfile = async (userId: number) => {
+const fetchProfile = async (userId: number | string) => {
+    return typeof userId === 'string' ? fetchProfileByUsername(userId) : fetchProfileById(userId);
+}
+const fetchProfileById = async (userId: number) => {
     try {
         const response = await axiosInstance.get(`/auth/profile/${userId}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+    }
+}
+
+const fetchProfileByUsername = async (username: string) => {
+    try {
+        const response = await axiosInstance.get(`/auth/profile/username/${username}`);
         return response.data;
     } catch (error) {
         console.error('Error fetching profile:', error);
