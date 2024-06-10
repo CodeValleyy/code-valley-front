@@ -25,7 +25,10 @@ const fetchMe = async () => {
     }
 };
 
-const fetchProfile = async (userId: number | string) => {
+const fetchProfile = async (userId: number | string | undefined) => {
+    if (!userId) {
+        throw new Error('No userId provided');
+    }
     return typeof userId === 'string' ? fetchProfileByUsername(userId) : fetchProfileById(userId);
 }
 const fetchProfileById = async (userId: number) => {

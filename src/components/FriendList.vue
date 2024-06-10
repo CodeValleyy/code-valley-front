@@ -7,9 +7,12 @@
         <v-list>
           <v-list-item v-for="friend in displayList" :key="friend.id">
             <v-list-item-content>
-              <router-link :to="`/profile/${String(friend.username)}`">{{
-                friend.username
-              }}</router-link>
+              <v-btn
+                :to="`/profile/${String(friend.username)}`"
+                @click="navigateToProfile(friend.username)"
+              >
+                {{ friend.username }}
+              </v-btn>
             </v-list-item-content>
             <v-btn
               icon
@@ -37,14 +40,16 @@
   </v-card>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, nextTick } from 'vue'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { FriendshipStatus, type UserFriend } from '@/types/FriendshipTypes'
 import { useUserStore } from '@/stores/userStore'
 import { useAuth } from '@/composables/useAuth'
+import { useRouter } from 'vue-router'
 const { fetchMe } = useAuth()
 
+const router = useRouter()
 const props = defineProps({
   type: {
     type: String,
@@ -75,7 +80,7 @@ const displayList = ref([] as UserFriend[])
 
 const loading = ref(true)
 const me = (await userStore.user) || (await fetchMe())
-const userId = props.userId || me.id
+const userId = ref<number>(props.userId || me.id)
 
 const updateLists = () => {
   if (props.type === 'followers') {
@@ -90,10 +95,19 @@ const updateLists = () => {
   }
 }
 
+const navigateToProfile = async (username: string) => {
+  emit('close')
+  await nextTick()
+  router.push({
+    path: `/profile/${username}`
+  })
+}
+
 onMounted(async () => {
   try {
-    await friendshipStore.fetchFollowings(userId)
-    await friendshipStore.fetchFollowers(userId)
+    loading.value = true
+    await friendshipStore.fetchFollowers(userId.value)
+    await friendshipStore.fetchFollowings(userId.value)
     updateLists()
   } finally {
     loading.value = false

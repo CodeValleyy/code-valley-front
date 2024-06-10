@@ -8,7 +8,7 @@
             <v-avatar size="100" class="mb-4" @mouseover="hover = true" @mouseleave="hover = false">
               <img :src="userAvatar" alt="User Avatar" />
               <input
-                v-if="hover && userId === me.id"
+                v-if="hover && profile.value.id === me.id"
                 type="file"
                 @change="postAvatar"
                 class="avatar-upload"
@@ -22,7 +22,7 @@
             </p>
             <v-divider class="my-4"></v-divider>
 
-            <v-btn @click="toggleFollow" v-if="userId !== me.id">
+            <v-btn @click="toggleFollow" v-if="profile.id !== me.id">
               {{ isFollowing ? 'Unfollow' : 'Follow' }}</v-btn
             >
             <v-divider class="my-4"></v-divider>
@@ -51,11 +51,11 @@
               icon
               class="absolute top-3 right-3"
               @click="goToSettings"
-              v-if="userId === me.id"
+              v-if="profile.id === me.id"
             >
               <v-icon>mdi-cog</v-icon>
             </v-btn>
-            <v-btn icon class="absolute right-2" @click="handleLogout" v-if="userId === me.id">
+            <v-btn icon class="absolute right-2" @click="handleLogout" v-if="profile.id === me.id">
               <v-icon>mdi-logout</v-icon>
             </v-btn>
           </template>
@@ -79,8 +79,8 @@
       <FriendList
         @close="showFollowersModal = false"
         :type="'followers'"
-        :isCurrentUser="userId === me.id"
-        :userId="userId"
+        :isCurrentUser="profile.id === me.id"
+        :userId="profile.id"
         @update-count="updateCount"
       />
     </v-dialog>
@@ -88,7 +88,7 @@
       <FriendList
         @close="showFollowingsModal = false"
         :type="'following'"
-        :isCurrentUser="userId === me.id"
+        :isCurrentUser="profile.id === me.id"
         :userId="profile.id"
         @update-count="updateCount"
       />
@@ -108,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
@@ -122,7 +122,6 @@ import { useUserStore } from '@/stores/userStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
 
 const route = useRoute()
-const userId = ref<number>(0)
 
 const { fetchMe, getToken, logout, uploadAvatar, fetchProfile } = useAuth()
 const followers = ref(0)
@@ -181,7 +180,7 @@ const postAvatar = async (event: Event) => {
 }
 
 const toggleFollow = async () => {
-  if (userId.value !== null) {
+  if (profile.value !== null) {
     await friendshipStore.toggleFollowUser(profile.value.id)
     isFollowing.value = friendshipStore.isFollowing
   }
@@ -219,7 +218,7 @@ const updateCount = (type: string, count: number) => {
   }
 }
 
-onMounted(async () => {
+const fetchUserData = async (username?: string) => {
   if (!getToken()) {
     logoutAndRedirect()
     return
@@ -228,20 +227,23 @@ onMounted(async () => {
   fetchUserPosts()
 
   try {
-    userId.value = route.params.userId ? route.params.userId : me.id
-
-    profile.value = await fetchProfile(userId.value)
+    if (!username) {
+      profile.value = me
+    } else {
+      profile.value = await fetchProfile(username)
+    }
 
     userProfile.value = profile.value
     userAvatar.value = profile.value.avatar || 'https://via.placeholder.com/100'
 
-    if (userId.value !== me.id) {
+    if (profile.value.id !== me.id) {
       await friendshipStore.fetchFriendshipFollowing(me.id, profile.value.id)
       isFollowing.value = friendshipStore.isFollowing
     }
 
     await friendshipStore.fetchFollowings(profile.value.id)
     await friendshipStore.fetchFollowers(profile.value.id)
+
     followers.value = friendshipStore.followers.length
     followings.value = friendshipStore.followings.length
     friendRequests.value = friendshipStore.friendRequests
@@ -254,5 +256,23 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+}
+
+onMounted(() => {
+  let username = route.params.username
+  if (Array.isArray(username)) {
+    username = username[0]
+  }
+  fetchUserData(username)
 })
+
+watch(
+  () => route.params.username,
+  (newUsername) => {
+    if (Array.isArray(newUsername)) {
+      newUsername = newUsername[0]
+    }
+    fetchUserData(newUsername)
+  }
+)
 </script>
