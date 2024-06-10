@@ -8,13 +8,18 @@
           <template v-for="(post, index) in posts" :key="post.id">
             <v-list-item class="post-item">
               <v-list-item-avatar>
-                <v-avatar>
-                  <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
-                </v-avatar>
+                <router-link :to="`/profile/${post.username}`">
+                  <v-avatar>
+                    <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
+                  </v-avatar>
+                </router-link>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="post-username">
-                  {{ post.username }} - {{ formatDate(post.createdAt) }}
+                  <router-link :to="`/profile/${post.username}`" class="username-link">
+                    {{ post.username }}
+                  </router-link>
+                  - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
               </v-list-item-content>
@@ -45,7 +50,11 @@
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider v-if="!isLastItem(index)" :key="`divider-${index}`" class="post-divider"></v-divider>
+            <v-divider
+              v-if="!isLastItem(index)"
+              :key="`divider-${index}`"
+              class="post-divider"
+            ></v-divider>
           </template>
         </v-list>
       </v-col>
@@ -66,7 +75,6 @@
     </v-dialog>
   </v-container>
 </template>
-
 
 <script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue'
