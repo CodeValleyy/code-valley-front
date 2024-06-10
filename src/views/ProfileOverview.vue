@@ -64,7 +64,12 @@
         <v-divider class="my-4"></v-divider>
         <v-list>
           <template v-for="(post, index) in userPosts" :key="post.id">
-            <PostItem :post="post" @refreshPosts="fetchUserPosts" @deletePost="confirmDelete" />
+            <PostItem
+              :post="post"
+              @refreshPosts="fetchUserPosts"
+              @deletePost="confirmDelete"
+              @click="viewPost(post.id)"
+            />
             <v-divider
               v-if="!isLastItem(index)"
               :key="`divider-${index}`"
@@ -196,6 +201,10 @@ const fetchUserPosts = async () => {
 const confirmDelete = (post: Post) => {
   postToDelete.value = post
   deleteDialog.value = true
+}
+
+const viewPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId } })
 }
 
 const deletePost = async () => {
