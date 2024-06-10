@@ -2,6 +2,9 @@
   <v-container>
     <v-row>
       <v-col cols="12">
+        <v-btn icon @click="goBack" class="mb-4">
+          <v-icon>mdi-arrow-left</v-icon>
+        </v-btn>
         <v-card v-if="post">
           <v-card-title>
             <router-link :to="`/profile/${post.username}`">
@@ -42,15 +45,20 @@
         </div>
         <v-list>
           <v-list-item v-for="comment in comments" :key="comment.id">
-            <v-list-item-avatar>
-              <v-avatar>
-                <img :src="comment.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
-              </v-avatar>
-            </v-list-item-avatar>
-            <v-list-item-content>
-              <v-list-item-title>{{ comment.username }}</v-list-item-title>
-              <v-list-item-subtitle>{{ comment.content }}</v-list-item-subtitle>
-            </v-list-item-content>
+            <router-link :to="`/profile/${comment.username}`">
+              <v-list-item-avatar>
+                <v-avatar>
+                  <img
+                    :src="comment.avatar || 'https://via.placeholder.com/40'"
+                    alt="User Avatar"
+                  />
+                </v-avatar>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>{{ comment.username }}</v-list-item-title>
+                <v-list-item-subtitle>{{ comment.content }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </router-link>
           </v-list-item>
         </v-list>
       </v-col>
@@ -71,13 +79,14 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/usePostStore'
 import type { Post } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 const { fetchMe } = useAuth()
 
 const route = useRoute()
+const router = useRouter()
 const postStore = usePostStore()
 const post = ref<Post | null>(null)
 const isLoading = ref(false)
@@ -131,10 +140,10 @@ const toggleLike = async (post: Post) => {
 const postComment = () => {
   if (newComment.value.trim()) {
     comments.value.push({
-      id: Date.now(),
-      username: 'Current User',
+      id: me.id,
+      username: me.username,
       content: newComment.value,
-      avatar: 'https://via.placeholder.com/40'
+      avatar: me.avatar
     })
     newComment.value = ''
     showCommentInput.value = false
@@ -151,6 +160,10 @@ const deletePost = async () => {
     await postStore.deletePost(postToDelete.value.id)
     deleteDialog.value = false
   }
+}
+
+const goBack = () => {
+  router.back()
 }
 </script>
 
