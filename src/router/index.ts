@@ -10,6 +10,7 @@ import ChangePassword from '@/views/ChangePassword.vue'
 import ChangeEmail from '@/views/ChangeEmail.vue'
 import SearchView from '@/views/SearchView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
+import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
 
@@ -40,7 +41,11 @@ const routes = [
     meta: { requiresAuth: true },
     component: NotificationsView
   },
-
+  {
+    path: '/post/:id',
+    name: 'PostDetail',
+    component: PostDetail
+  },
   {
     path: '/code',
     name: 'code',
@@ -60,27 +65,26 @@ const routes = [
     meta: { requiresGuest: true }
   },
   {
-    path: '/profile',
+    path: '/profile/:username?',
     name: 'profile',
+    component: ProfileOverview,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/settings',
+    name: 'profile-settings',
+    component: ProfileSettings,
     meta: { requiresAuth: true },
     children: [
       {
-        path: '',
-        component: ProfileOverview
+        path: 'change-password',
+        name: 'change-password',
+        component: ChangePassword
       },
       {
-        path: 'settings',
-        component: ProfileSettings,
-        children: [
-          {
-            path: 'change-password',
-            component: ChangePassword
-          },
-          {
-            path: 'change-email',
-            component: ChangeEmail
-          }
-        ]
+        path: 'change-email',
+        name: 'change-email',
+        component: ChangeEmail
       }
     ]
   },

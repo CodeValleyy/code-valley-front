@@ -54,15 +54,7 @@ import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 
-const routes = ref([
-  { location: '/', label: 'Accueil' },
-  { location: '/code', label: 'Code' },
-  { location: '/register', label: "S'inscrire" },
-  { location: '/login', label: 'Se connecter' }
-])
-
 const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
-
 const dark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
 const lang = computed(() => {

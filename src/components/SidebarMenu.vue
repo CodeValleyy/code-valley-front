@@ -47,6 +47,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import PostModal from '@/components/PostModal.vue'
 import UserProfileModal from '@/components/UserProfileModal.vue'
+import { useUserStore } from '@/stores/userStore'
 
 const { getToken, fetchMe } = useAuth()
 
@@ -58,6 +59,7 @@ const userAvatar = ref(
   'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
 )
 const username = ref('')
+const userStore = useUserStore()
 
 const menuItems = computed(() => {
   const items = [
@@ -65,7 +67,8 @@ const menuItems = computed(() => {
     { text: 'Recherche', to: '/search', icon: 'mdi-magnify', exact: false },
     { text: 'Code', to: '/code', icon: 'mdi-code-tags', exact: false },
     { text: 'Notifications', to: '/notifications', icon: 'mdi-bell', exact: false },
-    { text: 'Profil', to: '/profile', icon: 'mdi-account', exact: false }
+    { text: 'Profil', to: '/profile', icon: 'mdi-account', exact: false },
+    { text: 'Déconnexion', to: '/logout', icon: 'mdi-logout', exact: false }
   ]
 
   if (!isAuthenticated.value) {
@@ -86,10 +89,11 @@ const handleResize = () => {
 
 const fetchUserProfile = async () => {
   try {
-    const user = await fetchMe()
-    username.value = user.username
+    await userStore.fetchUserProfile()
+    const user = userStore.user
+    username.value = user?.username || ''
     userAvatar.value =
-      user.avatar ||
+      user?.avatar ||
       'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
   } catch (error) {
     console.error('Error fetching user profile:', error)

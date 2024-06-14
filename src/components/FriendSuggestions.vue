@@ -14,6 +14,10 @@
           >
         </v-list-item>
       </v-list>
+      <div>
+        <v-btn @click="previousPage" :disabled="offset === 0" class="mr-2">Précédent</v-btn>
+        <v-btn @click="nextPage" :disabled="friends.length < limit">Suivant</v-btn>
+      </div>
     </v-card-text>
   </v-card>
 </template>
@@ -24,17 +28,31 @@ import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
 
 const friends = ref([] as UserFriend[])
+const limit = ref(5)
+const offset = ref(0)
 
 const friendshipStore = useFriendshipStore()
 
 const fetchFriendSuggestions = async () => {
-  await friendshipStore.fetchFriendSuggestions()
+  await friendshipStore.fetchFriendSuggestions(limit.value, offset.value)
   friends.value = friendshipStore.friendSuggestions
 }
 
 const sendFriendRequest = async (friendId: number) => {
   await friendshipStore.sendFriendRequest(friendId)
   await fetchFriendSuggestions()
+}
+
+const nextPage = () => {
+  offset.value += limit.value
+  fetchFriendSuggestions()
+}
+
+const previousPage = () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    fetchFriendSuggestions()
+  }
 }
 
 onMounted(fetchFriendSuggestions)
