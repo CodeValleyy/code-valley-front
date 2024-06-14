@@ -1,6 +1,6 @@
 import { useAuth } from './useAuth';
 import { ref, computed } from 'vue'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/useUserStore'
 import type { AxiosError } from 'axios'
 import axiosInstance from '@/config/axiosInstance'
 

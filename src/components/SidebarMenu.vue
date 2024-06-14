@@ -47,7 +47,7 @@ import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import PostModal from '@/components/PostModal.vue'
 import UserProfileModal from '@/components/UserProfileModal.vue'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/useUserStore'
 
 const { getToken, fetchMe } = useAuth()
 
