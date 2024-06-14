@@ -15,13 +15,25 @@ export const usePostStore = defineStore('post', {
             try {
                 const response = await axiosInstance.get('/posts');
                 this.posts = response.data;
+                console.log('Posts:', this.posts);
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
         },
-        async createPost(content: string) {
+        async createPost(content: string, file?: File | null) {
             try {
-                await axiosInstance.post('/posts', { content });
+                if (file) {
+                    const formData = new FormData();
+                    formData.append('content', content);
+                    formData.append('file', file);
+                    await axiosInstance.post('/posts', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                        },
+                    });
+                } else {
+                    await axiosInstance.post('/posts', { content });
+                }
                 this.fetchPosts();
             } catch (error) {
                 console.error('Error creating post:', error);

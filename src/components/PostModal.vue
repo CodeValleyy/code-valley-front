@@ -28,7 +28,7 @@ const postContent = async () => {
   if (!content.value) return
 
   try {
-    await postStore.createPost(content.value)
+    await postStore.createPost(content.value, file.value)
     content.value = ''
     file.value = null
     emit('close')
