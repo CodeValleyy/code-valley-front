@@ -10,7 +10,10 @@
               <v-list-item-avatar>
                 <router-link :to="`/profile/${post.username}`">
                   <v-avatar>
-                    <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
+                    <img
+                      :src="post.avatar ? post.avatar : 'https://via.placeholder.com/40'"
+                      alt="User Avatar"
+                    />
                   </v-avatar>
                 </router-link>
               </v-list-item-avatar>
@@ -28,7 +31,7 @@
                   v-model="post.code"
                   basic
                   disabled
-                  :extensions="[lang(post.code_language)]"
+                  :extensions="[lang(post.code_language ?? 'plaintext')]"
                   height="300px"
                   class="mb-4"
                 />
