@@ -10,6 +10,7 @@ import ChangePassword from '@/views/ChangePassword.vue'
 import ChangeEmail from '@/views/ChangeEmail.vue'
 import SearchView from '@/views/SearchView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
+import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
 
@@ -40,7 +41,11 @@ const routes = [
     meta: { requiresAuth: true },
     component: NotificationsView
   },
-
+  {
+    path: '/post/:id',
+    name: 'PostDetail',
+    component: PostDetail
+  },
   {
     path: '/code',
     name: 'code',

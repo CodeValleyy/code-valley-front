@@ -6,15 +6,20 @@
         <v-divider class="my-4"></v-divider>
         <v-list>
           <template v-for="(post, index) in posts" :key="post.id">
-            <v-list-item class="post-item">
+            <v-list-item class="post-item" @click="viewPost(post.id)">
               <v-list-item-avatar>
-                <v-avatar>
-                  <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
-                </v-avatar>
+                <router-link :to="`/profile/${post.username}`">
+                  <v-avatar>
+                    <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
+                  </v-avatar>
+                </router-link>
               </v-list-item-avatar>
               <v-list-item-content>
                 <v-list-item-title class="post-username">
-                  {{ post.username }} - {{ formatDate(post.createdAt) }}
+                  <router-link :to="`/profile/${post.username}`" class="username-link">
+                    {{ post.username }}
+                  </router-link>
+                  - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
                 <v-list-item-subtitle class="post-code">{{}}</v-list-item-subtitle>
@@ -32,7 +37,7 @@
               <v-list-item-action>
                 <v-btn
                   icon
-                  @click="toggleLike(post)"
+                  @click.stop="toggleLike(post)"
                   :class="{ liked: post.userHasLiked }"
                   class="mr-2 text-xs"
                   size="25"
@@ -41,13 +46,13 @@
                     {{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
                   </v-icon>
                 </v-btn>
-                <v-btn icon @click="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
+                <v-btn icon @click.stop="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
                   <v-icon class="small-icon">mdi-comment</v-icon>
                 </v-btn>
                 <v-btn
                   v-if="post.isOwner"
                   icon
-                  @click="confirmDelete(post)"
+                  @click.stop="confirmDelete(post)"
                   class="mr-2 text-xs"
                   size="25"
                 >
@@ -83,6 +88,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/usePostStore'
 import { useAuth } from '@/composables/useAuth'
 import PostComposer from '@/components/PostComposer.vue'
@@ -93,6 +99,7 @@ import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 
+const router = useRouter()
 const postStore = usePostStore()
 const posts: Ref<Post[]> = ref([])
 const deleteDialog = ref(false)
@@ -167,6 +174,10 @@ const lang = (codeLanguage: string) => {
       return python()
   }
 }
+
+const viewPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId } })
+}
 </script>
 
 <style scoped>
@@ -201,5 +212,10 @@ const lang = (codeLanguage: string) => {
 
 .liked .small-icon {
   color: red;
+}
+
+.username-link {
+  text-decoration: none;
+  color: inherit;
 }
 </style>

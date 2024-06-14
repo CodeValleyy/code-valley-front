@@ -1,13 +1,14 @@
 <template>
   <v-card>
-    <v-card-title class="headline">{{ title }}</v-card-title>
+    <v-card-title>{{ title }}</v-card-title>
     <v-card-text>
       <LoadingSpinner v-if="loading" />
       <v-container v-else>
         <v-list>
           <v-list-item v-for="friend in displayList" :key="friend.id">
-            <v-list-item-content>
+            <v-list-item-content class="d-flex align-center pointer">
               <v-btn
+                variant="plain"
                 :to="`/profile/${String(friend.username)}`"
                 @click="navigateToProfile(friend.username)"
               >
@@ -32,6 +33,8 @@
             <v-divider class="my-2 mx-4" :thickness="2" color="grey"></v-divider>
           </v-list-item>
         </v-list>
+        <v-btn @click="previousPage" :disabled="offset === 0" class="mr-2">Précédent</v-btn>
+        <v-btn @click="nextPage" :disabled="displayList.length <= limit">Suivant</v-btn>
       </v-container>
     </v-card-text>
     <v-card-actions>
@@ -39,17 +42,14 @@
     </v-card-actions>
   </v-card>
 </template>
+
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { FriendshipStatus, type UserFriend } from '@/types/FriendshipTypes'
-import { useUserStore } from '@/stores/userStore'
-import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
-const { fetchMe } = useAuth()
 
-const router = useRouter()
 const props = defineProps({
   type: {
     type: String,
@@ -67,75 +67,62 @@ const props = defineProps({
 })
 
 const title = ref(props.type === 'followers' ? 'Followers' : 'Following')
-
 const emit = defineEmits(['close', 'update-count'])
 const friendshipStore = useFriendshipStore()
-const userStore = useUserStore()
+const router = useRouter()
 
-const followers = ref([] as UserFriend[])
-const followings = ref([] as UserFriend[])
-const friendRequests = ref([] as UserFriend[])
-const sentFriendRequests = ref([] as UserFriend[])
+const limit = ref(5)
+const offset = ref(0)
+const loading = ref(true)
 const displayList = ref([] as UserFriend[])
 
-const loading = ref(true)
-const me = (await userStore.user) || (await fetchMe())
-const userId = ref<number>(props.userId || me.id)
+const fetchFollowers = async () => {
+  loading.value = true
+  await friendshipStore.fetchFollowers(props.userId, limit.value, offset.value)
+  displayList.value = friendshipStore.followers
+  loading.value = false
+}
 
-const updateLists = () => {
+const fetchFollowings = async () => {
+  loading.value = true
+  await friendshipStore.fetchFollowings(props.userId, limit.value, offset.value)
+  displayList.value = friendshipStore.followings
+  loading.value = false
+}
+
+const nextPage = () => {
+  offset.value += limit.value
   if (props.type === 'followers') {
-    followers.value = friendshipStore.followers
-    friendRequests.value = friendshipStore.friendRequests
-    displayList.value = followers.value
-  }
-  if (props.type === 'following') {
-    followings.value = friendshipStore.followings
-    sentFriendRequests.value = friendshipStore.sentFriendRequests
-    displayList.value = followings.value
+    fetchFollowers()
+  } else {
+    fetchFollowings()
   }
 }
 
-const navigateToProfile = async (username: string) => {
+const previousPage = () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    if (props.type === 'followers') {
+      fetchFollowers()
+    } else {
+      fetchFollowings()
+    }
+  }
+}
+
+const navigateToProfile = (username: string) => {
   emit('close')
-  await nextTick()
-  router.push({
-    path: `/profile/${username}`
-  })
+  router.push(`/profile/${username}`)
 }
-
-onMounted(async () => {
-  try {
-    loading.value = true
-    await friendshipStore.fetchFollowers(userId.value)
-    await friendshipStore.fetchFollowings(userId.value)
-    updateLists()
-  } finally {
-    loading.value = false
-  }
-})
-
-watch(
-  () => [
-    friendshipStore.followers,
-    friendshipStore.followings,
-    friendshipStore.friendRequests,
-    friendshipStore.sentFriendRequests
-  ],
-  updateLists,
-  { deep: true }
-)
 
 const removeFriend = async (friendId: number) => {
   await friendshipStore.removeFriend(friendId)
   if (props.type === 'followers') {
-    followers.value = followers.value.filter((f) => f.id !== friendId)
-    displayList.value = followers.value
-  } else if (props.type === 'following') {
-    followings.value = followings.value.filter((f) => f.id !== friendId)
-    displayList.value = followings.value
+    displayList.value = displayList.value.filter((f) => f.id !== friendId)
+  } else {
+    displayList.value = displayList.value.filter((f) => f.id !== friendId)
   }
-  emit('update-count', 'followers', followers.value.length)
-  emit('update-count', 'following', followings.value.length)
+  emit('update-count', props.type, displayList.value.length)
 }
 
 const followBack = async (friend: UserFriend) => {
@@ -144,15 +131,23 @@ const followBack = async (friend: UserFriend) => {
   displayList.value = displayList.value.map((f) => (f.id === friend.id ? friend : f))
 }
 
-const declineFriendRequest = async (senderId: number) => {
-  await friendshipStore.declineFriendRequest(senderId)
-  friendRequests.value = friendRequests.value.filter((f) => f.id !== senderId)
-  displayList.value = friendRequests.value
-}
+onMounted(() => {
+  if (props.type === 'followers') {
+    fetchFollowers()
+  } else {
+    fetchFollowings()
+  }
+})
 
-const removeSentRequest = async (requestId: number) => {
-  await friendshipStore.cancelSentRequest(requestId)
-  sentFriendRequests.value = sentFriendRequests.value.filter((f) => f.id !== requestId)
-  displayList.value = sentFriendRequests.value
-}
+watch(
+  () => props.userId,
+  () => {
+    offset.value = 0
+    if (props.type === 'followers') {
+      fetchFollowers()
+    } else {
+      fetchFollowings()
+    }
+  }
+)
 </script>
