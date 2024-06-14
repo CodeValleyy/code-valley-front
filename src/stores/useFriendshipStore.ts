@@ -4,7 +4,6 @@ import type { FriendshipPendingDTO, FriendshipSentDTO, UserFriend } from '@/type
 
 export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
-        friends: [] as UserFriend[],
         followers: [] as UserFriend[],
         followings: [] as UserFriend[],
         friendRequests: [] as UserFriend[],
@@ -13,22 +12,6 @@ export const useFriendshipStore = defineStore('friendship', {
         isFollowing: false,
     }),
     actions: {
-        async fetchFriends() {
-            try {
-                const response = await axiosInstance.get('/friendships/list');
-                this.friends = response.data as UserFriend[];
-            } catch (error) {
-                console.error('Error fetching friends:', error);
-            }
-        },
-        async fetchFriendsByUserId(userId: number) {
-            try {
-                const response = await axiosInstance.get('/friendships/list/' + userId);
-                this.friends = response.data as UserFriend[];
-            } catch (error) {
-                console.error('Error fetching friends:', error);
-            }
-        },
         async fetchFriendshipFollowing(currentUserId: number, targetUserId: number) {
             try {
                 const response = await axiosInstance.get(`/friendships/following/${currentUserId}/${targetUserId}`);
@@ -70,7 +53,6 @@ export const useFriendshipStore = defineStore('friendship', {
         async acceptFriendRequest(senderId: number) {
             try {
                 await axiosInstance.post(`/friendships/accept/${senderId}`);
-                this.fetchFriends();
             } catch (error) {
                 console.error('Error accepting friend request:', error);
             }
@@ -78,7 +60,6 @@ export const useFriendshipStore = defineStore('friendship', {
         async declineFriendRequest(senderId: number) {
             try {
                 await axiosInstance.post(`/friendships/decline/${senderId}`);
-                this.fetchFriends();
             } catch (error) {
                 console.error('Error declining friend request:', error);
             }
@@ -86,14 +67,13 @@ export const useFriendshipStore = defineStore('friendship', {
         async removeFriend(friendId: number) {
             try {
                 await axiosInstance.delete(`/friendships/remove/${friendId}`);
-                this.fetchFriends();
             } catch (error) {
                 console.error('Error removing friend:', error);
             }
         },
-        async fetchFriendSuggestions() {
+        async fetchFriendSuggestions(limit: number, offset: number) {
             try {
-                const response = await axiosInstance.get('/friendships/suggestions');
+                const response = await axiosInstance.get(`/friendships/suggestions?limit=${limit}&offset=${offset}`);
                 this.friendSuggestions = response.data;
             } catch (error) {
                 console.error('Error fetching friend suggestions:', error);
@@ -108,22 +88,30 @@ export const useFriendshipStore = defineStore('friendship', {
                 this.isFollowing = true;
             }
         },
-        async fetchFollowers(userId: number) {
+        async fetchFollowers(userId: number, limit: number, offset: number) {
             try {
-                const response = await axiosInstance.get(`/friendships/followers/${userId}`);
+                const response = await axiosInstance.get(`/friendships/followers/${userId}?limit=${limit}&offset=${offset}`);
                 this.followers = response.data as UserFriend[];
                 this.friendRequests = this.followers.filter((follower) => follower.status === 'pending');
             } catch (error) {
                 console.error('Error fetching followers:', error);
             }
         },
-        async fetchFollowings(userId: number) {
+        async fetchFollowings(userId: number, limit: number, offset: number) {
             try {
-                const response = await axiosInstance.get(`/friendships/followings/${userId}`);
+                const response = await axiosInstance.get(`/friendships/followings/${userId}?limit=${limit}&offset=${offset}`);
                 this.followings = response.data as UserFriend[];
                 this.sentFriendRequests = this.followings.filter((following) => following.status === 'pending');
             } catch (error) {
                 console.error('Error fetching followings:', error);
+            }
+        },
+        async fetchFollowersAndFollowingsCount(userId: number) {
+            try {
+                const response = await axiosInstance.get(`/friendships/count/${userId}`);
+                return response.data;
+            } catch (error) {
+                console.error('Error fetching counts:', error);
             }
         },
     }

@@ -64,7 +64,12 @@
         <v-divider class="my-4"></v-divider>
         <v-list>
           <template v-for="(post, index) in userPosts" :key="post.id">
-            <PostItem :post="post" @refreshPosts="fetchUserPosts" @deletePost="confirmDelete" />
+            <PostItem
+              :post="post"
+              @refreshPosts="fetchUserPosts"
+              @deletePost="confirmDelete"
+              @click="viewPost(post.id)"
+            />
             <v-divider
               v-if="!isLastItem(index)"
               :key="`divider-${index}`"
@@ -198,6 +203,10 @@ const confirmDelete = (post: Post) => {
   deleteDialog.value = true
 }
 
+const viewPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId } })
+}
+
 const deletePost = async () => {
   if (postToDelete.value) {
     await postStore.deletePost(postToDelete.value.id)
@@ -241,11 +250,10 @@ const fetchUserData = async (username?: string) => {
       isFollowing.value = friendshipStore.isFollowing
     }
 
-    await friendshipStore.fetchFollowings(profile.value.id)
-    await friendshipStore.fetchFollowers(profile.value.id)
+    const counts = await friendshipStore.fetchFollowersAndFollowingsCount(profile.value.id)
+    followers.value = counts.followers
+    followings.value = counts.followings
 
-    followers.value = friendshipStore.followers.length
-    followings.value = friendshipStore.followings.length
     friendRequests.value = friendshipStore.friendRequests
     sentFriendRequests.value = friendshipStore.sentFriendRequests
 
