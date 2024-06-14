@@ -17,6 +17,16 @@
                   {{ post.username }} - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="post-code">{{}}</v-list-item-subtitle>
+                <CodeMirror
+                  v-if="post.code"
+                  v-model="post.code"
+                  basic
+                  disabled
+                  :extensions="[lang(post.code_language)]"
+                  height="300px"
+                  class="mb-4"
+                />
               </v-list-item-content>
               <span>{{ post.likes }} likes</span>
               <v-list-item-action>
@@ -45,7 +55,11 @@
                 </v-btn>
               </v-list-item-action>
             </v-list-item>
-            <v-divider v-if="!isLastItem(index)" :key="`divider-${index}`" class="post-divider"></v-divider>
+            <v-divider
+              v-if="!isLastItem(index)"
+              :key="`divider-${index}`"
+              class="post-divider"
+            ></v-divider>
           </template>
         </v-list>
       </v-col>
@@ -67,7 +81,6 @@
   </v-container>
 </template>
 
-
 <script setup lang="ts">
 import { ref, onMounted, watch, type Ref } from 'vue'
 import { usePostStore } from '@/stores/usePostStore'
@@ -75,6 +88,10 @@ import { useAuth } from '@/composables/useAuth'
 import PostComposer from '@/components/PostComposer.vue'
 import FriendSuggestions from '@/components/FriendSuggestions.vue'
 import type { Post } from '@/types'
+import CodeMirror from 'vue-codemirror6'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
 
 const postStore = usePostStore()
 const posts: Ref<Post[]> = ref([])
@@ -135,6 +152,19 @@ const deletePost = async () => {
   if (postToDelete.value) {
     await postStore.deletePost(postToDelete.value.id)
     deleteDialog.value = false
+  }
+}
+
+const lang = (codeLanguage: string) => {
+  switch (codeLanguage) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
   }
 }
 </script>

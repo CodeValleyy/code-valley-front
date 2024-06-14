@@ -23,7 +23,7 @@ const postStore = usePostStore()
 const postContent = async () => {
   if (!content.value) return
 
-  await postStore.createPost(content.value)
+  await postStore.createPost(content.value, file.value)
   resetForm()
 }
 

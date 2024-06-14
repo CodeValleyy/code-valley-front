@@ -10,6 +10,7 @@
         {{ post.username }} - {{ new Date(post.createdAt).toLocaleDateString('fr-FR') }}
       </v-list-item-title>
       <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
+      <v-list-item-subtitle class="post-code">{{ post.code }}</v-list-item-subtitle>
     </v-list-item-content>
     <span>{{ post.likes }} likes</span>
     <v-list-item-action>

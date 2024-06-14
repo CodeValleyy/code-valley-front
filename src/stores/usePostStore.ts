@@ -2,6 +2,26 @@ import axiosInstance from '@/config/axiosInstance';
 import type { Post } from '@/types';
 import { defineStore } from 'pinia';
 
+function getCodeLanguageFromUrl(url: string): string | null {
+    const extension = url.split('.').pop()?.split('?')[0];
+    if (!extension) {
+        return null;
+    }
+
+    switch (extension.toLowerCase()) {
+        case 'py':
+            return 'python';
+        case 'js':
+            return 'javascript';
+        case 'rs':
+            return 'rust';
+        case 'lua':
+            return 'lua';
+        default:
+            return 'Unknown';
+    }
+}
+
 export interface CreatePostDto {
     content: string;
 }
@@ -15,7 +35,13 @@ export const usePostStore = defineStore('post', {
             try {
                 const response = await axiosInstance.get('/posts');
                 this.posts = response.data;
-                console.log('Posts:', this.posts);
+                for (const element of this.posts) {
+                    if (element.code_url) {
+                        const response = await axiosInstance.get(element.code_url);
+                        element.code = response.data;
+                        element.code_language = getCodeLanguageFromUrl(element.code_url);
+                    }
+                }
             } catch (error) {
                 console.error('Error fetching posts:', error);
             }
