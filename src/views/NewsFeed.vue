@@ -10,7 +10,10 @@
               <v-list-item-avatar>
                 <router-link :to="`/profile/${post.username}`">
                   <v-avatar>
-                    <img :src="post.avatar || 'https://via.placeholder.com/40'" alt="User Avatar" />
+                    <img
+                      :src="post.avatar ? post.avatar : 'https://via.placeholder.com/40'"
+                      alt="User Avatar"
+                    />
                   </v-avatar>
                 </router-link>
               </v-list-item-avatar>
@@ -22,6 +25,16 @@
                   - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
+                <v-list-item-subtitle class="post-code">{{}}</v-list-item-subtitle>
+                <CodeMirror
+                  v-if="post.code"
+                  v-model="post.code"
+                  basic
+                  disabled
+                  :extensions="[lang(post.code_language ?? 'plaintext')]"
+                  height="300px"
+                  class="mb-4"
+                />
               </v-list-item-content>
               <span>{{ post.likes }} likes</span>
               <v-list-item-action>
@@ -84,6 +97,10 @@ import { useAuth } from '@/composables/useAuth'
 import PostComposer from '@/components/PostComposer.vue'
 import FriendSuggestions from '@/components/FriendSuggestions.vue'
 import type { Post } from '@/types'
+import CodeMirror from 'vue-codemirror6'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
 
 const router = useRouter()
 const postStore = usePostStore()
@@ -145,6 +162,19 @@ const deletePost = async () => {
   if (postToDelete.value) {
     await postStore.deletePost(postToDelete.value.id)
     deleteDialog.value = false
+  }
+}
+
+const lang = (codeLanguage: string) => {
+  switch (codeLanguage) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
   }
 }
 
