@@ -1,7 +1,7 @@
 import { ref } from 'vue';
 import axiosInstance from '@/config/axiosInstance';
 import type { UserResponse } from '@/types/UserResponse'
-import { useUserStore } from '@/stores/userStore';
+import { useUserStore } from '@/stores/useUserStore';
 
 const token = ref(localStorage.getItem('token') ?? '');
 
