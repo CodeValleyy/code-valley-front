@@ -34,7 +34,7 @@
           </v-list-item>
         </v-list>
         <v-btn @click="previousPage" :disabled="offset === 0" class="mr-2">Précédent</v-btn>
-        <v-btn @click="nextPage" :disabled="displayList.length <= limit">Suivant</v-btn>
+        <v-btn @click="nextPage" :disabled="displayList.length < limit">Suivant</v-btn>
       </v-container>
     </v-card-text>
     <v-card-actions>
