@@ -1,5 +1,6 @@
 import { ref } from 'vue';
 import axiosInstance from '@/config/axiosInstance';
+import { useUserStore } from '@/stores/userStore';
 
 const token = ref(localStorage.getItem('token') ?? '');
 
@@ -18,6 +19,7 @@ const getToken = () => token.value;
 const fetchMe = async () => {
     try {
         const response = await axiosInstance.get('/auth/me');
+        useUserStore().setUser(response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching profile:', error);

@@ -11,6 +11,7 @@ export const useUserStore = defineStore('user', {
             try {
                 const response = await axiosInstance.get('/auth/me');
                 this.user = response.data;
+                return response.data;
             } catch (error) {
                 console.error('Error fetching profile:', error);
                 throw error;
