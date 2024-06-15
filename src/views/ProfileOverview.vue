@@ -5,13 +5,18 @@
         <v-card class="pa-6 text-center">
           <LoadingSpinner v-if="loading" />
           <template v-else>
-            <v-avatar size="100" class="mb-4" @mouseover="hover = true" @mouseleave="hover = false">
-              <img :src="userAvatar" alt="User Avatar" />
+            <v-avatar
+              size="100"
+              class="mb-4 relative"
+              @mouseover="hover = true"
+              @mouseleave="hover = false"
+            >
+              <img :src="userAvatar" alt="User Avatar" class="rounded-full object-cover" />
               <input
                 v-if="hover && profile.id === me.id"
                 type="file"
                 @change="postAvatar"
-                class="avatar-upload"
+                class="absolute inset-0 opacity-0 cursor-pointer"
                 accept="image/*"
               />
             </v-avatar>

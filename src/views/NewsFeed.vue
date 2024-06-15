@@ -5,6 +5,7 @@
         <PostComposer />
         <v-divider class="my-4"></v-divider>
         <v-list>
+          <LoadingSpinner v-if="loading" />
           <template v-for="(post, index) in posts" :key="post.id">
             <v-list-item class="post-item" @click="viewPost(post.id)">
               <v-list-item-avatar>
@@ -25,7 +26,6 @@
                   - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
-                <v-list-item-subtitle class="post-code">{{}}</v-list-item-subtitle>
                 <CodeMirror
                   v-if="post.code"
                   v-model="post.code"
@@ -101,6 +101,7 @@ import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
+import type LoadingSpinner from '@/components/LoadingSpinner.vue'
 
 const router = useRouter()
 const postStore = usePostStore()
@@ -108,15 +109,18 @@ const posts: Ref<Post[]> = ref([])
 const deleteDialog = ref(false)
 const postToDelete = ref<Post | null>(null)
 const { fetchMe } = useAuth()
+const loading = ref(false)
 
 const me = await fetchMe()
 
 const fetchPosts = async () => {
+  loading.value = true
   await postStore.fetchPosts()
   posts.value = postStore.posts.map((post: Post) => ({
     ...post,
     isOwner: post.userId === me.id
   }))
+  loading.value = false
 }
 
 onMounted(fetchPosts)

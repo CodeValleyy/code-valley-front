@@ -5,6 +5,7 @@
         <v-btn icon @click="goBack" class="mb-4">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
+        <LoadingSpinner v-if="isLoading" />
         <v-card v-if="post">
           <v-card-title>
             <router-link :to="`/profile/${post.username}`">
@@ -24,6 +25,15 @@
             {{ new Date(post.createdAt).toLocaleDateString('fr-FR') }}
           </v-card-subtitle>
           <v-card-text>{{ post.content }}</v-card-text>
+          <CodeMirror
+            v-if="codeMirrorValue"
+            v-model="codeMirrorValue"
+            :extensions="[lang(post.code_language ?? 'plaintext')]"
+            :height="'300px'"
+            basic
+            disabled
+            class="mb-4"
+          />
           <v-card-actions class="ml-4">
             <v-btn icon @click="toggleLike(post)">
               <v-icon>{{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}</v-icon>
@@ -83,6 +93,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/usePostStore'
 import type { Post } from '@/types'
 import { useAuth } from '@/composables/useAuth'
+import CodeMirror from 'vue-codemirror6'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
+import LoadingSpinner from '@/components/LoadingSpinner.vue'
+
 const { fetchMe } = useAuth()
 
 const route = useRoute()
@@ -112,22 +128,37 @@ const comments = ref([
   }
 ])
 
+const lang = (codeLanguage: string) => {
+  switch (codeLanguage) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
+  }
+}
+
+const codeMirrorValue = ref<string>('')
 const fetchPost = async () => {
   isLoading.value = true
   const postId = Number(route.params.id)
   post.value = await postStore.fetchPost(postId)
   if (post.value) {
     post.value.isOwner = post.value.userId === me.id
+    console.log(post.value)
+    codeMirrorValue.value = typeof post.value.code === 'string' ? post.value.code : ''
   }
   isLoading.value = false
 }
 
-onMounted(fetchPost)
-
-const formatDate = (dateString: Date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' } as const
-  return new Date(dateString).toLocaleDateString('fr-FR', options)
-}
+onMounted(async () => {
+  isLoading.value = true
+  await fetchPost()
+  isLoading.value = false
+})
 
 const toggleLike = async (post: Post) => {
   if (post.userHasLiked) {

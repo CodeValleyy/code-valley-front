@@ -51,6 +51,11 @@ export const usePostStore = defineStore('post', {
             try {
                 const response = await axiosInstance.get(`/posts/${postId}`);
                 const post = response.data;
+                if (post.code_url) {
+                    const response = await axiosInstance.get(post.code_url);
+                    post.code = response.data;
+                    post.code_language = getCodeLanguageFromUrl(post.code_url);
+                }
                 return post;
             } catch (error) {
                 console.error('Error fetching post:', error);
