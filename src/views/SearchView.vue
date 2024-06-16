@@ -11,7 +11,7 @@
       <ul>
         <li v-for="profile in filteredProfiles" :key="profile.id">
           <div class="mb-3">
-            <router-link :to="`/profile/${profile.id}`">
+            <router-link :to="`/profile/${profile.username}`">
               <v-avatar class="mr-3">
                 <img :src="getAvatar(profile)" alt="Avatar" />
               </v-avatar>
@@ -31,19 +31,19 @@ import type { UserResponse } from '@/types/UserResponse'
 
 const { searchUser } = useAuth()
 
-let inputValue = ref<string>("")
+let inputValue = ref<string>('')
 let filteredProfiles = ref<UserResponse[]>([])
 
 const onInputChange = async () => {
   const searchQuery = inputValue.value.trim()
-  if (searchQuery !== "") {
+  if (searchQuery !== '') {
     filteredProfiles.value = await searchUser(searchQuery)
   }
 }
 
 const getAvatar = (profile: UserResponse) => {
   if (profile.avatar == null || !profile.avatar) {
-    return "https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg"
+    return 'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
   }
   return profile.avatar
 }

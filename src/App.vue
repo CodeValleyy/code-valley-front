@@ -14,7 +14,7 @@ import SidebarMenu from './components/SidebarMenu.vue'
 import { useAuth } from '@/composables/useAuth'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { SpeedInsights } from '@vercel/speed-insights/next'
+import { SpeedInsights } from '@vercel/speed-insights/vue'
 
 const { getToken } = useAuth()
 const route = useRoute()
