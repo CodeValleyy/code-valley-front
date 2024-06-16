@@ -1,6 +1,7 @@
 <template>
   <v-app>
     <SidebarMenu v-if="showHeaderFooter" />
+    <SpeedInsights />
 
     <v-main class="bg-backgroundColor min-h-screen">
       <router-view />
@@ -13,6 +14,7 @@ import SidebarMenu from './components/SidebarMenu.vue'
 import { useAuth } from '@/composables/useAuth'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const { getToken } = useAuth()
 const route = useRoute()

@@ -23,6 +23,7 @@
     "@mdi/font": "^7.4.47",
     "@mdi/js": "^7.4.47",
     "@upleveled/theme-vs-code-dark-plus": "github:upleveled/theme-vs-code-dark-plus",
+    "@vercel/speed-insights": "^1.0.12",
     "axios": "^1.7.1",
     "codemirror": "^6.0.1",
     "dotenv": "^16.4.5",
