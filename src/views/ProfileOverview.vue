@@ -128,7 +128,7 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import PostItem from '@/components/PostItem.vue'
 import router from '@/router'
 import type { Post } from '@/types'
-import { useUserStore } from '@/stores/userStore'
+import { useUserStore } from '@/stores/useUserStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
 
 const route = useRoute()

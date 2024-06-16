@@ -1,13 +1,14 @@
 import { ref } from 'vue';
 import axiosInstance from '@/config/axiosInstance';
-import { useUserStore } from '@/stores/userStore';
+import type { UserResponse } from '@/types/UserResponse'
+import { useUserStore } from '@/stores/useUserStore';
 
 const token = ref(localStorage.getItem('token') ?? '');
 
 const setToken = (newToken: string) => {
     token.value = newToken;
     localStorage.setItem('token', newToken);
-};
+}
 
 const resetToken = () => {
     token.value = '';
@@ -25,7 +26,7 @@ const fetchMe = async () => {
         console.error('Error fetching profile:', error);
         throw error;
     }
-};
+}
 
 const fetchProfile = async (userId: number | string | undefined) => {
     if (!userId) {
@@ -89,7 +90,17 @@ const uploadAvatar = async (file: File) => {
         console.error('Error uploading avatar:', error);
         throw error;
     }
-};
+}
+
+const searchUser = async (username: string): Promise<UserResponse[]> => {
+    try {
+        const response = await axiosInstance.get('/auth/search/' + username);
+        return response.data as UserResponse[];
+    } catch (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+    }
+}
 
 export const useAuth = () => ({
     setToken,
@@ -100,4 +111,5 @@ export const useAuth = () => ({
     fetchProfile,
     resetToken,
     uploadAvatar,
+    searchUser,
 });
