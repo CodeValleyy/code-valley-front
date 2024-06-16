@@ -14,7 +14,7 @@ import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
 
-const { getToken } = useAuth()
+const { fetchMe, resetToken } = useAuth()
 
 const routes = [
   {
@@ -98,8 +98,11 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const isAuthenticated = !!getToken()
+router.beforeEach(async (to, from, next) => {
+  const isAuthenticated = await fetchMe().then(() => true).catch(() => false)
+  if (!isAuthenticated) {
+    resetToken()
+  }
 
   if (to.meta.requiresAuth && !isAuthenticated) {
     next({ name: 'login' })

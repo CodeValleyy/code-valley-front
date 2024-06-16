@@ -9,26 +9,35 @@
       <v-spacer></v-spacer>
       <v-btn color="blue" @click="postContent">Poster</v-btn>
     </v-card-actions>
+    <v-alert v-model="error" type="error" dismissible v-if="error">{{ error }}</v-alert>
   </v-card>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
-import axios from 'axios'
-import { useAuth } from '@/composables/useAuth'
 import { usePostStore } from '@/stores/usePostStore'
 
 const emit = defineEmits(['close', 'new-post'])
 
-const { getToken } = useAuth()
 const content = ref('')
 const file = ref(null)
 const postStore = usePostStore()
+const error = ref('')
 
 const postContent = async () => {
-  if (!content.value) return
+  error.value = ''
+
+  if (!content.value) {
+    error.value = 'Le contenu du post ne peut pas être vide'
+    return
+  }
 
   try {
     await postStore.createPost(content.value, file.value)
+    if (postStore.error) {
+      console.log('Error posting content:', postStore.error.message)
+      error.value = postStore.error.message
+      return
+    }
     content.value = ''
     file.value = null
     emit('close')
