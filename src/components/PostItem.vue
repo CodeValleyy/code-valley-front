@@ -51,8 +51,7 @@ import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
-import { useUserStore } from '@/stores/userStore'
-
+import { useUserStore } from '@/stores/useUserStore'
 const props = defineProps<{ post: Post }>()
 const emits = defineEmits(['refreshPosts', 'deletePost'])
 
