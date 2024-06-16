@@ -4,7 +4,14 @@
     <v-card-text>
       <v-list>
         <v-list-item v-for="friend in friends" :key="friend.id">
-          <v-list-item-content>{{ friend.username }}</v-list-item-content>
+          <router-link :to="`/profile/${friend.username}`">
+            <v-list-item-avatar class="mr-4">
+              <v-avatar>
+                <img :src="getAvatar(friend)" alt="Avatar" />
+              </v-avatar>
+            </v-list-item-avatar>
+            <v-list-item-content>{{ friend.username }}</v-list-item-content>
+          </router-link>
           <v-btn
             @click="sendFriendRequest(friend.id)"
             size="small"
@@ -53,6 +60,10 @@ const previousPage = () => {
     offset.value -= limit.value
     fetchFriendSuggestions()
   }
+}
+
+const getAvatar = (friend: UserFriend) => {
+  return 'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
 }
 
 onMounted(fetchFriendSuggestions)
