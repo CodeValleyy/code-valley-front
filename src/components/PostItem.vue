@@ -58,7 +58,7 @@ const emits = defineEmits(['refreshPosts', 'deletePost'])
 const postStore = usePostStore()
 
 const userStore = useUserStore()
-const me = !userStore.user ? userStore.fetchUserProfile() : userStore.user
+const me = !userStore.user ? await userStore.fetchUserProfile() : userStore.user
 
 const lang = (codeLanguage: string) => {
   switch (codeLanguage) {

@@ -42,14 +42,6 @@ export const useFriendshipStore = defineStore('friendship', {
                 console.error('Error canceling friend request:', error);
             }
         },
-        async fetchSentFriendRequests() {
-            try {
-                const response = await axiosInstance.get('/friendships/sent-requests');
-                this.sentFriendRequests = response.data as FriendshipSentDTO[];
-            } catch (error) {
-                console.error('Error fetching pending requests:', error);
-            }
-        },
         async acceptFriendRequest(senderId: number) {
             try {
                 await axiosInstance.post(`/friendships/accept/${senderId}`);
