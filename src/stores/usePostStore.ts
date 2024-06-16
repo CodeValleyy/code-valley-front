@@ -30,6 +30,9 @@ export const usePostStore = defineStore('post', {
     state: () => ({
         posts: [] as Post[],
         currentPost: null as Post | null,
+        error: null as {
+            message: string, error: string, statusCode: number
+        } | null,
     }),
     actions: {
         async fetchPosts() {
@@ -65,20 +68,44 @@ export const usePostStore = defineStore('post', {
         async createPost(content: string, file?: File | null) {
             try {
                 if (file) {
-                    const formData = new FormData();
-                    formData.append('content', content);
-                    formData.append('file', file);
-                    await axiosInstance.post('/posts', formData, {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                        },
-                    });
+                    await this.createPostWithFile(content, file);
                 } else {
                     await axiosInstance.post('/posts', { content });
                 }
                 this.fetchPosts();
-            } catch (error) {
-                console.error('Error creating post:', error);
+            } catch (error: any) {
+                if (error.response) {
+                    this.error = error.response.data || 'An error occurred';
+                } else if (error.request) {
+                    console.error('Error request:', error.request);
+                    this.error = { message: 'No response received from the server', error: 'No response received from the server', statusCode: 500 }
+                } else {
+                    console.error('Error message:', error.message);
+                    this.error = error.message || 'An error occurred';
+                }
+            }
+        },
+        async createPostWithFile(content: string, file: File) {
+            try {
+                const formData = new FormData();
+                formData.append('content', content);
+                formData.append('file', file);
+                await axiosInstance.post('/posts', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+                this.fetchPosts();
+            } catch (error: any) {
+                if (error.response) {
+                    this.error = error.response.data || 'An error occurred';
+                } else if (error.request) {
+                    console.error('Error request:', error.request);
+                    this.error = { message: 'No response received from the server', error: 'No response received from the server', statusCode: 500 }
+                } else {
+                    console.error('Error message:', error.message);
+                    this.error = error.message || 'An error occurred';
+                }
             }
         },
         async deletePost(postId: number) {
