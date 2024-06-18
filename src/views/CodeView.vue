@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
@@ -85,7 +85,7 @@ const handleTab = (e: KeyboardEvent) => {
           const spacesText = ' '.repeat(spacesLength)
           activeLine.textContent = spacesText + activeLine.textContent.substring(spacesLength)
         }
-        
+
         range.setStart(activeLine.childNodes[0], spaces ? spaces[0].length : 0)
         range.collapse(true)
 
@@ -97,7 +97,6 @@ const handleTab = (e: KeyboardEvent) => {
     }
   }
 }
-
 </script>
 
 <style scoped>

@@ -5,7 +5,7 @@
         <v-card>
           <v-card-title class="text-h5">Pipeline Orchestrator</v-card-title>
           <v-card-text>
-            <v-form ref="form" v-model="formValid" @submit.prevent="submitPipeline">
+            <v-form ref="form" @submit.prevent="submitPipeline">
               <v-container v-for="(step, index) in steps.steps" :key="index" class="mb-4 pa-4">
                 <v-row>
                   <v-col cols="12">
@@ -17,16 +17,19 @@
                       label="Language"
                       v-model="step.payload.language"
                       :rules="[rules.required]"
+                      @change="validateForm"
                       required
                     ></v-select>
                   </v-col>
                   <v-col cols="12">
-                    <v-textarea
-                      label="Code"
+                    <CodeMirror
                       v-model="step.payload.code"
-                      :rules="[rules.required]"
-                      required
-                    ></v-textarea>
+                      basic
+                      :extensions="[getLangExtension(step.payload.language)]"
+                      @update="validateForm"
+                      height="300px"
+                      class="mb-4"
+                    />
                   </v-col>
                 </v-row>
               </v-container>
@@ -61,20 +64,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, watch } from 'vue'
 import { io } from 'socket.io-client'
 import type { CreatePipelineDto, StepResultDto } from '@/types/Pipeline'
 import { languages } from '@/config/languagesConfig'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
+import CodeMirror from 'vue-codemirror6'
 
 const form = ref()
 const formValid = ref(false)
 
 const steps = reactive<CreatePipelineDto>({
-  steps: [{ service: 'dyno-code', endpoint: 'execute', payload: { code: '', language: '' } }]
+  steps: [
+    { service: 'dyno-code', endpoint: 'execute', payload: { code: '', language: languages[0] } }
+  ]
 })
 const results = ref<StepResultDto[]>([])
-let url = 'ws://localhost:3000'
-const socket = io(url)
+const socket = io('ws://localhost:3000')
+
 const rules = {
   required: (v: any) => !!v || 'Field is required'
 }
@@ -84,15 +93,35 @@ const addStep = () => {
     steps.steps.push({
       service: 'dyno-code',
       endpoint: 'execute',
-      payload: { code: '', language: '' }
+      payload: { code: '', language: languages[0] }
     })
   }
 }
+
 const submitPipeline = () => {
   if (form.value && form.value.validate()) {
     socket.emit('executePipeline', steps)
   }
 }
+
+const getLangExtension = (language: string) => {
+  switch (language) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
+  }
+}
+
+const validateForm = () => {
+  formValid.value = steps.steps.every((step) => step.payload.language && step.payload.code)
+}
+
+watch(() => steps.steps, validateForm, { deep: true })
 
 onMounted(() => {
   socket.on('pipelineUpdate', (update: StepResultDto) => {
