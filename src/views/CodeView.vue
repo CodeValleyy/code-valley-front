@@ -20,11 +20,10 @@
                 v-model="codeInput"
                 basic
                 :extensions="[lang]"
-                :theme="dark ? 'dark' : 'light'"
                 height="300px"
                 class="mb-4"
-                @keydown.tab.prevent.stop="tab"
-                @keydown.shift.tab.prevent.stop="tab"
+                @keydown.tab.prevent.stop="handleTab"
+                @keydown.shift.tab.prevent.stop="handleTab"
                 @keydown.ctrl.s.prevent.stop="runCode"
               />
               <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
@@ -55,7 +54,6 @@ import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 
 const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
-const dark = ref(window.matchMedia('(prefers-color-scheme: dark)').matches)
 
 const lang = computed(() => {
   switch (currentLanguage.value) {
@@ -70,16 +68,36 @@ const lang = computed(() => {
   }
 })
 
-const tab = (e: KeyboardEvent) => {
-  const cm = e.target as HTMLTextAreaElement
-  const start = cm.selectionStart
-  const end = cm.selectionEnd
+const handleTab = (e: KeyboardEvent) => {
+  const cm = e.target as HTMLDivElement
 
-  const insert = '  '
-  cm.value = cm.value.substring(0, start) + insert + cm.value.substring(end)
+  if (cm.classList.contains('cm-content')) {
+    const activeLine = cm.querySelector('.cm-activeLine')
+    if (activeLine && activeLine.textContent !== null) {
+      const range = document.createRange()
+      const selection = window.getSelection()
 
-  cm.selectionStart = cm.selectionEnd = start + insert.length
+      if (activeLine.textContent !== null) {
+        activeLine.textContent = '  ' + activeLine.textContent
+        const spaces = activeLine.textContent.match(/^ +/)
+        if (spaces) {
+          const spacesLength = spaces[0].length
+          const spacesText = ' '.repeat(spacesLength)
+          activeLine.textContent = spacesText + activeLine.textContent.substring(spacesLength)
+        }
+        
+        range.setStart(activeLine.childNodes[0], spaces ? spaces[0].length : 0)
+        range.collapse(true)
+
+        if (selection) {
+          selection.removeAllRanges()
+          selection.addRange(range)
+        }
+      }
+    }
+  }
 }
+
 </script>
 
 <style scoped>

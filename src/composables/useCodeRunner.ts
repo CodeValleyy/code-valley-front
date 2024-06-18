@@ -28,8 +28,12 @@ export function useCodeRunner() {
             result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
 
             result.value = fetchedResult || "Aucun résultat à afficher";
-        } catch (err) {
-            error.value = (err as Error).message || 'Une erreur est survenue';
+        } catch (err: any) {
+            if (err.response) {
+                error.value = err.response.data.error.error || 'Une erreur est survenue';
+            } else {
+                error.value = (err as Error).message || 'Une erreur est survenue';
+            }
         } finally {
             isLoading.value = false;
         }
