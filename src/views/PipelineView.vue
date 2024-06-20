@@ -22,6 +22,13 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="12">
+                    <v-text-field
+                      label="Additional Input"
+                      v-model="step.payload.input"
+                      @input="validateForm"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12">
                     <CodeMirror
                       v-model="step.payload.code"
                       basic
@@ -93,7 +100,7 @@ const addStep = () => {
     steps.steps.push({
       service: 'dyno-code',
       endpoint: 'execute',
-      payload: { code: '', language: languages[0] }
+      payload: { code: '', language: languages[0], input: '' }
     })
   }
 }

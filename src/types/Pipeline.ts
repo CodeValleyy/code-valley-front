@@ -3,6 +3,8 @@ export interface StepDto {
     endpoint: string;
     payload: {
         code: string;
+        language: string;
+        input?: string;
         [key: string]: any;
     };
 }
