@@ -41,6 +41,12 @@ const routes = [
     path: '/notifications',
     name: 'notifications',
     meta: { requiresAuth: true },
+    component: NotificationsView
+  },
+  {
+    path: '/pipeline',
+    name: 'pipeline',
+    meta: { requiresAuth: true },
     component: PipelineView
   },
   {

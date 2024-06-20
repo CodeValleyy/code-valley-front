@@ -67,8 +67,8 @@ const menuItems = computed(() => {
     { text: 'Recherche', to: '/search', icon: 'mdi-magnify', exact: false },
     { text: 'Code', to: '/code', icon: 'mdi-code-tags', exact: false },
     { text: 'Notifications', to: '/notifications', icon: 'mdi-bell', exact: false },
+    { text: 'Pipeline', to: '/pipeline', icon: 'mdi-pipe', exact: false },
     { text: 'Profil', to: '/profile', icon: 'mdi-account', exact: false },
-    { text: 'Déconnexion', to: '/logout', icon: 'mdi-logout', exact: false }
   ]
 
   if (!isAuthenticated.value) {
