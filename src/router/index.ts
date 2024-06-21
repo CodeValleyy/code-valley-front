@@ -10,6 +10,8 @@ import ChangePassword from '@/views/ChangePassword.vue'
 import ChangeEmail from '@/views/ChangeEmail.vue'
 import SearchView from '@/views/SearchView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
+import PipelineView from '@/views/PipelineView.vue'
+
 import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
@@ -40,6 +42,12 @@ const routes = [
     name: 'notifications',
     meta: { requiresAuth: true },
     component: NotificationsView
+  },
+  {
+    path: '/pipeline',
+    name: 'pipeline',
+    meta: { requiresAuth: true },
+    component: PipelineView
   },
   {
     path: '/post/:id',
