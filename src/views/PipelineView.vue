@@ -89,7 +89,7 @@ const steps = reactive<CreatePipelineDto>({
   ]
 })
 const results = ref<StepResultDto[]>([])
-const socket = io('ws://localhost:3000')
+const socket = io('ws://pipeline-orchestrator.code-valley.xyz')
 
 const rules = {
   required: (v: any) => !!v || 'Field is required'
