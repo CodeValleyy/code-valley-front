@@ -35,9 +35,9 @@ export const usePostStore = defineStore('post', {
         } | null,
     }),
     actions: {
-        async fetchPosts() {
+        async fetchPosts({ limit = 10, offset = 0 } = {}) {
             try {
-                const response = await axiosInstance.get('/posts');
+                const response = await axiosInstance.get(`/posts?limit=${limit}&offset=${offset}`);
                 this.posts = response.data;
                 for (const element of this.posts) {
                     if (element.code_url) {

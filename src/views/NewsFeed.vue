@@ -70,6 +70,10 @@
             ></v-divider>
           </template>
         </v-list>
+        <div class="pagination-buttons">
+          <v-btn @click="previousPage" :disabled="offset === 0">Précédent</v-btn>
+          <v-btn @click="nextPage" :disabled="posts.length < limit">Suivant</v-btn>
+        </div>
       </v-col>
       <v-col cols="12" md="4">
         <FriendSuggestions />
@@ -113,9 +117,12 @@ const loading = ref(false)
 
 const me = await fetchMe()
 
+const limit = ref(3)
+const offset = ref(0)
+
 const fetchPosts = async () => {
   loading.value = true
-  await postStore.fetchPosts()
+  await postStore.fetchPosts({ limit: limit.value, offset: offset.value })
   posts.value = postStore.posts.map((post: Post) => ({
     ...post,
     isOwner: post.userId === me.id
@@ -184,6 +191,18 @@ const lang = (codeLanguage: string) => {
 
 const viewPost = (postId: number) => {
   router.push({ name: 'PostDetail', params: { id: postId } })
+}
+
+const nextPage = () => {
+  offset.value += limit.value
+  fetchPosts()
+}
+
+const previousPage = () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    fetchPosts()
+  }
 }
 </script>
 

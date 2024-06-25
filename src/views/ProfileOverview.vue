@@ -83,8 +83,11 @@
           </template>
         </v-list>
       </v-col>
+      <div class="pagination-buttons">
+        <v-btn @click="previousPage" :disabled="offset === 0">Précédent</v-btn>
+        <v-btn @click="nextPage" :disabled="userPosts.length < limit">Suivant</v-btn>
+      </div>
     </v-row>
-
     <v-dialog v-model="showFollowersModal" max-width="600">
       <FriendList
         @close="showFollowersModal = false"
@@ -160,6 +163,9 @@ const userProfile = ref({
   email: '',
   createdAt: ''
 })
+
+const limit = ref(1)
+const offset = ref(0)
 
 const goToSettings = async () => {
   await nextTick()
@@ -268,6 +274,18 @@ const fetchUserData = async (username?: string) => {
     console.error('Error fetching profile:', error)
   } finally {
     loading.value = false
+  }
+}
+
+const nextPage = () => {
+  offset.value += limit.value
+  fetchUserPosts()
+}
+
+const previousPage = () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    fetchUserPosts()
   }
 }
 
