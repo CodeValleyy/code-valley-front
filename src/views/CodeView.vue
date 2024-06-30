@@ -16,6 +16,12 @@
                 label="Langage"
                 class="mb-4"
               ></v-select>
+              <v-file-input
+                v-model="file"
+                label="Fichier Input"
+                accept=".txt, .py, .js, .rs"
+                class="mb-4"
+              ></v-file-input>
               <CodeMirror
                 v-model="codeInput"
                 basic
@@ -45,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
@@ -53,7 +59,8 @@ import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 
-const { codeInput, result, isLoading, error, runCode, currentLanguage, languages } = useCodeRunner()
+const { codeInput, result, isLoading, error, file, runCode, currentLanguage, languages } =
+  useCodeRunner()
 
 const lang = computed(() => {
   switch (currentLanguage.value) {

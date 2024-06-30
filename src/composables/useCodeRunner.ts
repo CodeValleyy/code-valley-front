@@ -13,18 +13,23 @@ export function useCodeRunner() {
     const isLoading = ref<boolean>(false);
     const error = ref<string>('');
     const currentLanguage = ref<string>(languages[0]);
+    const file = ref<File | null>(null);
+
     const runCode = async () => {
         if (!codeInput.value.trim()) return;
 
         isLoading.value = true;
         error.value = '';
-        try {
-            const executeCodeRequest: ExecuteCodeRequest = {
-                language: currentLanguage.value,
-                code: codeInput.value
-            };
 
-            const fetchedResult = await fetchData(executeCodeRequest);
+        const formData = new FormData();
+        formData.append("language", String(currentLanguage.value));
+        formData.append("code", String(codeInput.value));
+        if (file.value) {
+            formData.append("input_file", file.value);
+        }
+
+        try {
+            const fetchedResult = await fetchData(formData);
             result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
 
             result.value = fetchedResult || "Aucun résultat à afficher";
@@ -45,6 +50,6 @@ export function useCodeRunner() {
 
 
     return {
-        codeInput, result, isLoading, error, languages, currentLanguage, runCode, getLanguage
+        codeInput, result, isLoading, error, languages, currentLanguage, file, runCode, getLanguage
     };
 }
