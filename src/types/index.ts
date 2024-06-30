@@ -6,6 +6,7 @@ export interface ExecuteCodeRequest {
 export interface ExecuteCodeResponse {
     output: string;
     error?: string;
+    outputFileContent?: string;
 }
 
 export * from './User';

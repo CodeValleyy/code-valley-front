@@ -33,8 +33,16 @@
                 @keydown.ctrl.s.prevent.stop="runCode"
               />
               <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
+              <v-btn
+                v-if="downloadLink"
+                :href="downloadLink"
+                download="output.txt"
+                class="mt-2 ml-4"
+              >
+                Download Output File
+              </v-btn>
             </v-col>
-            <v-col cols="8" md="4" v-show="isLoading || error || result !== ''">
+            <v-col cols="8" md="4" v-show="isLoading || error || result !== '' || fileContent">
               <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
               <div v-show="isLoading" class="text-backgroundColor mb-2">Compilation :</div>
               <Loading v-if="isLoading" />
@@ -42,6 +50,10 @@
                 {{ error }}
               </div>
               <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
+              <v-card v-if="fileContent" class="mt-4">
+                <v-card-title>Output File Content</v-card-title>
+                <v-card-text>{{ fileContent }}</v-card-text>
+              </v-card>
             </v-col>
           </v-row>
         </v-card>
@@ -59,8 +71,18 @@ import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 
-const { codeInput, result, isLoading, error, file, runCode, currentLanguage, languages } =
-  useCodeRunner()
+const {
+  codeInput,
+  result,
+  isLoading,
+  error,
+  file,
+  runCode,
+  currentLanguage,
+  languages,
+  downloadLink,
+  fileContent
+} = useCodeRunner()
 
 const lang = computed(() => {
   switch (currentLanguage.value) {

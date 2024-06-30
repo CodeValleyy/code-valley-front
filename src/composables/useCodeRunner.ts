@@ -1,6 +1,6 @@
 import { ref } from 'vue';
 import { fetchData } from '@/api/fetchData';
-import type { ExecuteCodeRequest } from '@/types';
+import type { ExecuteCodeRequest, ExecuteCodeResponse } from '@/types';
 import { languages } from '@/config/languagesConfig';
 
 const transformNewlines = (str: string): string => {
@@ -14,12 +14,16 @@ export function useCodeRunner() {
     const error = ref<string>('');
     const currentLanguage = ref<string>(languages[0]);
     const file = ref<File | null>(null);
+    const downloadLink = ref<string | null>(null);
+    const fileContent = ref<string | null>(null);
 
     const runCode = async () => {
         if (!codeInput.value.trim()) return;
 
         isLoading.value = true;
         error.value = '';
+        downloadLink.value = null;
+        fileContent.value = null;
 
         const formData = new FormData();
         formData.append("language", String(currentLanguage.value));
@@ -29,10 +33,18 @@ export function useCodeRunner() {
         }
 
         try {
-            const fetchedResult = await fetchData(formData);
-            result.value = fetchedResult ? transformNewlines(fetchedResult) : "Aucun résultat à afficher";
+            const fetchedResult: ExecuteCodeResponse = await fetchData(formData);
+            result.value = fetchedResult.output ? transformNewlines(fetchedResult.output) : "Aucun résultat à afficher";
+            if (fetchedResult.outputFileContent) {
+                const byteArray = Uint8Array.from(atob(fetchedResult.outputFileContent), char => char.charCodeAt(0));
+                const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+                downloadLink.value = URL.createObjectURL(blob);
+                fileContent.value = new TextDecoder().decode(byteArray);
+            } else {
+                downloadLink.value = null;
+                fileContent.value = null;
+            }
 
-            result.value = fetchedResult || "Aucun résultat à afficher";
         } catch (err: any) {
             if (err.response) {
                 error.value = err.response.data.error.error || 'Une erreur est survenue';
@@ -48,8 +60,7 @@ export function useCodeRunner() {
         currentLanguage.value = language;
     };
 
-
     return {
-        codeInput, result, isLoading, error, languages, currentLanguage, file, runCode, getLanguage
+        codeInput, result, isLoading, error, languages, currentLanguage, file, runCode, getLanguage, downloadLink, fileContent
     };
 }
