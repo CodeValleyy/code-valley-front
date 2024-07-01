@@ -11,6 +11,7 @@ import ChangeEmail from '@/views/ChangeEmail.vue'
 import SearchView from '@/views/SearchView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
 import PipelineView from '@/views/PipelineView.vue'
+import GroupsView from '@/views/GroupsView.vue'
 
 import PostDetail from '@/components/PostDetail.vue'
 
@@ -50,6 +51,12 @@ const routes = [
     component: PipelineView
   },
   {
+    path: '/groups',
+    name: 'groups',
+    meta: { requiresAuth: true },
+    component: GroupsView
+  },
+  {
     path: '/post/:id',
     name: 'PostDetail',
     component: PostDetail
@@ -76,7 +83,7 @@ const routes = [
     path: '/profile/:username?',
     name: 'profile',
     component: ProfileOverview,
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true }
   },
   {
     path: '/settings',
@@ -107,7 +114,9 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, from, next) => {
-  const isAuthenticated = await fetchMe().then(() => true).catch(() => false)
+  const isAuthenticated = await fetchMe()
+    .then(() => true)
+    .catch(() => false)
   if (!isAuthenticated) {
     resetToken()
   }
