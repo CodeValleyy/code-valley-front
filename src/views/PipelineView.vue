@@ -5,7 +5,54 @@
         <v-card>
           <v-card-title class="text-h5">Pipeline Orchestrator</v-card-title>
           <v-card-text>
-            <v-form ref="form" @submit.prevent="submitPipeline">
+            <ul>
+              <li>
+                <strong>Initial Input:</strong> The initial input for the pipeline must be a file.
+              </li>
+              <li>
+                <strong>Step:</strong> Each step in the pipeline consists of a code snippet in a specific language.
+              </li>
+              <li>
+                <strong>Output:</strong> The output of each step is passed as the input to the next step.
+              </li>
+              <li>
+                <strong>Supported Languages:</strong>
+                <ul>
+                  <em>
+                  <li v-for="language in languages" :key="language">{{ language }}</li>
+                  </em>
+                </ul>
+              </li>
+              <li>
+                <strong>Usage:</strong> you must use 
+                <ul>
+                  <li>For <strong>Python</strong>, <strong>Javascript</strong> and <strong>Lua</strong>: <code>(input_data, output_path)</code></li>
+                  <li>For <strong>result</strong>: <code>(INPUT_PATH, OUTPUT_PATH)</code></li>
+                </ul>
+                variables for JS, PY and LUA as in the example below.
+              </li>
+            </ul>
+          </v-card-text>
+          <v-card-text>
+            <v ref="form" @submit.prevent="submitPipeline">
+              <v-row class="mb-4">
+                <v-col cols="12">
+                  <div v-if="initialInputType === 'file'">
+                    <v-file-input
+                      label="Initial Input File"
+                      v-model="initialInput.file"
+                      @change="validateForm"
+                    ></v-file-input>
+                  </div>
+                  <div v-else>
+                    <v-text-field
+                      label="Initial Input"
+                      v-model="initialInput.text"
+                      @input="validateForm"
+                    ></v-text-field>
+                  </div>
+                </v-col>
+              </v-row>
               <v-container v-for="(step, index) in steps.steps" :key="index" class="mb-4 pa-4">
                 <v-row>
                   <v-col cols="12">
@@ -22,29 +69,25 @@
                     ></v-select>
                   </v-col>
                   <v-col cols="12">
-                    <v-text-field
-                      label="Additional Input"
-                      v-model="step.payload.input"
-                      @input="validateForm"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12">
-                    <CodeMirror
+                    <v-select
+                      :items="snippets"
+                      item-title="filename"
+                      item-value="code"
+                      label="Snippets"
                       v-model="step.payload.code"
-                      basic
-                      :extensions="[getLangExtension(step.payload.language)]"
-                      @update="validateForm"
-                      height="300px"
-                      class="mb-4"
-                    />
+                      :rules="[rules.required]"
+                      @change="validateForm"
+                    >
+                    </v-select>
                   </v-col>
                 </v-row>
               </v-container>
-              <v-btn :disabled="!formValid" @click="addStep" color="primary" class="mr-2"
-                >Add Step</v-btn
-              >
-              <v-btn :disabled="!formValid" type="submit" color="success">Execute Pipeline</v-btn>
-            </v-form>
+
+              <v-btn :disabled="!formValid" @click="addStep" color="primary" class="mr-2">
+                Add Step
+              </v-btn>
+              <v-btn :disabled="!formValid" type="submit" @click="submitPipeline" color="success">Execute Pipeline</v-btn>
+            </v>
           </v-card-text>
         </v-card>
       </v-col>
@@ -69,66 +112,31 @@
     </v-row>
   </v-container>
 </template>
-
 <script setup lang="ts">
-import { ref, reactive, onMounted, watch } from 'vue'
-import { io } from 'socket.io-client'
-import type { CreatePipelineDto, StepResultDto } from '@/types/Pipeline'
+import { onMounted, watch } from 'vue'
+import type { StepResultDto } from '@/types/Pipeline'
 import { languages } from '@/config/languagesConfig'
-import { python } from '@codemirror/lang-python'
-import { rust } from '@codemirror/lang-rust'
-import { javascript } from '@codemirror/lang-javascript'
-import CodeMirror from 'vue-codemirror6'
+import { usePipeline } from '@/composables/usePipeline'
 
-const form = ref()
-const formValid = ref(false)
-
-const steps = reactive<CreatePipelineDto>({
-  steps: [
-    { service: 'dyno-code', endpoint: 'execute', payload: { code: '', language: languages[0] } }
-  ]
-})
-const results = ref<StepResultDto[]>([])
-const socket = io('wss://pipeline-orchestrator.code-valley.xyz')
-
-const rules = {
-  required: (v: any) => !!v || 'Field is required'
-}
-
-const addStep = () => {
-  if (form.value && form.value.validate()) {
-    steps.steps.push({
-      service: 'dyno-code',
-      endpoint: 'execute',
-      payload: { code: '', language: languages[0], input: '' }
-    })
-  }
-}
-
-const submitPipeline = () => {
-  if (form.value && form.value.validate()) {
-    socket.emit('executePipeline', steps)
-  }
-}
-
-const getLangExtension = (language: string) => {
-  switch (language) {
-    case 'python':
-      return python()
-    case 'rust':
-      return rust()
-    case 'javascript':
-      return javascript()
-    default:
-      return python()
-  }
-}
-
-const validateForm = () => {
-  formValid.value = steps.steps.every((step) => step.payload.language && step.payload.code)
-}
+const {
+  contents,
+  snippets,
+  form,
+  formValid,
+  initialInputType,
+  initialInput,
+  steps,
+  results,
+  addStep,
+  submitPipeline,
+  validateForm,
+  socket,
+  rules
+} = usePipeline()
 
 watch(() => steps.steps, validateForm, { deep: true })
+watch(initialInput, validateForm, { deep: true })
+watch(initialInputType, validateForm, { deep: true })
 
 onMounted(() => {
   socket.on('pipelineUpdate', (update: StepResultDto) => {
@@ -144,7 +152,3 @@ onMounted(() => {
   })
 })
 </script>
-
-<style scoped>
-@import 'tailwindcss/tailwind.css';
-</style>

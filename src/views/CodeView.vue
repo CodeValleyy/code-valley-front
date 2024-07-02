@@ -81,10 +81,12 @@ const {
   currentLanguage,
   languages,
   downloadLink,
-  fileContent
+  fileContent,
+  setBoilerplate,
 } = useCodeRunner()
 
 const lang = computed(() => {
+  setBoilerplate(currentLanguage.value)
   switch (currentLanguage.value) {
     case 'python':
       return python()

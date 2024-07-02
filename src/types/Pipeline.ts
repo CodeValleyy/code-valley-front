@@ -7,6 +7,7 @@ export interface StepDto {
         input?: string;
         [key: string]: any;
     };
+    inputType: string;
 }
 
 export interface CreatePipelineDto {

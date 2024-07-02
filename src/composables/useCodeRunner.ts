@@ -2,13 +2,14 @@ import { ref } from 'vue';
 import { fetchData } from '@/api/fetchData';
 import type { ExecuteCodeRequest, ExecuteCodeResponse } from '@/types';
 import { languages } from '@/config/languagesConfig';
+import { pythonBoilerplate, javascriptBoilerplate, rustBoilerplate, luaBoilerplate } from '@/config/languagesConfig'
 
 const transformNewlines = (str: string): string => {
     return str.replace(/\r?\n/g, '<br>');
 };
 
 export function useCodeRunner() {
-    const codeInput = ref<string>('');
+    const codeInput = ref<string>(pythonBoilerplate);
     const result = ref<string>('');
     const isLoading = ref<boolean>(false);
     const error = ref<string>('');
@@ -60,7 +61,26 @@ export function useCodeRunner() {
         currentLanguage.value = language;
     };
 
+    const setBoilerplate = (language: string) => {
+        switch (language) {
+            case 'python':
+                codeInput.value = pythonBoilerplate;
+                break;
+            case 'rust':
+                codeInput.value = rustBoilerplate;
+                break;
+            case 'javascript':
+                codeInput.value = javascriptBoilerplate;
+                break;
+            case 'lua':
+                codeInput.value = luaBoilerplate;
+                break;
+            default:
+                codeInput.value = '';
+        }
+    }
+
     return {
-        codeInput, result, isLoading, error, languages, currentLanguage, file, runCode, getLanguage, downloadLink, fileContent
+        codeInput, result, isLoading, error, languages, currentLanguage, file, runCode, getLanguage, downloadLink, fileContent, setBoilerplate
     };
 }
