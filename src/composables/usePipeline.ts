@@ -4,8 +4,7 @@ import { useContentStore } from "@/stores/useContentStore";
 import { useUserStore } from "@/stores/useUserStore";
 import type { CreatePipelineDto, StepResultDto } from "@/types/Pipeline";
 import { languages } from "@/config/languagesConfig";
-import { Socket, io } from "socket.io-client";
-import type { BufferData } from "@/types/buffer";
+import { io } from "socket.io-client";
 
 export function usePipeline() {
     const contentStore = useContentStore();
@@ -14,10 +13,11 @@ export function usePipeline() {
     const contents = ref(contentStore.contents as Content[]);
     const snippets = ref(contentStore.snippets as Snippets[])
 
+    const error = ref<string>('');
+
     const form = ref(null);
     const formValid = ref(false)
-    const initialInput = reactive<{ text: string | undefined, file: BufferData | undefined }>({ text: '', file: undefined });
-
+    const initialInput = ref<File | null>(null);
 
     if (userStore.user) {
         contentStore.fetchContentsByOwner(userStore.user.id).catch((error) => {
@@ -37,7 +37,7 @@ export function usePipeline() {
 
     const steps = reactive<CreatePipelineDto>({
         steps: [
-            { service: 'dyno-code', endpoint: 'execute', payload: { code: '', language: languages[0], input: undefined } }
+            { service: 'dyno-code', endpoint: 'execute', payload: { code: '', language: languages[0], input_file: undefined } }
         ]
     })
     const results = ref<StepResultDto[]>([])
@@ -52,16 +52,18 @@ export function usePipeline() {
             steps.steps.push({
                 service: 'dyno-code',
                 endpoint: 'execute',
-                payload: { code: '', language: languages[0], input: undefined },
+                payload: { code: '', language: languages[0], input_file: undefined },
             });
         }
     };
 
-    const submitPipeline = () => {
+    const submitPipeline = async () => {
         if (form.value) {
-            steps.steps[0].payload.input = initialInput.file as unknown as string;
+            if (initialInput.value) {
+                steps.steps[0].payload.input_file = await fileToBase64(initialInput.value);
+            }
             for (let i = 1; i < steps.steps.length; i++) {
-                steps.steps[i].payload.input = results.value[i - 1]?.output;
+                steps.steps[i].payload.input_file = results.value[i - 1]?.output;
             }
             socket.emit('executePipeline', steps);
         } else {
@@ -69,17 +71,25 @@ export function usePipeline() {
         }
     };
     const validateForm = () => {
-        formValid.value = (initialInput.file !== undefined) &&
+        formValid.value = (initialInput.value !== undefined) &&
             steps.steps.every((step) => {
                 const isValid = step.payload.language && step.payload.code;
                 console.log(`Step ${JSON.stringify(step)}: ${isValid ? 'valid' : 'invalid'}`);
                 return isValid;
             });
-    }
-
+    };
+    function fileToBase64(file: File): Promise<{ name: string, data: string }> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({ name: file.name, data: reader.result as string });
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    };
     return {
         contents,
         snippets,
+        error,
         form,
         formValid,
         initialInput,

@@ -34,13 +34,13 @@
             </ul>
           </v-card-text>
           <v-card-text>
-            <v ref="form" @submit.prevent="submitPipeline">
+            <v-form ref="form" @submit.prevent="submitPipeline">
               <v-row class="mb-4">
                 <v-col cols="12">
                   <v-file-input
+                    v-model="initialInput"
                     label="Initial Input File"
-                    v-model="initialInput.file"
-                    @change="handleFileChange"
+                    accept=".txt, .py, .js, .rs"
                   ></v-file-input>
                 </v-col>
               </v-row>
@@ -77,8 +77,8 @@
               <v-btn :disabled="!formValid" @click="addStep" color="primary" class="mr-2">
                 Add Step
               </v-btn>
-              <v-btn :disabled="!formValid" type="submit" @click="submitPipeline" color="success">Execute Pipeline</v-btn>
-            </v>
+              <v-btn :disabled="!formValid" type="submit" color="success">Execute Pipeline</v-btn>
+            </v-form>
           </v-card-text>
         </v-card>
       </v-col>
@@ -86,17 +86,35 @@
         <v-card>
           <v-card-title class="text-h5">Pipeline Results</v-card-title>
           <v-card-text>
-            <v-list>
+            <v-list dense>
               <v-list-item v-for="result in results" :key="result.stepNumber">
                 <v-list-item-content>
-                  <v-list-item-title>Step {{ result.stepNumber }}</v-list-item-title>
+                  <v-list-item-title class="text-subtitle-1">Step {{ result.stepNumber }}</v-list-item-title>
                   <v-list-item-subtitle>
-                    <div v-if="result.error" class="text-red-500">{{ result.error }}</div>
-                    <div v-else>
-                      <div v-if="result.output">Output: {{ result.output }}</div>
-                      <div v-if="result.output_file_content">Output File Content: {{ decodeBase64(result.output_file_content) }}</div>
-                      <v-btn v-if="result.output_file_content" @click="downloadFile(result.output_file_content, result.stepNumber)" color="primary">Download Output File</v-btn>
-                    </div>
+                    <v-row>
+                      <v-col cols="12">
+                        <v-chip v-if="result.output_file_content" color="primary" class="mr-2">Output File</v-chip>
+                        <v-chip v-if="result.output" color="green" class="mr-2">Output</v-chip>
+                        <v-chip v-if="result.error" color="red">Error</v-chip>
+                      </v-col>
+                      <v-col cols="12">
+                        <div v-if="result.error">
+                          <v-alert type="error" class="mb-2">
+                            <v-card-text>{{ result.error }}</v-card-text>
+                          </v-alert>
+                        </div>
+                        <div v-if="result.output">
+                          <v-alert type="success" class="mb-2">Output: {{ result.output }}</v-alert>
+                        </div>
+                        <div v-if="result.output_file_content">
+                          <v-alert type="info" class="mb-2">Output File Content: 
+                            <v-card-text>{{ decodeBase64(result.output_file_content) }}</v-card-text>
+
+                            </v-alert>
+                          <v-btn @click="downloadFile(result.output_file_content, result.stepNumber)" color="primary" outlined>Download Output File</v-btn>
+                        </div>
+                      </v-col>
+                    </v-row>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -135,6 +153,8 @@ watch(initialInput, validateForm, { deep: true })
 
 onMounted(() => {
   socket.on('pipelineUpdate', (update: StepResultDto) => {
+    if(!update) return
+    console.log('Pipeline update:', update)
     results.value.push(update)
   })
 
@@ -147,27 +167,11 @@ onMounted(() => {
   })
 })
 
-const handleFileChange = async (event: Event) => {
-  const input = event.target as HTMLInputElement;
-  const file = input.files?.[0];
-  if (file) {
-    const arrayBuffer = await file.arrayBuffer();
-    const bufferData: BufferData = {
-      bufferInput: {
-        data: Array.from(new Uint8Array(arrayBuffer))
-      }
-    };
-
-    initialInput.file = bufferData;
-    validateForm();
-  } else {
-    console.error('The selected input is not a file or is not a valid Blob.');
-  }
-};
 
 const decodeBase64 = (base64Content: string) => {
   try {
-    return atob(base64Content);
+    const byteArray = Uint8Array.from(atob(base64Content), char => char.charCodeAt(0));
+    return new TextDecoder().decode(byteArray);
   } catch (error) {
     console.error('Error decoding base64 content:', error);
     return '';
@@ -175,7 +179,7 @@ const decodeBase64 = (base64Content: string) => {
 };
 
 const downloadFile = (base64Content: string, stepNumber: number) => {
-  const decodedContent = atob(base64Content);
+  const decodedContent = Uint8Array.from(atob(base64Content), char => char.charCodeAt(0));
   const blob = new Blob([decodedContent], { type: 'text/plain' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');

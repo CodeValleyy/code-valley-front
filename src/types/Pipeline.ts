@@ -4,7 +4,7 @@ export interface StepDto {
     payload: {
         code: string;
         language: string;
-        input?: string | Blob;
+        input_file?: any;
         [key: string]: any;
     };
 }
