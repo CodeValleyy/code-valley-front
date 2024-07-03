@@ -1,4 +1,5 @@
 import axiosInstance from '@/config/axiosInstance'
+import type { GroupInput } from '@/types/GroupInput'
 import type { GroupResponse } from '@/types/GroupResponse'
 
 const fetchGroup = async (groupId: number | string | undefined) => {
@@ -37,6 +38,27 @@ const getAll = async (): Promise<GroupResponse[]> => {
   }
 }
 
+const getOneWithId = async (id: string): Promise<GroupResponse> => {
+  try {
+    const response = await axiosInstance.get('/groups/details/' + id)
+    return response.data as GroupResponse
+  } catch (error) {
+    console.error('Error fetching group:', error)
+    throw error
+  }
+}
+
+const createGroup = async (groupInput: GroupInput) => {
+  try {
+    const response = await axiosInstance.post(`/groups/create`, groupInput)
+    const createdGroup = response.data
+    window.location.href = `/groups/${createdGroup.name}`
+  } catch (error) {
+    console.error('Error creating group:', error)
+    throw error
+  }
+}
+
 const searchGroup = async (name: string): Promise<GroupResponse[]> => {
   try {
     const response = await axiosInstance.get('/groups/search/' + name)
@@ -49,6 +71,8 @@ const searchGroup = async (name: string): Promise<GroupResponse[]> => {
 
 export const useGroup = () => ({
   getAll,
+  getOneWithId,
   fetchGroup,
-  searchGroup
+  searchGroup,
+  createGroup
 })

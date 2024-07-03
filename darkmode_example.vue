@@ -1,6 +1,6 @@
 <template>
   <div :class="{ dark: isDarkMode }" class="min-h-screen transition-colors duration-300">
-    <header class="bg-primary text-white p-4">
+    <header class="bg-primaryTailwind text-white p-4">
       <h1 class="text-xl font-poppins">Mon Application</h1>
       <button @click="toggleDarkMode" class="ml-auto bg-secondary text-white px-4 py-2 rounded">
         {{ isDarkMode ? 'Mode Jour' : 'Mode Nuit' }}
@@ -15,7 +15,7 @@
           Rejoignez notre réseau social pour partager et collaborer sur des programmes de
           transformation de fichiers.
         </p>
-        <button class="mt-6 bg-primary hover:bg-primaryHover text-white px-6 py-3 rounded">
+        <button class="mt-6 bg-primaryTailwind hover:bg-primaryHover text-white px-6 py-3 rounded">
           Rejoignez-nous
         </button>
       </section>

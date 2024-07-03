@@ -12,7 +12,8 @@ import SearchView from '@/views/SearchView.vue'
 import NotificationsView from '@/views/NotificationsView.vue'
 import PipelineView from '@/views/PipelineView.vue'
 import GroupsView from '@/views/GroupsView.vue'
-
+import CreateGroupsView from '@/views/CreateGroupsView.vue'
+import GroupDetailsView from '@/views/GroupDetailsView.vue'
 import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
@@ -55,6 +56,18 @@ const routes = [
     name: 'groups',
     meta: { requiresAuth: true },
     component: GroupsView
+  },
+  {
+    path: '/groups/new',
+    name: 'groupCreate',
+    meta: { requiresAuth: true },
+    component: CreateGroupsView
+  },
+  {
+    path: '/groups/:id',
+    name: 'groupDetails',
+    meta: { requiresAuth: true },
+    component: GroupDetailsView
   },
   {
     path: '/post/:id',
