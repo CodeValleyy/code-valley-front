@@ -148,7 +148,6 @@ const fetchPost = async () => {
   post.value = await postStore.fetchPost(postId)
   if (post.value) {
     post.value.isOwner = post.value.userId === me.id
-    console.log(post.value)
     codeMirrorValue.value = typeof post.value.code === 'string' ? post.value.code : ''
   }
   isLoading.value = false

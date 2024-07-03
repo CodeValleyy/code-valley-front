@@ -29,7 +29,7 @@
                   <li>For <strong>Python</strong>, <strong>Javascript</strong> and <strong>Lua</strong>: <code>(input_data, output_path)</code></li>
                   <li>For <strong>result</strong>: <code>(INPUT_PATH, OUTPUT_PATH)</code></li>
                 </ul>
-                variables for JS, PY and LUA as in the example below.
+                variables for JS, PY et LUA as in the example below.
               </li>
             </ul>
           </v-card-text>
@@ -37,20 +37,11 @@
             <v ref="form" @submit.prevent="submitPipeline">
               <v-row class="mb-4">
                 <v-col cols="12">
-                  <div v-if="initialInputType === 'file'">
-                    <v-file-input
-                      label="Initial Input File"
-                      v-model="initialInput.file"
-                      @change="validateForm"
-                    ></v-file-input>
-                  </div>
-                  <div v-else>
-                    <v-text-field
-                      label="Initial Input"
-                      v-model="initialInput.text"
-                      @input="validateForm"
-                    ></v-text-field>
-                  </div>
+                  <v-file-input
+                    label="Initial Input File"
+                    v-model="initialInput.file"
+                    @change="handleFileChange"
+                  ></v-file-input>
                 </v-col>
               </v-row>
               <v-container v-for="(step, index) in steps.steps" :key="index" class="mb-4 pa-4">
@@ -101,7 +92,11 @@
                   <v-list-item-title>Step {{ result.stepNumber }}</v-list-item-title>
                   <v-list-item-subtitle>
                     <div v-if="result.error" class="text-red-500">{{ result.error }}</div>
-                    <div v-else>{{ result.output }}</div>
+                    <div v-else>
+                      <div v-if="result.output">Output: {{ result.output }}</div>
+                      <div v-if="result.output_file_content">Output File Content: {{ decodeBase64(result.output_file_content) }}</div>
+                      <v-btn v-if="result.output_file_content" @click="downloadFile(result.output_file_content, result.stepNumber)" color="primary">Download Output File</v-btn>
+                    </div>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
@@ -112,18 +107,19 @@
     </v-row>
   </v-container>
 </template>
+
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import type { StepResultDto } from '@/types/Pipeline'
 import { languages } from '@/config/languagesConfig'
 import { usePipeline } from '@/composables/usePipeline'
+import type { BufferData } from '@/types/buffer';
 
 const {
   contents,
   snippets,
   form,
   formValid,
-  initialInputType,
   initialInput,
   steps,
   results,
@@ -136,7 +132,6 @@ const {
 
 watch(() => steps.steps, validateForm, { deep: true })
 watch(initialInput, validateForm, { deep: true })
-watch(initialInputType, validateForm, { deep: true })
 
 onMounted(() => {
   socket.on('pipelineUpdate', (update: StepResultDto) => {
@@ -151,4 +146,43 @@ onMounted(() => {
     console.error('Pipeline execution error:', error)
   })
 })
+
+const handleFileChange = async (event: Event) => {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const bufferData: BufferData = {
+      bufferInput: {
+        data: Array.from(new Uint8Array(arrayBuffer))
+      }
+    };
+
+    initialInput.file = bufferData;
+    validateForm();
+  } else {
+    console.error('The selected input is not a file or is not a valid Blob.');
+  }
+};
+
+const decodeBase64 = (base64Content: string) => {
+  try {
+    return atob(base64Content);
+  } catch (error) {
+    console.error('Error decoding base64 content:', error);
+    return '';
+  }
+};
+
+const downloadFile = (base64Content: string, stepNumber: number) => {
+  const decodedContent = atob(base64Content);
+  const blob = new Blob([decodedContent], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `output_step_${stepNumber}.txt`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
 </script>

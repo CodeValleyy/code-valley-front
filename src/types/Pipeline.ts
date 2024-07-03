@@ -4,10 +4,9 @@ export interface StepDto {
     payload: {
         code: string;
         language: string;
-        input?: string;
+        input?: string | Blob;
         [key: string]: any;
     };
-    inputType: string;
 }
 
 export interface CreatePipelineDto {
@@ -18,4 +17,7 @@ export interface StepResultDto {
     output: string;
     error: string;
     stepNumber: number;
+    output_file_content?: string;
+    output_file_path?: string;
 }
+
