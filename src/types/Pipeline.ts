@@ -21,3 +21,9 @@ export interface StepResultDto {
     output_file_path?: string;
 }
 
+export interface SavePipelineDto {
+    owner_id: number;
+    name: string;
+    description: string;
+    steps: string[];
+}

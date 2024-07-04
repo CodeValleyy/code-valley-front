@@ -1,25 +1,43 @@
 import { defineStore } from "pinia";
 import axiosInstance from "@/config/axiosInstance";
-import type { Content, Snippets } from "@/types";
+import type { Content, ContentRaw, Snippets } from "@/types";
 
 const endpoint = "/content";
 export const useContentStore = defineStore('content', {
     state: () => ({
         contents: [] as Content[],
+        contentRaw: [] as ContentRaw[],
         snippets: [] as Snippets[]
     }),
     actions: {
         async fetchContentsByOwner(ownerId: number) {
             try {
                 const response = await axiosInstance.get(`${endpoint}/owner/${ownerId}`);
-                this.contents = response.data;
+                this.contentRaw = response.data;
+                this.contents = this.contentRaw.map((content) => {
+                    return {
+                        id: content._id.$oid,
+                        code_url: content.code_url,
+                        content_type: content.content_type,
+                        file_hash: content.file_hash,
+                        file_path: content.file_path,
+                        file_size: content.file_size,
+                        filename: content.filename,
+                        owner_id: content.owner_id,
+                        update_time: content.update_time,
+                        upload_time: content.upload_time
+                    };
+                });
+
                 this.snippets = this.contents.map((content) => {
                     return {
                         id: content.id,
+                        owner_id: content.owner_id,
                         filename: content.filename,
                         code: content.code_url
                     };
                 });
+                console.log(this.snippets);
             } catch (error) {
                 console.error('Error fetching contents:', error);
             }

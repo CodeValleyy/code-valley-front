@@ -2,7 +2,7 @@ import type { Content, Snippets } from "@/types";
 import { reactive, ref, watch, type Ref } from "vue";
 import { useContentStore } from "@/stores/useContentStore";
 import { useUserStore } from "@/stores/useUserStore";
-import type { CreatePipelineDto, StepResultDto } from "@/types/Pipeline";
+import type { CreatePipelineDto, SavePipelineDto, StepDto, StepResultDto } from "@/types/Pipeline";
 import { languages, parseLanguageFromCodeUrl } from "@/config/languagesConfig";
 import { io } from "socket.io-client";
 
@@ -40,6 +40,7 @@ export function usePipeline() {
                 console.error('Error fetching user profile:', error);
             });
     }
+
 
     const steps = reactive<CreatePipelineDto>({
         steps: [
@@ -79,6 +80,13 @@ export function usePipeline() {
     const validateForm = () => {
         formValid.value = (initialInput.value !== undefined) &&
             steps.steps.every((step) => {
+                if (step.payload.snippet) {
+                    step.payload.code = step.payload.snippet.code;
+                    step.payload.language = parseLanguageFromCodeUrl(step.payload.snippet.code);
+                    step.payload.owner_id = step.payload.snippet.owner_id;
+                    //step.payload.snippet = undefined;
+                }
+
                 const isValid = !!step.payload.code;
 
                 step.payload.language = parseLanguageFromCodeUrl(step.payload.code);
@@ -88,17 +96,34 @@ export function usePipeline() {
     };
     const savePipeline = async () => {
         if (form.value) {
-            if (initialInput.value) {
-                steps.steps[0].payload.input_file = await fileToBase64(initialInput.value);
+            const user = userStore.user;
+            if (!user) {
+                console.error('User not authenticated');
+                return;
             }
-            for (let i = 1; i < steps.steps.length; i++) {
-                steps.steps[i].payload.input_file = base64ToFileObject(results.value[i - 1]?.output_file_content, 'output');
-            }
+
+            const stepCodes = steps.steps.map(step => step.payload.code);
+            const savePipelineDto: SavePipelineDto = {
+                owner_id: user.id,
+                name: 'Pipeline Name', // Replace with actual name if available
+                description: 'Pipeline Description', // Replace with actual description if available
+                steps: stepCodes
+            };
+
+
             socket.emit('savePipeline', steps);
         } else {
             console.error('Form is not valid');
         }
-    }
+    };
+    const updatePayload = (step: StepDto & { snippet?: Snippets }, snippet: Snippets) => {
+        step.payload.code = snippet.code;
+        step.payload.ownerId = snippet.owner_id;
+        validateForm();
+    };
+
+
+    /** PRIVATE FUNCTION */
     function fileToBase64(file: File): Promise<{ name: string, data: string }> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -123,7 +148,9 @@ export function usePipeline() {
         submitPipeline,
         validateForm,
         socket,
-        rules
+        rules,
+        savePipeline,
+        updatePayload
     };
 
 
