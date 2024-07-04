@@ -34,6 +34,11 @@
               />
               <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
               <v-btn
+                color="primaryLight"
+                v-if="codeInput"
+                class="mt-2 ml-4"
+                >Sauvegarder</v-btn>
+              <v-btn
                 v-if="downloadLink"
                 :href="downloadLink"
                 download="output.txt"
@@ -109,7 +114,7 @@ const handleTab = (e: KeyboardEvent) => {
       const selection = window.getSelection()
 
       if (activeLine.textContent !== null) {
-        activeLine.textContent = '  ' + activeLine.textContent
+        activeLine.textContent = '    ' + activeLine.textContent
         const spaces = activeLine.textContent.match(/^ +/)
         if (spaces) {
           const spacesLength = spaces[0].length

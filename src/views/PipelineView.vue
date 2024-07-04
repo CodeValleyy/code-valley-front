@@ -51,16 +51,6 @@
                   </v-col>
                   <v-col cols="12">
                     <v-select
-                      :items="languages"
-                      label="Language"
-                      v-model="step.payload.language"
-                      :rules="[rules.required]"
-                      @change="validateForm"
-                      required
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12">
-                    <v-select
                       :items="snippets"
                       item-title="filename"
                       item-value="code"
@@ -77,7 +67,8 @@
               <v-btn :disabled="!formValid" @click="addStep" color="primary" class="mr-2">
                 Add Step
               </v-btn>
-              <v-btn :disabled="!formValid" type="submit" color="success">Execute Pipeline</v-btn>
+              <v-btn :disabled="!formValid" type="submit" color="success" class="mr-2">Execute Pipeline</v-btn>
+              <v-btn :disabled="!formValid" color="warning" @click="savePipeline">Save Pipeline</v-btn>
             </v-form>
           </v-card-text>
         </v-card>
@@ -145,7 +136,8 @@ const {
   submitPipeline,
   validateForm,
   socket,
-  rules
+  rules,
+  savePipeline,
 } = usePipeline()
 
 watch(() => steps.steps, validateForm, { deep: true })
@@ -165,6 +157,7 @@ onMounted(() => {
   socket.on('pipelineError', (error: string) => {
     console.error('Pipeline execution error:', error)
   })
+
 })
 
 

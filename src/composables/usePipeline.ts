@@ -1,9 +1,9 @@
 import type { Content, Snippets } from "@/types";
-import { reactive, ref, type Ref } from "vue";
+import { reactive, ref, watch, type Ref } from "vue";
 import { useContentStore } from "@/stores/useContentStore";
 import { useUserStore } from "@/stores/useUserStore";
 import type { CreatePipelineDto, StepResultDto } from "@/types/Pipeline";
-import { languages } from "@/config/languagesConfig";
+import { languages, parseLanguageFromCodeUrl } from "@/config/languagesConfig";
 import { io } from "socket.io-client";
 
 export function usePipeline() {
@@ -12,6 +12,12 @@ export function usePipeline() {
 
     const contents = ref(contentStore.contents as Content[]);
     const snippets = ref(contentStore.snippets as Snippets[])
+
+    watch(contentStore, (newVal) => {
+        contents.value = newVal.contents;
+        snippets.value = newVal.snippets;
+    });
+
 
     const error = ref<string>('');
 
@@ -63,7 +69,7 @@ export function usePipeline() {
                 steps.steps[0].payload.input_file = await fileToBase64(initialInput.value);
             }
             for (let i = 1; i < steps.steps.length; i++) {
-                steps.steps[i].payload.input_file = results.value[i - 1]?.output;
+                steps.steps[i].payload.input_file = base64ToFileObject(results.value[i - 1]?.output_file_content, 'output');
             }
             socket.emit('executePipeline', steps);
         } else {
@@ -73,11 +79,26 @@ export function usePipeline() {
     const validateForm = () => {
         formValid.value = (initialInput.value !== undefined) &&
             steps.steps.every((step) => {
-                const isValid = step.payload.language && step.payload.code;
+                const isValid = !!step.payload.code;
+
+                step.payload.language = parseLanguageFromCodeUrl(step.payload.code);
                 console.log(`Step ${JSON.stringify(step)}: ${isValid ? 'valid' : 'invalid'}`);
                 return isValid;
             });
     };
+    const savePipeline = async () => {
+        if (form.value) {
+            if (initialInput.value) {
+                steps.steps[0].payload.input_file = await fileToBase64(initialInput.value);
+            }
+            for (let i = 1; i < steps.steps.length; i++) {
+                steps.steps[i].payload.input_file = base64ToFileObject(results.value[i - 1]?.output_file_content, 'output');
+            }
+            socket.emit('savePipeline', steps);
+        } else {
+            console.error('Form is not valid');
+        }
+    }
     function fileToBase64(file: File): Promise<{ name: string, data: string }> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -86,6 +107,9 @@ export function usePipeline() {
             reader.readAsDataURL(file);
         });
     };
+    function base64ToFileObject(base64Data: string | undefined, fileName: string): { name: string, data: string } {
+        return { name: fileName, data: base64Data ?? '' };
+    }
     return {
         contents,
         snippets,
