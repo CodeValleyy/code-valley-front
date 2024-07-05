@@ -2,7 +2,7 @@ import type { Content, Snippets } from "@/types";
 import { reactive, ref, watch, type Ref } from "vue";
 import { useContentStore } from "@/stores/useContentStore";
 import { useUserStore } from "@/stores/useUserStore";
-import type { CreatePipelineDto, SavePipelineDto, StepDto, StepResultDto } from "@/types/Pipeline";
+import type { CreatePipelineDto, Pipeline, SavePipelineDto, StepDto, StepResultDto } from "@/types/Pipeline";
 import { languages, parseLanguageFromCodeUrl } from "@/config/languagesConfig";
 import { io } from "socket.io-client";
 
@@ -12,6 +12,7 @@ export function usePipeline() {
 
     const contents = ref(contentStore.contents as Content[]);
     const snippets = ref(contentStore.snippets as Snippets[])
+    const myPipelines = ref<Pipeline[]>([]);
 
     watch(contentStore, (newVal) => {
         contents.value = newVal.contents;
@@ -26,7 +27,8 @@ export function usePipeline() {
     const formValid = ref(false)
     const initialInput = ref<File | null>(null);
 
-    const dialog = ref(false);
+    const saveDialog = ref(false);
+    const myPipelinesDialog = ref(false);
     const pipelineName = ref('');
     const pipelineDescription = ref('');
 
@@ -120,23 +122,69 @@ export function usePipeline() {
         }
     };
 
-    const openDialog = () => {
-        dialog.value = true;
-    };
-
-    const closeDialog = () => {
-        dialog.value = false;
-    };
-
     const saveDialogPipeline = async () => {
         if (pipelineName.value && pipelineDescription.value) {
             await savePipeline();
-            dialog.value = false;
+            saveDialog.value = false;
         } else {
             console.error('Name and description are required');
-            errorDialog.value = 'Name and description are required';
+            error.value = 'Name and description are required';
         }
     };
+
+    const openSaveDialog = () => {
+        saveDialog.value = true;
+    };
+
+    const closeSaveDialog = () => {
+        saveDialog.value = false;
+    };
+
+
+    const openMyPipelinesDialog = async () => {
+        //await fetchMyPipelines(); //TODO: Implement fetchMyPipelines
+        myPipelines.value = [{
+            id: "1",
+            owner_id: 1,
+            name: 'My Pipeline',
+            description: 'My Pipeline Description',
+            steps: ['1', '2', '3'],
+            created_date: '2021-10-10'
+        },
+        {
+            id: "2",
+            owner_id: 1,
+            name: 'My Pipeline 2',
+            description: 'My Pipeline Description 2',
+            steps: ["66817478c39b2bccae9ea66d", "6682fab7ae27046d157fe057"],
+            created_date: '2021-10-10'
+        }
+        ];
+
+        myPipelinesDialog.value = true;
+    };
+
+    const closeMyPipelinesDialog = () => {
+        myPipelinesDialog.value = false;
+    };
+
+    const loadPipeline = (pipeline: Pipeline) => {
+        steps.steps = pipeline.steps.map(stepId => {
+            const snippet = snippets.value.find(snippet => snippet.id === stepId);
+            return {
+                service: 'dyno-code',
+                endpoint: 'execute',
+                payload: {
+                    code: snippet?.code || '',
+                    language: parseLanguageFromCodeUrl(snippet?.code || ''),
+                    input_file: undefined,
+                    snippet: snippet || undefined
+                }
+            };
+        });
+        closeMyPipelinesDialog();
+    };
+
     /** PRIVATE FUNCTION */
     function fileToBase64(file: File): Promise<{ name: string, data: string }> {
         return new Promise((resolve, reject) => {
@@ -165,12 +213,17 @@ export function usePipeline() {
         socket,
         rules,
         savePipeline,
-        dialog,
         pipelineName,
         pipelineDescription,
-        openDialog,
-        closeDialog,
+        saveDialog,
+        openSaveDialog,
+        closeSaveDialog,
         saveDialogPipeline,
+        myPipelinesDialog,
+        myPipelines,
+        openMyPipelinesDialog,
+        closeMyPipelinesDialog,
+        loadPipeline
     };
 
 

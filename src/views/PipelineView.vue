@@ -76,8 +76,9 @@
               <v-btn :disabled="!formValid" type="submit" color="success" class="mr-2"
                 >Execute Pipeline</v-btn
               >
-              <v-btn :disabled="!formValid" color="warning" @click="openDialog"
-                >Save Pipeline</v-btn
+              <v-btn color="info" @click="openMyPipelinesDialog" class="mr-2"> My Pipelines </v-btn>
+              <v-btn :disabled="!formValid" color="warning" @click="openSaveDialog">
+                Save Pipeline</v-btn
               >
             </v-form>
           </v-card-text>
@@ -134,13 +135,14 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-dialog v-model="dialog" persistent max-width="600px">
+      <!-- Save Pipeline Dialog -->
+      <v-dialog v-model="saveDialog" persistent max-width="600px">
         <v-card>
           <v-card-title>
             <span class="text-h5">Save Pipeline</span>
           </v-card-title>
           <v-card-text>
-            <v-form ref="dialogForm">
+            <v-form ref="saveDialogForm">
               <v-text-field v-model="pipelineName" label="Pipeline Name" required></v-text-field>
               <v-text-field
                 v-model="pipelineDescription"
@@ -152,8 +154,34 @@
           <v-chip v-if="errorDialog" color="red">{{ errorDialog }}</v-chip>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
-            <v-btn color="blue darken-1" text @click="saveDialogPipeline">Save</v-btn>
+            <v-btn color="blue darken-1" @click="closeSaveDialog">Cancel</v-btn>
+            <v-btn color="blue darken-1" @click="saveDialogPipeline">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+      <!-- Pipeline Dialog -->
+      <v-dialog v-model="myPipelinesDialog" persistent max-width="800px">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">My Pipelines</span>
+          </v-card-title>
+          <v-card-text>
+            <v-list>
+              <v-list-item
+                v-for="pipeline in myPipelines"
+                :key="pipeline.id"
+                @click="loadPipeline(pipeline)"
+              >
+                <v-list-item-content>
+                  <v-list-item-title>{{ pipeline.name }}</v-list-item-title>
+                  <v-list-item-subtitle>{{ pipeline.description }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-list>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" @click="closeMyPipelinesDialog">Close</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -166,9 +194,6 @@ import { onMounted, watch } from 'vue'
 import type { StepResultDto } from '@/types/Pipeline'
 import { languages } from '@/config/languagesConfig'
 import { usePipeline } from '@/composables/usePipeline'
-import type { BufferData } from '@/types/buffer'
-import type { Snippets } from '@/types'
-
 const {
   contents,
   snippets,
@@ -183,14 +208,19 @@ const {
   socket,
   rules,
   savePipeline,
-  dialog,
   pipelineName,
   pipelineDescription,
-  openDialog,
-  closeDialog,
+  saveDialog,
+  openSaveDialog,
+  closeSaveDialog,
   saveDialogPipeline,
+  openMyPipelinesDialog,
+  closeMyPipelinesDialog,
+  myPipelinesDialog,
+  myPipelines,
   errorDialog,
-  error
+  error,
+  loadPipeline
 } = usePipeline()
 
 watch(() => steps.steps, validateForm, { deep: true })

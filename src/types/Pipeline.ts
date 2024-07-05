@@ -27,3 +27,12 @@ export interface SavePipelineDto {
     description: string;
     steps: string[];
 }
+
+export interface Pipeline {
+    id: string;
+    owner_id: number;
+    name: string;
+    description: string;
+    steps: string[];
+    created_date: string;
+}
