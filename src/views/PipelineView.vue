@@ -249,8 +249,10 @@ onMounted(() => {
   socket.on('pipelineSaved', (pipelineSaved: string) => {
     console.log('Pipeline saved:', pipelineSaved)
     fetchMyPipelines()
-
     closeSaveDialog()
+
+    pipelineName.value = ''
+    pipelineDescription.value = ''
   })
 })
 

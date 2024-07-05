@@ -48,6 +48,15 @@ export const useContentStore = defineStore('content', {
             } catch (error) {
                 console.error('Error fetching content:', error);
             }
+        },
+        async uploadProgram(file: File) {
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                await axiosInstance.post(`${endpoint}/upload`, formData);
+            } catch (error) {
+                console.error('Error uploading program:', error);
+            }
         }
     }
 });
