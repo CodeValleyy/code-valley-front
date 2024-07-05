@@ -63,7 +63,7 @@
                       label="Snippets"
                       v-model="step.payload.snippet"
                       :rules="[rules.required]"
-                      @change="(value: Snippets) => updatePayload(step, value)"
+                      @change="validateForm()"
                     >
                     </v-select>
                   </v-col>
@@ -76,7 +76,7 @@
               <v-btn :disabled="!formValid" type="submit" color="success" class="mr-2"
                 >Execute Pipeline</v-btn
               >
-              <v-btn :disabled="!formValid" color="warning" @click="savePipeline"
+              <v-btn :disabled="!formValid" color="warning" @click="openDialog"
                 >Save Pipeline</v-btn
               >
             </v-form>
@@ -134,6 +134,29 @@
           </v-card-text>
         </v-card>
       </v-col>
+      <v-dialog v-model="dialog" persistent max-width="600px">
+        <v-card>
+          <v-card-title>
+            <span class="text-h5">Save Pipeline</span>
+          </v-card-title>
+          <v-card-text>
+            <v-form ref="dialogForm">
+              <v-text-field v-model="pipelineName" label="Pipeline Name" required></v-text-field>
+              <v-text-field
+                v-model="pipelineDescription"
+                label="Pipeline Description"
+                required
+              ></v-text-field>
+            </v-form>
+          </v-card-text>
+          <v-chip v-if="errorDialog" color="red">{{ errorDialog }}</v-chip>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="saveDialogPipeline">Save</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
     </v-row>
   </v-container>
 </template>
@@ -160,7 +183,14 @@ const {
   socket,
   rules,
   savePipeline,
-  updatePayload
+  dialog,
+  pipelineName,
+  pipelineDescription,
+  openDialog,
+  closeDialog,
+  saveDialogPipeline,
+  errorDialog,
+  error
 } = usePipeline()
 
 watch(() => steps.steps, validateForm, { deep: true })
@@ -177,8 +207,9 @@ onMounted(() => {
     console.log('Pipeline execution completed:', result)
   })
 
-  socket.on('pipelineError', (error: string) => {
-    console.error('Pipeline execution error:', error)
+  socket.on('pipelineError', (pipelineError: string) => {
+    console.error('Pipeline execution error:', pipelineError)
+    error.value = pipelineError
   })
 })
 

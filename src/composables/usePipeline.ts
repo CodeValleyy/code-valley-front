@@ -20,10 +20,15 @@ export function usePipeline() {
 
 
     const error = ref<string>('');
+    const errorDialog = ref<string>('');
 
     const form = ref(null);
     const formValid = ref(false)
     const initialInput = ref<File | null>(null);
+
+    const dialog = ref(false);
+    const pipelineName = ref('');
+    const pipelineDescription = ref('');
 
     if (userStore.user) {
         contentStore.fetchContentsByOwner(userStore.user.id).catch((error) => {
@@ -84,13 +89,12 @@ export function usePipeline() {
                     step.payload.code = step.payload.snippet.code;
                     step.payload.language = parseLanguageFromCodeUrl(step.payload.snippet.code);
                     step.payload.owner_id = step.payload.snippet.owner_id;
-                    //step.payload.snippet = undefined;
+                    step.payload.codeId = step.payload.snippet.id;
                 }
 
                 const isValid = !!step.payload.code;
 
                 step.payload.language = parseLanguageFromCodeUrl(step.payload.code);
-                console.log(`Step ${JSON.stringify(step)}: ${isValid ? 'valid' : 'invalid'}`);
                 return isValid;
             });
     };
@@ -99,30 +103,40 @@ export function usePipeline() {
             const user = userStore.user;
             if (!user) {
                 console.error('User not authenticated');
+                error.value = 'User not authenticated';
                 return;
             }
 
-            const stepCodes = steps.steps.map(step => step.payload.code);
+            const stepCodes = steps.steps.map(step => step.payload.codeId);
             const savePipelineDto: SavePipelineDto = {
                 owner_id: user.id,
-                name: 'Pipeline Name', // Replace with actual name if available
-                description: 'Pipeline Description', // Replace with actual description if available
+                name: pipelineName.value,
+                description: pipelineDescription.value,
                 steps: stepCodes
             };
-
-
-            socket.emit('savePipeline', steps);
+            socket.emit('pipelineSave', savePipelineDto);
         } else {
             console.error('Form is not valid');
         }
     };
-    const updatePayload = (step: StepDto & { snippet?: Snippets }, snippet: Snippets) => {
-        step.payload.code = snippet.code;
-        step.payload.ownerId = snippet.owner_id;
-        validateForm();
+
+    const openDialog = () => {
+        dialog.value = true;
     };
 
+    const closeDialog = () => {
+        dialog.value = false;
+    };
 
+    const saveDialogPipeline = async () => {
+        if (pipelineName.value && pipelineDescription.value) {
+            await savePipeline();
+            dialog.value = false;
+        } else {
+            console.error('Name and description are required');
+            errorDialog.value = 'Name and description are required';
+        }
+    };
     /** PRIVATE FUNCTION */
     function fileToBase64(file: File): Promise<{ name: string, data: string }> {
         return new Promise((resolve, reject) => {
@@ -139,6 +153,7 @@ export function usePipeline() {
         contents,
         snippets,
         error,
+        errorDialog,
         form,
         formValid,
         initialInput,
@@ -150,7 +165,12 @@ export function usePipeline() {
         socket,
         rules,
         savePipeline,
-        updatePayload
+        dialog,
+        pipelineName,
+        pipelineDescription,
+        openDialog,
+        closeDialog,
+        saveDialogPipeline,
     };
 
 
