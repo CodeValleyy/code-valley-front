@@ -5,6 +5,7 @@ import { useUserStore } from "@/stores/useUserStore";
 import type { CreatePipelineDto, Pipeline, SavePipelineDto, StepDto, StepResultDto } from "@/types/Pipeline";
 import { languages, parseLanguageFromCodeUrl } from "@/config/languagesConfig";
 import { io } from "socket.io-client";
+import { socketUrl } from "@/config/constants";
 
 export function usePipeline() {
     const contentStore = useContentStore();
@@ -55,8 +56,7 @@ export function usePipeline() {
         ]
     })
     const results = ref<StepResultDto[]>([])
-    const socket = io('wss://pipeline-orchestrator.code-valley.xyz')
-    //const socket = io('ws://localhost:3000')
+    const socket = io(socketUrl);
     const rules = {
         required: (v: any) => !!v || 'Field is required'
     }
