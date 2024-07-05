@@ -125,7 +125,6 @@ import { useCodeRunner } from '@/composables/useCodeRunner'
 import {
   fetchRawContentFromUrl,
   getLanguageFromExtension,
-  parseCodeFromCodeUrl,
   parseLanguageFromCodeUrl
 } from '@/config/languagesConfig'
 

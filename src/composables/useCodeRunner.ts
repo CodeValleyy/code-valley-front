@@ -1,7 +1,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { fetchData } from '@/api/fetchData';
 import type { ExecuteCodeResponse, Snippets } from '@/types';
-import { getContent_type, getExtensionFromContentType, languages } from '@/config/languagesConfig';
+import { getContent_type, getExtensionFromContentType, languageMap, languages } from '@/config/languagesConfig';
 import { pythonBoilerplate, javascriptBoilerplate, rustBoilerplate, luaBoilerplate } from '@/config/languagesConfig'
 import { useContentStore } from '@/stores/useContentStore';
 import { useUserStore } from '@/stores/useUserStore';
@@ -16,7 +16,7 @@ export function useCodeRunner() {
     const isLoading = ref<boolean>(false);
     const error = ref<string>('');
     const success = ref<string>('');
-    const currentLanguage = ref<string>(languages[0]);
+    const currentLanguage = ref<string>(languageMap['py']);
     const file = ref<File | null>(null);
     const file_loaded = ref<File | null>(null);
     const downloadLink = ref<string | null>(null);

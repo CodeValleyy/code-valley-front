@@ -1,4 +1,4 @@
-
+const defaultLanguage = 'python';
 export const languages = [
     'python',
     'rust',
@@ -6,36 +6,21 @@ export const languages = [
     'lua',
 ];
 
-export const getLanguageFromExtension = (extension: string): string => {
-    switch (extension) {
-        case 'py':
-            return languages[0];
-        case 'rs':
-            return languages[1];
-        case 'js':
-            return languages[2];
-        case 'lua':
-            return languages[3];
-        default:
-            return languages[0];
-    }
-}
+export const languageMap: { [key: string]: string } = {
+    'py': languages[0],
+    'rs': languages[1],
+    'js': languages[2],
+    'lua': languages[3],
+};
 
-export const parseLanguageFromCodeUrl = (code: string): string => {
-    const extension = code.split('.').pop()?.split('?')[0];
-    switch (extension) {
-        case 'py':
-            return languages[0];
-        case 'rs':
-            return languages[1];
-        case 'js':
-            return languages[2];
-        case 'lua':
-            return languages[3];
-        default:
-            return languages[0];
-    }
-}
+export const getLanguageFromExtension = (extension: string): string => {
+    return languageMap[extension] || defaultLanguage;
+};
+
+export const parseLanguageFromCodeUrl = (codeUrl: string): string => {
+    const extension = codeUrl.split('.').pop()?.split('?')[0];
+    return extension ? getLanguageFromExtension(extension) : defaultLanguage;
+};
 
 export const fetchRawContentFromUrl = async (code_url: string): Promise<string> => {
     try {
