@@ -6,7 +6,6 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-
   return {
     plugins: [
       vue(),
@@ -25,6 +24,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/url/, '')
+        },
+        '/pipeline-ms': {
+          target: env.MODE === 'production' ? 'https://pipeline-orchestrator.code-valley.xyz' : 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/pipeline-ms/, '')
         }
       }
     }

@@ -37,7 +37,6 @@ export const useContentStore = defineStore('content', {
                         code: content.code_url
                     };
                 });
-                console.log(this.snippets);
             } catch (error) {
                 console.error('Error fetching contents:', error);
             }

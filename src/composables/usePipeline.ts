@@ -6,20 +6,25 @@ import type { CreatePipelineDto, Pipeline, SavePipelineDto, StepDto, StepResultD
 import { languages, parseLanguageFromCodeUrl } from "@/config/languagesConfig";
 import { io } from "socket.io-client";
 import { socketUrl } from "@/config/constants";
+import { usePipelineStore } from "@/stores/usePipelineStore";
 
 export function usePipeline() {
     const contentStore = useContentStore();
     const userStore = useUserStore();
+    const pipelineStore = usePipelineStore();
 
     const contents = ref(contentStore.contents as Content[]);
     const snippets = ref(contentStore.snippets as Snippets[])
-    const myPipelines = ref<Pipeline[]>([]);
+    const myPipelines = ref(pipelineStore.pipelines as Pipeline[])
 
     watch(contentStore, (newVal) => {
         contents.value = newVal.contents;
         snippets.value = newVal.snippets;
     });
 
+    watch(pipelineStore, (newVal) => {
+        myPipelines.value = newVal.pipelines;
+    });
 
     const error = ref<string>('');
     const errorDialog = ref<string>('');
@@ -121,7 +126,11 @@ export function usePipeline() {
             console.error('Form is not valid');
         }
     };
-
+    const fetchMyPipelines = async () => {
+        if (userStore.user) {
+            await pipelineStore.fetchPipelineByOwner(userStore.user.id);
+        }
+    }
     const saveDialogPipeline = async () => {
         if (pipelineName.value && pipelineDescription.value) {
             await savePipeline();
@@ -140,26 +149,8 @@ export function usePipeline() {
         saveDialog.value = false;
     };
 
-
     const openMyPipelinesDialog = async () => {
-        //await fetchMyPipelines(); //TODO: Implement fetchMyPipelines
-        myPipelines.value = [{
-            id: "1",
-            owner_id: 1,
-            name: 'My Pipeline',
-            description: 'My Pipeline Description',
-            steps: ['1', '2', '3'],
-            created_date: '2021-10-10'
-        },
-        {
-            id: "2",
-            owner_id: 1,
-            name: 'My Pipeline 2',
-            description: 'My Pipeline Description 2',
-            steps: ["66817478c39b2bccae9ea66d", "6682fab7ae27046d157fe057"],
-            created_date: '2021-10-10'
-        }
-        ];
+        await pipelineStore.fetchPipelineByOwner(userStore.user?.id || 0);
 
         myPipelinesDialog.value = true;
     };
@@ -184,6 +175,10 @@ export function usePipeline() {
         });
         closeMyPipelinesDialog();
     };
+    const deletePipeline = async (id: string) => {
+        await pipelineStore.deletePipeline(id);
+    }
+
 
     /** PRIVATE FUNCTION */
     function fileToBase64(file: File): Promise<{ name: string, data: string }> {
@@ -223,7 +218,9 @@ export function usePipeline() {
         myPipelines,
         openMyPipelinesDialog,
         closeMyPipelinesDialog,
-        loadPipeline
+        loadPipeline,
+        fetchMyPipelines,
+        deletePipeline
     };
 
 

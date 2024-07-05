@@ -36,3 +36,14 @@ export interface Pipeline {
     steps: string[];
     created_date: string;
 }
+
+export interface PipelineRaw {
+    _id: {
+        $oid: string;
+    };
+    owner_id: number;
+    name: string;
+    description: string;
+    steps: string[];
+    created_date: string;
+}

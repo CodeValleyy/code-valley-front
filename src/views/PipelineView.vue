@@ -167,15 +167,17 @@
           </v-card-title>
           <v-card-text>
             <v-list>
-              <v-list-item
-                v-for="pipeline in myPipelines"
-                :key="pipeline.id"
-                @click="loadPipeline(pipeline)"
-              >
-                <v-list-item-content>
+              <v-list-item v-for="pipeline in myPipelines" :key="pipeline.id">
+                <v-list-item-content @click="loadPipeline(pipeline)" class="cursor-pointer">
                   <v-list-item-title>{{ pipeline.name }}</v-list-item-title>
                   <v-list-item-subtitle>{{ pipeline.description }}</v-list-item-subtitle>
                 </v-list-item-content>
+                <v-spacer></v-spacer>
+                <v-list-item-action>
+                  <v-btn icon @click.stop="deletePipeline(pipeline.id)">
+                    <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+                </v-list-item-action>
               </v-list-item>
             </v-list>
           </v-card-text>
@@ -220,7 +222,9 @@ const {
   myPipelines,
   errorDialog,
   error,
-  loadPipeline
+  fetchMyPipelines,
+  loadPipeline,
+  deletePipeline
 } = usePipeline()
 
 watch(() => steps.steps, validateForm, { deep: true })
@@ -240,6 +244,13 @@ onMounted(() => {
   socket.on('pipelineError', (pipelineError: string) => {
     console.error('Pipeline execution error:', pipelineError)
     error.value = pipelineError
+  })
+
+  socket.on('pipelineSaved', (pipelineSaved: string) => {
+    console.log('Pipeline saved:', pipelineSaved)
+    fetchMyPipelines()
+
+    closeSaveDialog()
   })
 })
 
