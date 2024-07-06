@@ -62,8 +62,6 @@ export const useContentStore = defineStore('content', {
         },
         async deleteContent(contentId: string) {
             try {
-
-
                 await axiosInstance.delete(`${endpoint}/${contentId}`);
                 this.contents = this.contents.filter((content) => content.id !== contentId);
 

@@ -258,6 +258,10 @@ const viewPost = (postId: number) => {
 const deletePost = async () => {
   if (postToDelete.value) {
     await postStore.deletePost(postToDelete.value.id)
+    const confirm = window.confirm('Voulez-vous supprimer la snippet liée à ce post ?')
+    if (confirm) {
+      await contentStore.deleteContent(postToDelete.value.fileId || '')
+    }
     deleteDialog.value = false
     await fetchUserPosts()
   }
