@@ -99,7 +99,7 @@
               <v-btn icon @click="editSnippet(snippet)">
                 <v-icon size="small">mdi-pencil</v-icon>
               </v-btn>
-              <v-btn icon>
+              <v-btn icon @click="deleteSnippet(snippet)">
                 <v-icon>mdi-delete</v-icon>
               </v-btn>
             </v-list-item-action>
@@ -316,6 +316,20 @@ const fetchUserData = async (username?: string) => {
   }
 }
 
+const deleteSnippet = async (snippet: Snippets) => {
+  if (userPosts.value.some((post) => post.fileId?.includes(snippet.id))) {
+    console.error('Cannot delete a snippet used in a post')
+    alert('Vous ne pouvez pas supprimer un snippet utilisé dans un post')
+    return
+  }
+  const confirm = window.confirm('Voulez-vous vraiment supprimer ce snippet ?')
+  if (!confirm) {
+    return
+  }
+  await contentStore.deleteContent(snippet.id)
+  await fetchUserSnippets()
+}
+
 const nextPage = () => {
   offset.value += limit.value
   fetchUserPosts()
@@ -345,4 +359,9 @@ watch(
     fetchUserData(newUsername)
   }
 )
+
+// watch contentStore.snippets
+watch(contentStore.snippets, () => {
+  userSnippets.value = contentStore.snippets
+})
 </script>

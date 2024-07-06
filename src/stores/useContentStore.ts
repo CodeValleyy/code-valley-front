@@ -59,6 +59,18 @@ export const useContentStore = defineStore('content', {
             } catch (error) {
                 console.error('Error uploading program:', error);
             }
+        },
+        async deleteContent(contentId: string) {
+            try {
+
+
+                await axiosInstance.delete(`${endpoint}/${contentId}`);
+                this.contents = this.contents.filter((content) => content.id !== contentId);
+
+                this.snippets = this.snippets.filter((snippet) => snippet.id !== contentId);
+            } catch (error) {
+                console.error('Error deleting content:', error);
+            }
         }
     }
 });

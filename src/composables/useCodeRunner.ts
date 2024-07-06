@@ -202,6 +202,8 @@ export function useCodeRunner() {
         codeInput.value = ''
         file_loaded.value = null;
         isCodeLoaded.value = false;
+        filename.value = '';
+        selectedSnippet.value = '';
         currentLanguage.value = languageMap['py']
     }
 

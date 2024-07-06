@@ -74,7 +74,7 @@
               v-model="filename"
               :label="file_loaded ? file_loaded.name : filename ? filename : 'Nom du fichier'"
               outlined
-              :disabled="file_loaded !== null || selectedSnippet !== null"
+              :disabled="file_loaded !== null || selectedSnippet !== ''"
             ></v-text-field>
             <v-card-actions>
               <v-btn color="primary" @click="saveCodeToFile">Télécharger</v-btn>
