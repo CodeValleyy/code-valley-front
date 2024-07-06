@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/**/*.{vue,js,ts,jsx,tsx}'],
+  content: [ './src/**/*.{vue,js,ts,jsx,tsx}' ],
   theme: {
     extend: {
       colors: {
@@ -20,9 +20,9 @@ export default {
         darkSecondary: '#d98b2d'
       },
       fontFamily: {
-        sans: ['Graphik', 'sans-serif'],
-        serif: ['Merriweather', 'serif'],
-        poppins: ['Poppins', 'sans-serif']
+        sans: [ 'Graphik', 'sans-serif' ],
+        serif: [ 'Merriweather', 'serif' ],
+        poppins: [ 'Poppins', 'sans-serif' ]
       }
     }
   },
