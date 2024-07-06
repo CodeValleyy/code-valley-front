@@ -31,4 +31,5 @@ export interface Snippets {
     owner_id: number;
     filename: string;
     code: string;
+    language: string;
 }

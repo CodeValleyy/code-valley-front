@@ -17,10 +17,30 @@ export const getLanguageFromExtension = (extension: string): string => {
     return languageMap[extension] || defaultLanguage;
 };
 
+export const getLanguageFromFilename = (filename: string): string => {
+    const extension = filename.split('.').pop();
+    return extension ? getLanguageFromExtension(extension) : defaultLanguage;
+}
+
 export const parseLanguageFromCodeUrl = (codeUrl: string): string => {
     const extension = codeUrl.split('.').pop()?.split('?')[0];
     return extension ? getLanguageFromExtension(extension) : defaultLanguage;
 };
+
+export const getLanguageColor = (language: string): string => {
+    switch (language) {
+        case 'python':
+            return 'bg-python';
+        case 'rust':
+            return 'bg-rust';
+        case 'javascript':
+            return 'bg-javascript';
+        case 'lua':
+            return 'bg-lua';
+        default:
+            return 'bg-gray-400';
+    }
+}
 
 export const fetchRawContentFromUrl = async (code_url: string): Promise<string> => {
     try {

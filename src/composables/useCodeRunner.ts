@@ -5,12 +5,14 @@ import { fetchRawContentFromUrl, getContent_type, getExtensionFromContentType, g
 import { pythonBoilerplate, javascriptBoilerplate, rustBoilerplate, luaBoilerplate } from '@/config/languagesConfig'
 import { useContentStore } from '@/stores/useContentStore';
 import { useUserStore } from '@/stores/useUserStore';
+import { useRouter } from 'vue-router';
 
 const transformNewlines = (str: string): string => {
     return str.replace(/\r?\n/g, '<br>');
 };
 
 export function useCodeRunner() {
+    const router = useRouter()
     const codeInput = ref<string>(pythonBoilerplate);
     const result = ref<string>('');
     const isLoading = ref<boolean>(false);
@@ -28,11 +30,23 @@ export function useCodeRunner() {
     const userStore = useUserStore();
     const isCodeLoaded = ref(false);
     const loadOption = ref('file')
-    const selectedSnippet = ref(null)
+    const selectedSnippet = ref('')
 
     const snippets = ref(contentStore.snippets as Snippets[]);
 
     onMounted(() => {
+        // Load code from query params (usually when user clicks on a edit snippet)
+        const snippetId = router.currentRoute.value.query.snippet;
+        if (snippetId) {
+            selectedSnippet.value = snippetId as string;
+            loadOption.value = 'snippet';
+            filename.value = router.currentRoute.value.query.filename as string;
+            currentLanguage.value = router.currentRoute.value.query.currentLanguage as string;
+            loadCode();
+        }
+
+        console.log("selectedSnippet: ", selectedSnippet.value, "loadOption: ", loadOption.value);
+
         const user = userStore.user;
         if (!user) {
             userStore.fetchUserProfile()
@@ -191,6 +205,17 @@ export function useCodeRunner() {
         currentLanguage.value = languageMap['py']
     }
 
+    const editSnippet = (snippet: Snippets) => {
+        router.push({
+            name: 'code', query: {
+                loadOption: 'snippet',
+                snippet: snippet.id,
+                filename: snippet.filename,
+                currentLanguage: parseLanguageFromCodeUrl(snippet.code)
+            }
+        });
+    };
+
 
     return {
         codeInput, result, isLoading, error,
@@ -207,6 +232,7 @@ export function useCodeRunner() {
         unloadCode,
         loadOption,
         selectedSnippet,
+        editSnippet,
         openModal: () => saveDialog.value = true,
         closeModal: () => saveDialog.value = false,
         openLoadDialog: () => loadDialog.value = true,

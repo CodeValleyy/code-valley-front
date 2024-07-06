@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import axiosInstance from "@/config/axiosInstance";
 import type { Content, ContentRaw, Snippets } from "@/types";
+import { getLanguageFromFilename } from "@/config/languagesConfig";
 
 const endpoint = "/content";
 export const useContentStore = defineStore('content', {
@@ -34,7 +35,8 @@ export const useContentStore = defineStore('content', {
                         id: content.id,
                         owner_id: content.owner_id,
                         filename: content.filename,
-                        code: content.code_url
+                        code: content.code_url,
+                        language: getLanguageFromFilename(content.filename)
                     };
                 });
             } catch (error) {

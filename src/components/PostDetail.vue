@@ -112,7 +112,7 @@ const deleteDialog = ref(false)
 const postToDelete = ref<Post | null>(null)
 const me = await fetchMe()
 
-// TODO delete it later
+// TODO: delete it later
 const comments = ref([
   {
     id: 1,
