@@ -2,14 +2,15 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VueDevTools from 'vite-plugin-vue-devtools'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-
   return {
     plugins: [
       vue(),
       VueDevTools(),
+      nodePolyfills(),
     ],
     resolve: {
       alias: {
@@ -23,6 +24,12 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/url/, '')
+        },
+        '/pipeline-ms': {
+          target: env.MODE === 'production' ? 'https://pipeline-orchestrator.code-valley.xyz' : 'http://localhost:3000',
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/pipeline-ms/, '')
         }
       }
     }

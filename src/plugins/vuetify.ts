@@ -20,6 +20,7 @@ export default createVuetify({
             light: {
                 colors: {
                     primary: '#902de0',
+                    primaryLight: '#bf80f2',
                     secondary: '#e07e2d',
                     background: '#ededed',
                     surface: '#ffffff',
@@ -29,6 +30,10 @@ export default createVuetify({
                     'on-secondary': '#ffffff',
                     'on-background': '#1a1a1a',
                     'on-surface': '#1a1a1a',
+                    'bg-python': '#306998',
+                    'bg-rust': '#b7410e',
+                    'bg-javascript': '#f0db4f',
+                    'bg-lua': '#000080',
                 },
                 variables: {
                     'border-color': '#4a4a4a',
@@ -37,6 +42,7 @@ export default createVuetify({
             dark: {
                 colors: {
                     primary: '#7158e0',
+                    primaryLight: '#8b76e8',
                     secondary: '#d98b2d',
                     background: '#1a1a1a',
                     surface: '#2c2c2c',
@@ -46,6 +52,10 @@ export default createVuetify({
                     'on-secondary': '#ededed',
                     'on-background': '#ededed',
                     'on-surface': '#ededed',
+                    'bg-python': '#306998',
+                    'bg-rust': '#b7410e',
+                    'bg-javascript': '#f0db4f',
+                    'bg-lua': '#000080',
                 },
                 variables: {
                     'border-color': '#a8a8a8',
