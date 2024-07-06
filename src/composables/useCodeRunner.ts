@@ -1,7 +1,7 @@
 import { onMounted, ref, watch } from 'vue';
 import { fetchData } from '@/api/fetchData';
 import type { ExecuteCodeResponse, Snippets } from '@/types';
-import { getContent_type, getExtensionFromContentType, languageMap, languages } from '@/config/languagesConfig';
+import { fetchRawContentFromUrl, getContent_type, getExtensionFromContentType, getLanguageFromExtension, languageMap, languages, parseLanguageFromCodeUrl } from '@/config/languagesConfig';
 import { pythonBoilerplate, javascriptBoilerplate, rustBoilerplate, luaBoilerplate } from '@/config/languagesConfig'
 import { useContentStore } from '@/stores/useContentStore';
 import { useUserStore } from '@/stores/useUserStore';
@@ -26,6 +26,9 @@ export function useCodeRunner() {
     const filename = ref('');
     const contentStore = useContentStore();
     const userStore = useUserStore();
+    const isCodeLoaded = ref(false);
+    const loadOption = ref('file')
+    const selectedSnippet = ref(null)
 
     const snippets = ref(contentStore.snippets as Snippets[]);
 
@@ -119,9 +122,6 @@ export function useCodeRunner() {
 
     const saveCodeToFile = () => {
         const content_type = getContent_type(currentLanguage.value);
-        console.log(content_type);
-        console.log(filename.value);
-
         const blob = new Blob([codeInput.value], { type: content_type });
         const url = URL.createObjectURL(blob);
 
@@ -160,6 +160,38 @@ export function useCodeRunner() {
         }
     }
 
+    const loadCode = async () => {
+        if (loadOption.value === 'file' && file_loaded.value) {
+            const reader = new FileReader()
+            reader.onload = (e) => {
+                if (e.target?.result) {
+                    codeInput.value = e.target.result as string
+                    isCodeLoaded.value = true
+                }
+            }
+            reader.readAsText(file_loaded.value)
+            const extension = file_loaded.value.name.split('.').pop()
+            currentLanguage.value = getLanguageFromExtension(extension ?? '')
+        } else if (loadOption.value === 'snippet' && selectedSnippet.value) {
+            const snippet = snippets.value.find((s) => s.id === selectedSnippet.value)
+            if (snippet) {
+                filename.value = snippet.filename
+                currentLanguage.value = parseLanguageFromCodeUrl(snippet.code)
+                codeInput.value = await fetchRawContentFromUrl(snippet.code)
+                isCodeLoaded.value = true
+            }
+        }
+        loadDialog.value = false
+    }
+
+    const unloadCode = () => {
+        codeInput.value = ''
+        file_loaded.value = null;
+        isCodeLoaded.value = false;
+        currentLanguage.value = languageMap['py']
+    }
+
+
     return {
         codeInput, result, isLoading, error,
         success, languages, currentLanguage,
@@ -170,6 +202,11 @@ export function useCodeRunner() {
         saveDialog, filename,
         loadDialog, snippets,
         saveCodeToSnippet,
+        isCodeLoaded,
+        loadCode,
+        unloadCode,
+        loadOption,
+        selectedSnippet,
         openModal: () => saveDialog.value = true,
         closeModal: () => saveDialog.value = false,
         openLoadDialog: () => loadDialog.value = true,

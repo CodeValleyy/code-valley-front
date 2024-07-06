@@ -60,7 +60,6 @@ export const usePipelineStore = defineStore('pipeline', {
                         created_date: pipeline.created_date
                     };
                 });
-                console.log(this.pipelines);
             } catch (error) {
                 console.error('Error fetching contents:', error);
             }

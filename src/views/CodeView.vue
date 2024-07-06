@@ -35,6 +35,9 @@
                 @keydown.ctrl.s.prevent.stop="runCode"
               />
               <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
+              <v-btn color="primaryLight" v-if="isCodeLoaded" @click="unloadCode" class="mt-2 ml-4"
+                >Décharger</v-btn
+              >
               <v-btn color="primaryLight" @click="openLoadDialog" class="mt-2 ml-4">Charger</v-btn>
               <v-btn color="primaryLight" v-if="codeInput" class="mt-2 ml-4" @click="openModal"
                 >Sauvegarder</v-btn
@@ -67,9 +70,12 @@
         <v-dialog v-model="saveDialog" max-width="400">
           <v-card>
             <v-card-title>Sauvegarder le fichier</v-card-title>
-            <v-card-text>
-              <v-text-field v-model="filename" label="Nom du fichier" outlined></v-text-field>
-            </v-card-text>
+            <v-text-field
+              v-model="filename"
+              :label="file_loaded ? file_loaded.name : filename ? filename : 'Nom du fichier'"
+              outlined
+              :disabled="file_loaded !== null || selectedSnippet !== null"
+            ></v-text-field>
             <v-card-actions>
               <v-btn color="primary" @click="saveCodeToFile">Télécharger</v-btn>
               <v-btn color="primary" @click="saveCodeToSnippet">Sauvegarder</v-btn>
@@ -115,19 +121,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
-import {
-  fetchRawContentFromUrl,
-  getLanguageFromExtension,
-  parseLanguageFromCodeUrl
-} from '@/config/languagesConfig'
-
 const {
   codeInput,
   result,
@@ -149,7 +149,12 @@ const {
   openLoadDialog,
   loadDialog,
   snippets,
-  file_loaded
+  file_loaded,
+  isCodeLoaded,
+  unloadCode,
+  loadCode,
+  loadOption,
+  selectedSnippet
 } = useCodeRunner()
 
 const lang = computed(() => {
@@ -194,29 +199,6 @@ const handleTab = (e: KeyboardEvent) => {
       }
     }
   }
-}
-const loadOption = ref('file')
-const selectedSnippet = ref(null)
-
-const loadCode = async () => {
-  if (loadOption.value === 'file' && file_loaded.value) {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      if (e.target?.result) {
-        codeInput.value = e.target.result as string
-      }
-    }
-    reader.readAsText(file_loaded.value)
-    const extension = file_loaded.value.name.split('.').pop()
-    currentLanguage.value = getLanguageFromExtension(extension ?? '')
-  } else if (loadOption.value === 'snippet' && selectedSnippet.value) {
-    const snippet = snippets.value.find((s) => s.id === selectedSnippet.value)
-    if (snippet) {
-      currentLanguage.value = parseLanguageFromCodeUrl(snippet.code)
-      codeInput.value = await fetchRawContentFromUrl(snippet.code)
-    }
-  }
-  loadDialog.value = false
 }
 </script>
 
