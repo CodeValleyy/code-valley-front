@@ -11,3 +11,5 @@ export interface ExecuteCodeResponse {
 
 export * from './User';
 export * from './Post';
+export * from './Content';
+export * from './Pipeline';
