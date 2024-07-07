@@ -1,5 +1,5 @@
 <template>
-  <v-footer app inset class="py-0 px-4 border-t border-gray-200 bg-primary">
+  <v-footer app inset class="py-0 px-4 border-t border-gray-200 bg-primaryTailwind">
     <v-container>
       <v-row justify="center" class="flex-wrap">
         <v-col class="text-center py-1" cols="12" sm="auto">

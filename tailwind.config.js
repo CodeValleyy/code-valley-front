@@ -4,10 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        primaryTailwind: '#902de0',
         primary: '#902de0',
         primaryLight: '#bf80f2',
         primaryHover: '#6a21a6',
-        secondary: '#e07e2d',
+        secondaryTailwind: '#e07e2d',
+        secondaryHover: '#b06221',
 
         backgroundColor: '#ededed',
         textPrimary: '#1a1a1a',
