@@ -4,7 +4,7 @@ import { useMessage } from '@/composables/useMessage'
 import { useRoute, useRouter } from 'vue-router'
 import TheMessage from '@/components/TheMessage.vue'
 import type { MessageInput } from '@/types/MessageInput'
-import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, nextTick, onMounted, onUnmounted, onBeforeMount } from 'vue'
 import type { GroupResponse } from '@/types/GroupResponse'
 import type { MessageResponse } from '@/types/MessageResponse'
 import { useAuth } from '@/composables/useAuth'
@@ -12,6 +12,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import type { User } from '@/types'
 
 const route = useRoute()
+const router = useRouter()
 const userStore = useUserStore()
 
 const { fetchMe } = useAuth()
@@ -24,6 +25,15 @@ const group = ref<GroupResponse>(await getOneWithId(String(groupId)))
 const messages = ref<MessageResponse[]>(await getMessagesWithGroupId(String(groupId)))
 
 const me: User = (await userStore.user) || (await fetchMe())
+
+onBeforeMount(() => {
+  const isMember = group.value.members.some((member) => member.id === me.id)
+
+  if (!isMember) {
+    router.push('/not-authorized')
+    return
+  }
+})
 
 const newMessage = ref<MessageInput>({
   authorId: String(me.id),
@@ -85,13 +95,26 @@ onMounted(() => {
 
 <template>
   <v-container class="h-screen">
-    <div class="flex">
-      <div class="p-4">
-        <v-avatar>
-          <img :src="getAvatar()" alt="Avatar" />
-        </v-avatar>
+    <div class="w-full flex justify-between">
+      <div class="flex">
+        <div class="p-4">
+          <v-avatar>
+            <img :src="getAvatar()" alt="Avatar" />
+          </v-avatar>
+        </div>
+        <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
       </div>
-      <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
+      <router-link
+        :to="`/groups/update/${group.id}`"
+        class="w-fit flex justify-center items-center"
+      >
+        <div
+          class="border w-fit text-sm text-white bg-primaryTailwind hover:bg-primaryHover shadow rounded-lg px-2 py-1 font-bold w-11/12 flex justify-between items-center rounded cursor-pointer"
+        >
+          <v-icon color="white" class="mr-2">mdi-pencil</v-icon>
+          <div>Modifier le groupe</div>
+        </div>
+      </router-link>
     </div>
 
     <div class="w-full h-5/6 flex justify-between">
@@ -106,7 +129,7 @@ onMounted(() => {
             v-for="message in messages"
             :key="message.id"
           >
-            <TheMessage :message="message" :user="message.author" />
+            <TheMessage :message="message" :user="me" />
           </div>
           <div class="w-full mb-2 text-gray-400 italic" v-else>Il n'y a aucun message</div>
         </div>
