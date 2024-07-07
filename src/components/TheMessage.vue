@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import type { User } from '@/types'
 import type { Message } from '@/types/Message'
+import type { MessageResponse } from '@/types/MessageResponse'
 import { format, isToday, isYesterday, subDays } from 'date-fns'
 import { fr } from 'date-fns/locale'
 import { ref } from 'vue'
 
 const props = defineProps<{
-  message: Message
+  message: MessageResponse
   user?: User
 }>()
 

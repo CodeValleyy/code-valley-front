@@ -1,26 +1,86 @@
 <script setup lang="ts">
 import { useGroup } from '@/composables/useGroup'
-import { useRoute } from 'vue-router'
+import { useMessage } from '@/composables/useMessage'
+import { useRoute, useRouter } from 'vue-router'
 import TheMessage from '@/components/TheMessage.vue'
-import type { Message } from '@/types/Message'
+import type { MessageInput } from '@/types/MessageInput'
+import { ref, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import type { GroupResponse } from '@/types/GroupResponse'
+import type { MessageResponse } from '@/types/MessageResponse'
+import { useAuth } from '@/composables/useAuth'
+import { useUserStore } from '@/stores/useUserStore'
+import type { User } from '@/types'
 
 const route = useRoute()
+const userStore = useUserStore()
+
+const { fetchMe } = useAuth()
 const groupId = route.params.id
 
 const { getOneWithId } = useGroup()
+const { getMessagesWithGroupId, createMessage } = useMessage()
 
-const group = await getOneWithId(String(groupId))
+const group = ref<GroupResponse>(await getOneWithId(String(groupId)))
+const messages = ref<MessageResponse[]>(await getMessagesWithGroupId(String(groupId)))
 
-const defaultMessage: Message = {
-  id: 0,
-  value: "T'as fait l'API ?",
-  author: group.members[0],
-  createdAt: new Date()
+const me: User = (await userStore.user) || (await fetchMe())
+
+const newMessage = ref<MessageInput>({
+  authorId: String(me.id),
+  groupId: String(groupId),
+  value: ''
+})
+
+const messageContainerRef = ref<HTMLElement | null>(null)
+
+const sendMessage = async () => {
+  if (newMessage.value && newMessage.value.value !== '') {
+    await createMessage(newMessage.value)
+    newMessage.value.value = ''
+    refreshMessages(true)
+  }
 }
 
 const getAvatar = () => {
   return 'https://yt3.googleusercontent.com/Pjk-KU0aJH978tDhdO05PgUx8j3i1OvqC4-U0L_3EUdJo0eBUrQ-cb1g2ZJiTYTlk5pq_0gy=s900-c-k-c0x00ffffff-no-rj'
 }
+
+const refreshMessages = async (scroll = false) => {
+  const fetchedMessages = await getMessagesWithGroupId(String(groupId))
+  messages.value = sortMessagesByDate(fetchedMessages)
+  if (scroll) scrollToBottom()
+}
+
+const sortMessagesByDate = (messagesArray: MessageResponse[]) => {
+  return messagesArray.sort(
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+  ) as MessageResponse[]
+}
+
+const scrollToBottom = async () => {
+  await nextTick()
+  if (messageContainerRef.value) {
+    messageContainerRef.value.scrollTop = messageContainerRef.value.scrollHeight
+  }
+}
+
+watch(route, async (newRoute) => {
+  const newGroupId = newRoute.params.id
+  group.value = await getOneWithId(String(newGroupId))
+  messages.value = sortMessagesByDate(await getMessagesWithGroupId(String(newGroupId)))
+  scrollToBottom()
+})
+
+messages.value = sortMessagesByDate(messages.value)
+nextTick(scrollToBottom)
+
+onMounted(() => {
+  const intervalId = setInterval(refreshMessages, 20000)
+
+  onUnmounted(() => {
+    clearInterval(intervalId)
+  })
+})
 </script>
 
 <template>
@@ -34,30 +94,46 @@ const getAvatar = () => {
       <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
     </div>
 
-    <div class="w-full h-5/6 flex justif-between">
+    <div class="w-full h-5/6 flex justify-between">
       <div class="w-3/4 h-full flex flex-col justify-between mr-2">
-        <div class="w-full h-5/6 p-10 rounded-2xl bg-white shadow overflow-auto">
-          <div class="w-full h- mb-2" v-for="member in group.members" :key="member.id">
-            <TheMessage :message="defaultMessage" :user="member" />
+        <div
+          ref="messageContainerRef"
+          class="w-full h-5/6 p-10 rounded-2xl bg-white shadow overflow-auto"
+        >
+          <div
+            class="w-full mb-2"
+            v-if="messages.length !== 0"
+            v-for="message in messages"
+            :key="message.id"
+          >
+            <TheMessage :message="message" :user="message.author" />
           </div>
-          <div class="w-full h- mb-2" v-for="member in group.members" :key="member.id">
-            <TheMessage :message="defaultMessage" :user="member" />
-          </div>
+          <div class="w-full mb-2 text-gray-400 italic" v-else>Il n'y a aucun message</div>
         </div>
         <div class="w-full h-1/6 flex flex-col justify-end">
-          <div class="w-full h-4/6 rounded-2xl bg-white shadow flex justify-between items-center">
-            <input type="text" class="w-10/12 h-full p-4" placeholder="Votre message..." />
+          <form
+            @submit.prevent="sendMessage"
+            class="w-full h-4/6 rounded-2xl bg-white shadow flex justify-between items-center"
+          >
+            <input
+              v-model="newMessage.value"
+              type="text"
+              class="w-10/12 h-full p-4"
+              placeholder="Votre message..."
+            />
             <v-icon
               class="w-1/12 h-full rounded-2xl cursor-pointer hover:bg-gray-100"
               color="primary"
               >mdi-attachment</v-icon
             >
-            <v-icon
-              class="w-1/12 h-full rounded-2xl cursor-pointer hover:bg-gray-100"
-              color="primary"
-              >mdi-send-circle</v-icon
-            >
-          </div>
+            <button type="submit" class="w-1/12 h-full">
+              <v-icon
+                class="w-full h-full rounded-2xl cursor-pointer hover:bg-gray-100"
+                color="primary"
+                >mdi-send-circle</v-icon
+              >
+            </button>
+          </form>
         </div>
       </div>
 
