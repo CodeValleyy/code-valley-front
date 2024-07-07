@@ -6,7 +6,7 @@ const pipelineAxiosInstance = axios.create({
 
 export const createAxiosInstance = (contentType: string = 'application/json') => {
     const instance = axios.create({
-        baseURL: `/url`,
+        baseURL: `/pipeline-ms`,
         headers: {
             'Content-Type': contentType
         }

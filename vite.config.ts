@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/url/, '')
         },
         '/pipeline-ms': {
-          target: env.MODE === 'production' ? 'https://pipeline-orchestrator.code-valley.xyz' : 'http://localhost:3000',
+          target: 'https://pipeline-orchestrator.code-valley.xyz',
           changeOrigin: true,
           secure: false,
           rewrite: (path) => path.replace(/^\/pipeline-ms/, '')
