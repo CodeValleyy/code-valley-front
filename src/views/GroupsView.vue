@@ -64,6 +64,7 @@ const joinCurrentGroup = async () => {
       await sendJoinRequest(currentGroup.value?.id, me.id)
       isModalOpen.value = false
       alert('Votre demande a bien été envoyé')
+      onInputChange()
     }
   }
   isModalOpen.value = false
@@ -205,9 +206,18 @@ const getAvatar = () => {
         @submit.prevent="joinCurrentGroup"
         class="w-1/3 bg-white rounded flex flex-col items-center p-4"
       >
-        <div class="mb-4 font-bold text-primary text-center">
+        <div
+          v-if="currentGroup && !checkRequestSended(currentGroup)"
+          class="mb-4 font-bold text-primary text-center"
+        >
           Ce groupe est un groupe <b class="text-secondary">privé</b> , envoyer une demande pour
           rejoindre le groupe ?
+        </div>
+        <div
+          v-if="currentGroup && checkRequestSended(currentGroup)"
+          class="mb-4 font-bold text-primary text-center"
+        >
+          Vous avez déjà envoyé une demande pour rejoindre ce groupe :
         </div>
         <div class="mb-3 border shadow p-4 w-11/12 flex justify-between items-center rounded">
           <v-avatar>
@@ -221,6 +231,7 @@ const getAvatar = () => {
         </div>
         <div class="flex items-center justify-center">
           <button
+            v-if="currentGroup && !checkRequestSended(currentGroup)"
             @click="isModalOpen = false"
             type="button"
             class="p-2 font-bold bg-gray-300 rounded shadow mr-1"
@@ -228,12 +239,21 @@ const getAvatar = () => {
             Annuler
           </button>
           <button
+            v-if="currentGroup && !checkRequestSended(currentGroup)"
             type="submit"
             class="p-2 font-bold flex items-center text-white bg-secondaryTailwind rounded shadow ml-1"
           >
             <div class="mr-2 font-bold">Envoyer</div>
 
             <v-icon color="white">mdi-account-multiple-plus</v-icon>
+          </button>
+          <button
+            v-if="currentGroup && checkRequestSended(currentGroup)"
+            type="button"
+            @click="isModalOpen = false"
+            class="px-4 py-2 font-bold bg-gray-300 rounded shadow ml-1"
+          >
+            Ok
           </button>
         </div>
       </form>

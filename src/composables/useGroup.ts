@@ -72,12 +72,49 @@ const updateGroup = async (groupInput: GroupInput, groupId: number) => {
   }
 }
 
+const addAdmin = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/admin/${groupId}/${userId}`)
+    window.location.href = `/groups/${groupId}`
+  } catch (error) {
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
 const joinGroup = async (groupId: number, userId: number) => {
   try {
     await axiosInstance.post(`/groups/add/${groupId}/${userId}`)
     window.location.href = `/groups/${groupId}`
   } catch (error) {
-    console.error('Error adding to group group:', error)
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
+const acceptRequest = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/accept/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
+const refuseRequest = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.delete(`/groups/refuse/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error deleting to group request:', error)
+    throw error
+  }
+}
+
+const removeUser = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.delete(`/groups/remove/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error adding to removing user from group:', error)
     throw error
   }
 }
@@ -86,7 +123,7 @@ const sendJoinRequest = async (groupId: number, userId: number) => {
   try {
     await axiosInstance.post(`/groups/join/${groupId}/${userId}`)
   } catch (error) {
-    console.error('Error sending to group group:', error)
+    console.error('Error sending request to group:', error)
     throw error
   }
 }
@@ -109,5 +146,9 @@ export const useGroup = () => ({
   createGroup,
   joinGroup,
   sendJoinRequest,
-  updateGroup
+  updateGroup,
+  removeUser,
+  acceptRequest,
+  refuseRequest,
+  addAdmin
 })
