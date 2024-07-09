@@ -14,9 +14,9 @@
         <div class="flex justify-between">
           <div>
             <p :class="{ 'font-bold': !notification.hasBeenRead }">{{ message(notification) }}</p>
-            <div v-if="notification.notificationType === NotificationType.friendshipReceived" class="mt-2 mb-2">
-              <v-btn @click="friendshipStore.acceptFriendRequest(notification.fromUserId)">Accepter</v-btn>
-              <v-btn class="ml-3" @click="friendshipStore.declineFriendRequest(notification.fromUserId)">Refuser</v-btn>
+            <div v-if="isFriendRequestButton(notification)" class="mt-2 mb-2">
+              <v-btn @click="acceptFriendRequest(notification)">Accepter</v-btn>
+              <v-btn class="ml-3" @click="declineFriendRequest(notification)">Refuser</v-btn>
             </div>
             <p class="text-xs text-gray-400">{{ formatDate(notification.createdAt) }}</p>
           </div>
@@ -47,6 +47,7 @@ import { useNotification } from '@/stores/useNotification'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import { type Notification, NotificationType } from '@/types/Notification'
 import { ref } from 'vue'
+import { FriendshipStatus } from '@/types/FriendshipTypes'
 
 const notificationStore = useNotification()
 const friendshipStore = useFriendshipStore()
@@ -55,6 +56,7 @@ const isLoading = ref(true)
 const limit = ref(10)
 const notifications = ref([] as Notification[])
 const notificationCount = ref(-1)
+const idsFriendshipRequestButtonShowed = ref([] as number[])
 
 // Frontend functions
 const notificationCountMessage = () => {
@@ -92,7 +94,18 @@ const formatDate = (dateString: Date) => {
   return new Date(dateString).toLocaleDateString('fr-FR', options)
 }
 
+const isFriendRequestButton = (notification: Notification) => {
+  return idsFriendshipRequestButtonShowed.value.includes(notification.id);
+}
+
 // API calls
+const isFriendRequest = async (notification: Notification) => {
+  if (notification.notificationType !== NotificationType.friendshipReceived) {
+    return false;
+  }
+  const friendshipStatus = await friendshipStore.fetchFriendshipStatus(notification.fromUserId);
+  return friendshipStatus.status === FriendshipStatus.PENDING;
+}
 const fetchNotifications = async () => {
   isLoading.value = true
   let result = await notificationStore.fetchNotifications(limit.value);
@@ -101,6 +114,11 @@ const fetchNotifications = async () => {
       (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     ) as Notification[]
     notifications.value = result;
+    for (let i = 0; i < result.length; i++) {
+      if (await isFriendRequest(result[i])) {
+        idsFriendshipRequestButtonShowed.value.push(result[i].id);
+      }
+    }
   }
   isLoading.value = false
 }
@@ -150,5 +168,19 @@ const removeNotification = async (notification: Notification) => {
     notifications.value.splice(index, 1);
   }
   isLoading.value = false;
+}
+
+const acceptFriendRequest = async (notification: Notification) => {
+  const isSuccessful = await friendshipStore.acceptFriendRequest(notification.fromUserId);
+  if (isSuccessful) {
+    idsFriendshipRequestButtonShowed.value = idsFriendshipRequestButtonShowed.value.filter(id => id !== notification.id);
+  }
+}
+
+const declineFriendRequest = async (notification: Notification) => {
+  const isSuccessful = await friendshipStore.declineFriendRequest(notification.fromUserId);
+  if (isSuccessful) {
+    idsFriendshipRequestButtonShowed.value = idsFriendshipRequestButtonShowed.value.filter(id => id !== notification.id);
+  }
 }
 </script>
