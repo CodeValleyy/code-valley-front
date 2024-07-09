@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import axiosInstance from '@/config/axiosInstance';
-import type { FriendshipPendingDTO, FriendshipSentDTO, UserFriend } from '@/types/FriendshipTypes';
+import type { FriendshipPendingDTO, UserFriend } from '@/types/FriendshipTypes';
 
 export const useFriendshipStore = defineStore('friendship', {
     state: () => ({
