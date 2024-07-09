@@ -3,6 +3,7 @@ export interface Notification {
   createdAt: Date;
   hasBeenRead: boolean;
   fromUsername: string;
+  fromUserId: number;
   notificationType: NotificationType;
 }
 

@@ -14,6 +14,10 @@
         <div class="flex justify-between">
           <div>
             <p :class="{ 'font-bold': !notification.hasBeenRead }">{{ message(notification) }}</p>
+            <div v-if="notification.notificationType === NotificationType.friendshipReceived" class="mt-2 mb-2">
+              <v-btn @click="friendshipStore.acceptFriendRequest(notification.fromUserId)">Accepter</v-btn>
+              <v-btn class="ml-3" @click="friendshipStore.declineFriendRequest(notification.fromUserId)">Refuser</v-btn>
+            </div>
             <p class="text-xs text-gray-400">{{ formatDate(notification.createdAt) }}</p>
           </div>
           <v-menu>
@@ -40,10 +44,12 @@
 <script setup lang="ts">
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { useNotification } from '@/stores/useNotification'
+import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import { type Notification, NotificationType } from '@/types/Notification'
 import { ref } from 'vue'
 
 const notificationStore = useNotification()
+const friendshipStore = useFriendshipStore()
 
 const isLoading = ref(true)
 const limit = ref(10)
@@ -53,31 +59,31 @@ const notificationCount = ref(-1)
 // Frontend functions
 const notificationCountMessage = () => {
   if (notificationCount.value === -1) {
-    return "Loading...";
+    return "Chargement...";
   }
   else if (notificationCount.value === 0) {
-    return "No new notifications";
+    return "Pas de nouvelle notification";
   }
   else if (notificationCount.value === 1) {
-    return "1 new notification";
+    return "1 notification non lu";
   }
   else {
-    return notificationCount.value + " new notifications";
+    return notificationCount.value + " notifications non lues";
   }
 }
 
 const message = (notification: Notification) => {
   switch(notification.notificationType) {
     case NotificationType.friendshipAccepted:
-      return notification.fromUsername + " is now your friend!";
+      return notification.fromUsername + " est maintenant ton ami!";
     case NotificationType.friendshipReceived:
-      return notification.fromUsername + " has send you a new friend request!";
+      return notification.fromUsername + " t'as envoyé une demande d'ami!";
     case NotificationType.friendshipRefused:
-      return notification.fromUsername + " has refused your friend request...";
+      return notification.fromUsername + " a refusé ta demande d'ami...";
     case NotificationType.like:
-      return notification.fromUsername + " liked your post!";
+      return notification.fromUsername + " a aimé ton post!";
     case NotificationType.post:
-      return "Check out " + notification.fromUsername + "'s new post!";
+      return "Jette un coup d'œil au nouveau post de " + notification.fromUsername + " !";
   }
 }
 
