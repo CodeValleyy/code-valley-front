@@ -14,6 +14,7 @@ import PipelineView from '@/views/PipelineView.vue'
 import GroupsView from '@/views/GroupsView.vue'
 import CreateGroupsView from '@/views/CreateGroupsView.vue'
 import GroupDetailsView from '@/views/GroupDetailsView.vue'
+import UpdateGroupsView from '@/views/UpdateGroupsView.vue'
 import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
@@ -62,6 +63,12 @@ const routes = [
     name: 'groupCreate',
     meta: { requiresAuth: true },
     component: CreateGroupsView
+  },
+  {
+    path: '/groups/update/:id',
+    name: 'groupUpdate',
+    meta: { requiresAuth: true },
+    component: UpdateGroupsView
   },
   {
     path: '/groups/:id',

@@ -2,18 +2,27 @@
 import type { GroupInput } from '@/types/GroupInput'
 import { ref } from 'vue'
 import { useGroup } from '@/composables/useGroup'
+import type { GroupResponse } from '@/types/GroupResponse'
+import { useRoute, useRouter } from 'vue-router'
 
-const { createGroup } = useGroup()
+const route = useRoute()
+const router = useRouter()
+const { updateGroup, getOneWithId } = useGroup()
+
+const groupId = route.params.id
+
+const group = ref<GroupResponse>(await getOneWithId(String(groupId)))
 
 const groupInput = ref<GroupInput>({
-  name: '',
-  description: '',
-  isPublic: true
+  name: group.value.name,
+  description: group.value.description,
+  isPublic: group.value.isPublic
 })
 
-const onSubmit = () => {
+const onSubmit = async () => {
   console.log(groupInput.value)
-  createGroup(groupInput.value)
+  await updateGroup(groupInput.value, group.value.id)
+  router.push('groups/' + group.value.id)
 }
 
 const getAvatar = () => {
@@ -22,7 +31,7 @@ const getAvatar = () => {
 </script>
 <template>
   <v-container>
-    <div class="text-3xl font-bold text-primary mb-10">Nouveau Groupe :</div>
+    <div class="text-3xl font-bold text-primary mb-10">Editer le Groupe :</div>
     <form @submit.prevent="onSubmit" class="flex flex-col w-full items-start">
       <div class="w-full flex justify-between border rounded shadow p-4 mb-4">
         <div class="w-1/2 flex flex-col">

@@ -1,6 +1,8 @@
 import axiosInstance from '@/config/axiosInstance'
 import type { GroupInput } from '@/types/GroupInput'
 import type { GroupResponse } from '@/types/GroupResponse'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 const fetchGroup = async (groupId: number | string | undefined) => {
   if (!groupId) {
@@ -52,9 +54,76 @@ const createGroup = async (groupInput: GroupInput) => {
   try {
     const response = await axiosInstance.post(`/groups/create`, groupInput)
     const createdGroup = response.data
-    window.location.href = `/groups/${createdGroup.name}`
+    window.location.href = `/groups/${createdGroup.id}`
   } catch (error) {
     console.error('Error creating group:', error)
+    throw error
+  }
+}
+
+const updateGroup = async (groupInput: GroupInput, groupId: number) => {
+  try {
+    const response = await axiosInstance.patch(`/groups/update/${groupId}`, groupInput)
+    const createdGroup = response.data
+    window.location.href = `/groups/${createdGroup.id}`
+  } catch (error) {
+    console.error('Error creating group:', error)
+    throw error
+  }
+}
+
+const addAdmin = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/admin/${groupId}/${userId}`)
+    window.location.href = `/groups/${groupId}`
+  } catch (error) {
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
+const joinGroup = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/add/${groupId}/${userId}`)
+    window.location.href = `/groups/${groupId}`
+  } catch (error) {
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
+const acceptRequest = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/accept/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error adding to group:', error)
+    throw error
+  }
+}
+
+const refuseRequest = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.delete(`/groups/refuse/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error deleting to group request:', error)
+    throw error
+  }
+}
+
+const removeUser = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.delete(`/groups/remove/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error adding to removing user from group:', error)
+    throw error
+  }
+}
+
+const sendJoinRequest = async (groupId: number, userId: number) => {
+  try {
+    await axiosInstance.post(`/groups/join/${groupId}/${userId}`)
+  } catch (error) {
+    console.error('Error sending request to group:', error)
     throw error
   }
 }
@@ -74,5 +143,12 @@ export const useGroup = () => ({
   getOneWithId,
   fetchGroup,
   searchGroup,
-  createGroup
+  createGroup,
+  joinGroup,
+  sendJoinRequest,
+  updateGroup,
+  removeUser,
+  acceptRequest,
+  refuseRequest,
+  addAdmin
 })

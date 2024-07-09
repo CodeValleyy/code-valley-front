@@ -11,7 +11,7 @@ const props = defineProps<{
   user?: User
 }>()
 
-const isAuthor = ref(props.user?.id === 186 ? true : false)
+const isAuthor = ref(props.user?.id === props.message.author.id ? true : false)
 
 const formatCreatedAt = (createdAt: Date) => {
   if (isToday(createdAt)) {
