@@ -18,6 +18,9 @@
               <v-btn @click="acceptFriendRequest(notification)">Accepter</v-btn>
               <v-btn class="ml-3" @click="declineFriendRequest(notification)">Refuser</v-btn>
             </div>
+            <div v-if="isPostButton(notification)" class="mt-2 mb-2">
+              <v-btn @click="router.push('/post/' + notification.linkId)">Voir le post</v-btn>
+            </div>
             <p class="text-xs text-gray-400">{{ formatDate(notification.createdAt) }}</p>
           </div>
           <v-menu>
@@ -48,6 +51,7 @@ import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import { type Notification, NotificationType } from '@/types/Notification'
 import { ref } from 'vue'
 import { FriendshipStatus } from '@/types/FriendshipTypes'
+import router from '@/router'
 
 const notificationStore = useNotification()
 const friendshipStore = useFriendshipStore()
@@ -96,6 +100,9 @@ const formatDate = (dateString: Date) => {
 
 const isFriendRequestButton = (notification: Notification) => {
   return idsFriendshipRequestButtonShowed.value.includes(notification.id);
+}
+const isPostButton = (notification: Notification) => {
+  return notification.notificationType === NotificationType.post || notification.notificationType === NotificationType.like;
 }
 
 // API calls

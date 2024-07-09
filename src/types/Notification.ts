@@ -4,6 +4,7 @@ export interface Notification {
   hasBeenRead: boolean;
   fromUsername: string;
   fromUserId: number;
+  linkId?: number;
   notificationType: NotificationType;
 }
 
