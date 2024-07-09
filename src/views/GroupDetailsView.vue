@@ -222,7 +222,7 @@ onMounted(() => {
     </div>
 
     <div class="w-full h-5/6 flex justify-between">
-      <div class="w-4/6 h-full flex flex-col justify-between mr-2">
+      <div class="w-7/12 h-full flex flex-col justify-between mr-2">
         <div
           ref="messageContainerRef"
           class="w-full h-full p-10 rounded-2xl bg-white shadow overflow-auto"
@@ -264,7 +264,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <div class="w-2/6 h-full flex flex-col">
+      <div class="w-5/12 h-full flex flex-col">
         <div
           class="w-full mb-2 ml-2 p-4 border shadow bg-white flex flex-col"
           :class="{
@@ -279,11 +279,11 @@ onMounted(() => {
               :key="member.id"
               class="w-full bg-primaryTailwind rounded shadow p-2 text-white flex justify-between items-center mb-2 text-xs"
             >
-              <div class="w-full flex items-center">
+              <div class="w-10/12 flex items-center truncate">
                 <v-avatar class="mr-2">
                   <img :src="member.avatar" alt="Avatar" />
                 </v-avatar>
-                <div class="truncate">{{ member.username }}</div>
+                <div>{{ member.username }}</div>
                 <div v-if="checkIfAdmin(member)" class="text-gray-300 italic ml-1">
                   - administrateur
                 </div>
@@ -330,11 +330,11 @@ onMounted(() => {
               :key="member.id"
               class="w-full bg-secondaryTailwind rounded shadow p-2 text-white flex justify-between items-center mb-2 text-xs"
             >
-              <div class="w-full flex items-center">
+              <div class="w-full flex items-center truncate">
                 <v-avatar class="mr-2">
                   <img :src="member.avatar" alt="Avatar" />
                 </v-avatar>
-                <div class="truncate">{{ member.username }}</div>
+                <div>{{ member.username }}</div>
               </div>
               <v-menu>
                 <template v-slot:activator="{ props }">
