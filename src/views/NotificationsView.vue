@@ -1,5 +1,5 @@
 <template>
-  <v-container class="h-screen">
+  <v-container class="min-h-screen">
     <div class="text-3xl font-bold text-primary">Notifications</div>
     <b class="mb-15">{{ notificationCountMessage() }}</b>
     <LoadingSpinner v-if="isLoading" />
@@ -41,6 +41,7 @@
         </div>
       </div>
     </div>
+    <div class="mt-3 mb-3" v-if="notificationCount > limit">{{ notificationCount - limit }} notifications masqués</div>
   </v-container>
 </template>
 
@@ -52,12 +53,14 @@ import { type Notification, NotificationType } from '@/types/Notification'
 import { ref } from 'vue'
 import { FriendshipStatus } from '@/types/FriendshipTypes'
 import router from '@/router'
+import { format, isToday, isYesterday } from 'date-fns'
+import { fr } from 'date-fns/locale'
 
 const notificationStore = useNotification()
 const friendshipStore = useFriendshipStore()
 
 const isLoading = ref(true)
-const limit = ref(10)
+const limit = ref(50)
 const notifications = ref([] as Notification[])
 const notificationCount = ref(-1)
 const idsFriendshipRequestButtonShowed = ref([] as number[])
@@ -93,9 +96,14 @@ const message = (notification: Notification) => {
   }
 }
 
-const formatDate = (dateString: Date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' } as const
-  return new Date(dateString).toLocaleDateString('fr-FR', options)
+const formatDate = (createdAt: Date) => {
+  if (isToday(createdAt)) {
+    return format(createdAt, 'HH:mm', { locale: fr })
+  } else if (isYesterday(createdAt)) {
+    return `hier à ${format(createdAt, 'HH:mm', { locale: fr })}`
+  } else {
+    return format(createdAt, 'EEEE d MMMM yyyy à HH:mm', { locale: fr })
+  }
 }
 
 const isFriendRequestButton = (notification: Notification) => {
@@ -117,9 +125,6 @@ const fetchNotifications = async () => {
   isLoading.value = true
   let result = await notificationStore.fetchNotifications(limit.value);
   if (result != null) {
-    result = result.sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    ) as Notification[]
     notifications.value = result;
     for (let i = 0; i < result.length; i++) {
       if (await isFriendRequest(result[i])) {
@@ -173,6 +178,8 @@ const removeNotification = async (notification: Notification) => {
   if (isSuccessful) {
     const index = notifications.value.indexOf(notification);
     notifications.value.splice(index, 1);
+    notificationCount.value -= 1;
+    await fetchNotifications();
   }
   isLoading.value = false;
 }
