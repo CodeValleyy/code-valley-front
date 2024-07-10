@@ -199,11 +199,11 @@ onMounted(() => {
 <template>
   <v-container class="h-screen">
     <div class="w-full flex justify-between">
-      <div class="flex">
-        <div class="p-4">
-          <v-avatar>
-            <img :src="getAvatar()" alt="Avatar" />
-          </v-avatar>
+      <div class="flex p-4 w-1/2">
+        <div class="h-20 w-20">
+          <div class="h-full w-full overflow-hidden rounded-full">
+            <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
+          </div>
         </div>
         <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
       </div>
