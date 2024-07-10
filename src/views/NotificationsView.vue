@@ -74,7 +74,7 @@ const notificationCountMessage = () => {
     return "Pas de nouvelle notification";
   }
   else if (notificationCount.value === 1) {
-    return "1 notification non lu";
+    return "1 notification non lue";
   }
   else {
     return notificationCount.value + " notifications non lues";
