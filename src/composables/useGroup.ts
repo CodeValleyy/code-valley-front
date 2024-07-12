@@ -51,22 +51,62 @@ const getOneWithId = async (id: string): Promise<GroupResponse> => {
 }
 
 const createGroup = async (groupInput: GroupInput) => {
+  groupInput.isPublic = String(groupInput.isPublic)
   try {
-    const response = await axiosInstance.post(`/groups/create`, groupInput)
-    const createdGroup = response.data
-    window.location.href = `/groups/${createdGroup.id}`
+    if (groupInput.file) {
+      await createGroupWithFile(groupInput)
+    } else {
+      const response = await axiosInstance.post(`/groups/create`, groupInput)
+      const createdGroup = response.data
+      window.location.href = `/groups/${createdGroup.id}`
+    }
   } catch (error) {
     console.error('Error creating group:', error)
     throw error
   }
 }
 
-const updateGroup = async (groupInput: GroupInput, groupId: number) => {
+const createGroupWithFile = async (groupInput: GroupInput) => {
   try {
-    const response = await axiosInstance.patch(`/groups/update/${groupId}`, groupInput)
+    const response = await axiosInstance.post('/groups/create', groupInput, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
     const createdGroup = response.data
     window.location.href = `/groups/${createdGroup.id}`
+  } catch (error: any) {
+    console.error('Error creating group:', error)
+    throw error
+  }
+}
+
+const updateGroup = async (groupInput: GroupInput, groupId: number) => {
+  groupInput.isPublic = String(groupInput.isPublic)
+  try {
+    if (groupInput.file) {
+      await updateGroupWithFile(groupInput, groupId)
+    } else {
+      const response = await axiosInstance.patch(`/groups/update/${groupId}`, groupInput)
+      const createdGroup = response.data
+      window.location.href = `/groups/${createdGroup.id}`
+    }
   } catch (error) {
+    console.error('Error creating group:', error)
+    throw error
+  }
+}
+
+const updateGroupWithFile = async (groupInput: GroupInput, groupId: number) => {
+  try {
+    const response = await axiosInstance.patch(`/groups/update/${groupId}`, groupInput, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+    const createdGroup = response.data
+    window.location.href = `/groups/${createdGroup.id}`
+  } catch (error: any) {
     console.error('Error creating group:', error)
     throw error
   }

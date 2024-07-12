@@ -160,6 +160,7 @@ import { useContentStore } from '@/stores/useContentStore'
 import { getLanguageColor } from '@/config/languagesConfig'
 import { filenameShort } from '@/utils/file-utils'
 import { useCodeRunner } from '@/composables/useCodeRunner'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const route = useRoute()
 
@@ -296,8 +297,7 @@ const fetchUserData = async (username?: string) => {
     }
 
     userProfile.value = profile.value
-    userAvatar.value = profile.value.avatar || 'https://via.placeholder.com/100'
-
+    userAvatar.value = profile.value.avatar || DEFAULT_AVATAR
     if (profile.value.id !== me.id) {
       await friendshipStore.fetchFriendshipFollowing(me.id, profile.value.id)
       isFollowing.value = friendshipStore.isFollowing

@@ -6,6 +6,7 @@ export interface GroupResponse {
   description: string
   members: User[]
   admins: User[]
+  avatar: string
   isPublic: boolean
   memberJoinRequests: User[]
 }

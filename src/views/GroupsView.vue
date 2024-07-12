@@ -6,6 +6,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import { useAuth } from '@/composables/useAuth'
 import type { User } from '@/types'
 import { useRouter } from 'vue-router'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const { searchGroup, getAll, joinGroup, sendJoinRequest } = useGroup()
 
@@ -23,6 +24,9 @@ const checkIfMember = (group: GroupResponse): boolean => {
 }
 
 const checkRequestSended = (group: GroupResponse): boolean => {
+  if (!group.memberJoinRequests) {
+    return false
+  }
   return group.memberJoinRequests.some((member) => member.id === me.id)
 }
 
@@ -71,7 +75,7 @@ const joinCurrentGroup = async () => {
 }
 
 const getAvatar = () => {
-  return 'https://yt3.googleusercontent.com/Pjk-KU0aJH978tDhdO05PgUx8j3i1OvqC4-U0L_3EUdJo0eBUrQ-cb1g2ZJiTYTlk5pq_0gy=s900-c-k-c0x00ffffff-no-rj'
+  return DEFAULT_AVATAR
 }
 </script>
 
@@ -111,9 +115,13 @@ const getAvatar = () => {
             <div
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <v-avatar>
-                <img :src="getAvatar()" alt="Avatar" />
-              </v-avatar>
+              <div class="h-10 w-10">
+                <div
+                  class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
+                >
+                  <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
+                </div>
+              </div>
               <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
               <div class="w-1/4 flex justify-end itemcenter">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -130,9 +138,13 @@ const getAvatar = () => {
               @click="openJoinGroupModal(group)"
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <v-avatar>
-                <img :src="getAvatar()" alt="Avatar" />
-              </v-avatar>
+              <div class="h-10 w-10">
+                <div
+                  class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
+                >
+                  <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
+                </div>
+              </div>
               <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
               <div class="w-1/4 flex justify-end itemcenter">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -146,9 +158,13 @@ const getAvatar = () => {
               @click="openJoinGroupModal(group)"
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <v-avatar>
-                <img :src="getAvatar()" alt="Avatar" />
-              </v-avatar>
+              <div class="h-10 w-10">
+                <div
+                  class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
+                >
+                  <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
+                </div>
+              </div>
               <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
               <div class="w-1/4 flex justify-end itemcenter">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -176,9 +192,13 @@ const getAvatar = () => {
       >
         <div class="mb-4 font-bold text-primary">Voulez-vous rejoindre ce groupe :</div>
         <div class="mb-3 border shadow p-4 w-11/12 flex justify-between items-center rounded">
-          <v-avatar>
-            <img :src="getAvatar()" alt="Avatar" />
-          </v-avatar>
+          <div class="h-10 w-10">
+            <div
+              class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
+            >
+              <img :src="currentGroup.avatar" class="h-full w-full object-cover" alt="Avatar" />
+            </div>
+          </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>
@@ -220,9 +240,13 @@ const getAvatar = () => {
           Vous avez déjà envoyé une demande pour rejoindre ce groupe :
         </div>
         <div class="mb-3 border shadow p-4 w-11/12 flex justify-between items-center rounded">
-          <v-avatar>
-            <img :src="getAvatar()" alt="Avatar" />
-          </v-avatar>
+          <div class="h-10 w-10">
+            <div
+              class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
+            >
+              <img :src="currentGroup?.avatar" class="h-full w-full object-cover" alt="Avatar" />
+            </div>
+          </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>

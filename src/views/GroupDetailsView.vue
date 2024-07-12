@@ -10,6 +10,7 @@ import type { MessageResponse } from '@/types/MessageResponse'
 import { useAuth } from '@/composables/useAuth'
 import { useUserStore } from '@/stores/useUserStore'
 import type { User } from '@/types'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -85,7 +86,7 @@ const sendMessage = async () => {
 }
 
 const getAvatar = () => {
-  return 'https://yt3.googleusercontent.com/Pjk-KU0aJH978tDhdO05PgUx8j3i1OvqC4-U0L_3EUdJo0eBUrQ-cb1g2ZJiTYTlk5pq_0gy=s900-c-k-c0x00ffffff-no-rj'
+  return DEFAULT_AVATAR
 }
 
 const isModalOpen = ref(false)
@@ -199,11 +200,11 @@ onMounted(() => {
 <template>
   <v-container class="h-screen">
     <div class="w-full flex justify-between">
-      <div class="flex">
-        <div class="p-4">
-          <v-avatar>
-            <img :src="getAvatar()" alt="Avatar" />
-          </v-avatar>
+      <div class="flex p-4 w-1/2">
+        <div class="h-20 w-20">
+          <div class="h-full w-full overflow-hidden rounded-full">
+            <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
+          </div>
         </div>
         <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
       </div>
