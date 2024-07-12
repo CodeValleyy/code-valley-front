@@ -97,6 +97,11 @@ const register = async () => {
     }
 
     if (axiosError.response?.status === 400) {
+      if (axiosError.response.data) {
+        errorMessage.value = (axiosError.response.data as { message: string }).message[0]
+        return
+      }
+
       errorMessage.value = 'Veuillez remplir tous les champs'
       return
     }

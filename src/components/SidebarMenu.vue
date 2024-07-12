@@ -48,6 +48,7 @@ import { useAuth } from '@/composables/useAuth'
 import PostModal from '@/components/PostModal.vue'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 import { useUserStore } from '@/stores/useUserStore'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const { getToken, fetchMe } = useAuth()
 
@@ -55,9 +56,7 @@ const isAuthenticated = computed(() => !!getToken())
 const drawer = ref(true)
 const postModal = ref(false)
 const userProfileModal = ref(false)
-const userAvatar = ref(
-  'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
-)
+const userAvatar = ref(DEFAULT_AVATAR)
 const username = ref('')
 const userStore = useUserStore()
 
@@ -93,9 +92,7 @@ const fetchUserProfile = async () => {
     await userStore.fetchUserProfile()
     const user = userStore.user
     username.value = user?.username || ''
-    userAvatar.value =
-      user?.avatar ||
-      'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+    userAvatar.value = user?.avatar || DEFAULT_AVATAR
   } catch (error) {
     console.error('Error fetching user profile:', error)
   }

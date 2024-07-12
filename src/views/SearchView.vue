@@ -28,6 +28,7 @@
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import type { UserResponse } from '@/types/UserResponse'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const { searchUser } = useAuth()
 
@@ -43,7 +44,7 @@ const onInputChange = async () => {
 
 const getAvatar = (profile: UserResponse) => {
   if (profile.avatar == null || !profile.avatar) {
-    return 'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+    return DEFAULT_AVATAR
   }
   return profile.avatar
 }

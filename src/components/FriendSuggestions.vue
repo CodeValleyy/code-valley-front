@@ -33,6 +33,7 @@
 import { ref, onMounted } from 'vue'
 import { useFriendshipStore } from '@/stores/useFriendshipStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const friends = ref([] as UserFriend[])
 const limit = ref(5)
@@ -63,7 +64,7 @@ const previousPage = () => {
 }
 
 const getAvatar = (friend: UserFriend) => {
-  return 'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+  return DEFAULT_AVATAR
 }
 
 onMounted(fetchFriendSuggestions)

@@ -14,6 +14,7 @@
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const emit = defineEmits(['close'])
 
@@ -26,9 +27,7 @@ const fetchUserProfile = async () => {
   try {
     const user = await fetchMe()
     username.value = user.username
-    userAvatar.value =
-      user.avatar ||
-      'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+    userAvatar.value = user.avatar || DEFAULT_AVATAR
   } catch (error) {
     console.error('Error fetching user profile:', error)
   }

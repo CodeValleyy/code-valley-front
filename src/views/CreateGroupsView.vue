@@ -2,6 +2,7 @@
 import type { GroupInput } from '@/types/GroupInput'
 import { ref } from 'vue'
 import { useGroup } from '@/composables/useGroup'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const { createGroup } = useGroup()
 
@@ -38,7 +39,7 @@ const onFilePicked = (event: any) => {
 }
 
 const getAvatar = () => {
-  return 'https://yt3.googleusercontent.com/Pjk-KU0aJH978tDhdO05PgUx8j3i1OvqC4-U0L_3EUdJo0eBUrQ-cb1g2ZJiTYTlk5pq_0gy=s900-c-k-c0x00ffffff-no-rj'
+  return DEFAULT_AVATAR
 }
 </script>
 <template>

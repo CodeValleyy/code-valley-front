@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import { useGroup } from '@/composables/useGroup'
 import type { GroupResponse } from '@/types/GroupResponse'
 import { useRoute, useRouter } from 'vue-router'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const route = useRoute()
 const router = useRouter()
@@ -47,7 +48,7 @@ const onSubmit = async () => {
 }
 
 const getAvatar = () => {
-  return 'https://yt3.googleusercontent.com/Pjk-KU0aJH978tDhdO05PgUx8j3i1OvqC4-U0L_3EUdJo0eBUrQ-cb1g2ZJiTYTlk5pq_0gy=s900-c-k-c0x00ffffff-no-rj'
+  return DEFAULT_AVATAR
 }
 </script>
 <template>
