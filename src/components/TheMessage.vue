@@ -29,7 +29,7 @@ const formatCreatedAt = (createdAt: Date) => {
 <template>
   <div v-if="!isAuthor" class="w-full">
     <div class="text-xs text-gray-400 mb-1">
-      {{ user?.username }} - {{ formatCreatedAt(message.createdAt) }}
+      {{ message?.author.username }} - {{ formatCreatedAt(message.createdAt) }}
     </div>
     <div class="w-fit py-2 px-4 border rounded-lg">
       {{ message.value }}

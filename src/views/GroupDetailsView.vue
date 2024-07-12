@@ -282,7 +282,7 @@ onMounted(() => {
             >
               <div class="w-10/12 flex items-center truncate">
                 <v-avatar class="mr-2">
-                  <img :src="member.avatar" alt="Avatar" />
+                  <img :src="member.avatar !== null ? member.avatar : getAvatar()" alt="Avatar" />
                 </v-avatar>
                 <div>{{ member.username }}</div>
                 <div v-if="checkIfAdmin(member)" class="text-gray-300 italic ml-1">
