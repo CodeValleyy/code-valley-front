@@ -1,5 +1,5 @@
 export interface BufferData {
-    bufferInput: {
-        data: number[];
-    };
+  bufferInput: {
+    data: number[]
+  }
 }
