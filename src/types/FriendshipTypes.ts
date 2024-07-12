@@ -4,6 +4,7 @@ interface UserFriend {
     username: string;
     status: FriendshipStatus;
     createdAt: string;
+    avatar: string;
 }
 
 interface FriendshipPendingDTO {

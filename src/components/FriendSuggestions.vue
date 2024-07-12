@@ -64,7 +64,7 @@ const previousPage = () => {
 }
 
 const getAvatar = (friend: UserFriend) => {
-  return DEFAULT_AVATAR
+  return friend.avatar || DEFAULT_AVATAR
 }
 
 onMounted(fetchFriendSuggestions)
