@@ -8,6 +8,9 @@
       "source": "/pipeline-ms/:path*",
       "destination": "https://pipeline-orchestrator.code-valley.xyz/:path*"
     },
-    { "source": "/(.*)", "destination": "/" }
+    {
+      "source": "/(.*)",
+      "destination": "/"
+    }
   ]
 }
