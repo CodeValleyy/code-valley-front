@@ -24,6 +24,9 @@ const checkIfMember = (group: GroupResponse): boolean => {
 }
 
 const checkRequestSended = (group: GroupResponse): boolean => {
+  if (!group.memberJoinRequests) {
+    return false
+  }
   return group.memberJoinRequests.some((member) => member.id === me.id)
 }
 
