@@ -41,6 +41,26 @@ const unseeNotification = async (notificationId: number): Promise<boolean> => {
   }
 }
 
+const seeAllNotifications = async (): Promise<boolean> => {
+  try {
+    await axiosInstance.post(`/notifications/seeall`);
+    return true;
+  } catch (error) {
+    console.error('Error seeing notification:', error);
+    return false;
+  }
+}
+
+const unseeAllNotifications = async (): Promise<boolean> => {
+  try {
+    await axiosInstance.post(`/notifications/unseeall`);
+    return true;
+  } catch (error) {
+    console.error('Error unseeing notification:', error);
+    return false;
+  }
+}
+
 const removeNotification = async (notificationId: number): Promise<boolean> => {
   try {
     await axiosInstance.delete(`/notifications/${notificationId}`);
@@ -56,5 +76,7 @@ export const useNotification = () => ({
   fetchNotificationCount,
   seeNotification,
   unseeNotification,
+  seeAllNotifications,
+  unseeAllNotifications,
   removeNotification,
 });

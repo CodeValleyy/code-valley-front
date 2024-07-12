@@ -2,6 +2,11 @@
   <v-container class="min-h-screen">
     <div class="text-3xl font-bold text-primary">Notifications</div>
     <b class="mb-15">{{ notificationCountMessage() }}</b>
+    <div class="flex items-center mt-3 mb-3">
+      <v-btn @click="fetchNotifications">Rafraîchir</v-btn>
+      <v-btn @click="seeAllNotifications" class="ml-3">Tout marquer comme lu</v-btn>
+      <v-btn @click="unseeAllNotifications" class="ml-3">Tout marquer comme non lu</v-btn>
+    </div>
     <LoadingSpinner v-if="isLoading" />
     <div v-else v-for="notification in notifications" :key="notification.id">
       <div class="mt-2 p-4 border rounded shadow-lg cursor"
@@ -170,6 +175,24 @@ const unseeNotification = async (notification: Notification) => {
   else {
     notification.hasBeenRead = true;
   }
+}
+
+const seeAllNotifications = async () => {
+  if (notificationCount.value !== 0) {
+    isLoading.value = true;
+    await notificationStore.seeAllNotifications();
+    await fetchNotifications();
+    notificationCount.value = 0;
+    isLoading.value = false;
+  }
+}
+
+const unseeAllNotifications = async () => {
+  isLoading.value = true;
+  await notificationStore.unseeAllNotifications();
+  await fetchNotifications();
+  await fetchNotificationCount();
+  isLoading.value = false;
 }
 
 const removeNotification = async (notification: Notification) => {
