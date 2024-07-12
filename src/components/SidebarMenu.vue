@@ -19,7 +19,15 @@
           <v-icon>{{ item.icon }}</v-icon>
         </v-list-item-icon>
         <v-list-item-content>
-          <v-list-item-title>{{ item.text }}</v-list-item-title>
+          <v-list-item-title class="flex items-center">
+            <div>{{ item.text }}</div>
+            <div
+              v-if="isNotificationsShowed(item.text)"
+              class="w-5 h-5 ml-2 bg-red-500 rounded-full flex items-center justify-center text-white"
+            >
+              {{ countNotifications > 99 ? '99' : countNotifications }}
+            </div>
+          </v-list-item-title>
         </v-list-item-content>
       </v-list-item>
     </v-list>
@@ -48,18 +56,19 @@ import { useAuth } from '@/composables/useAuth'
 import PostModal from '@/components/PostModal.vue'
 import UserProfileModal from '@/components/UserProfileModal.vue'
 import { useUserStore } from '@/stores/useUserStore'
+import { useNotification } from '@/stores/useNotification'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
-const { getToken, fetchMe } = useAuth()
+const { getToken } = useAuth()
 
 const isAuthenticated = computed(() => !!getToken())
 const drawer = ref(true)
 const postModal = ref(false)
 const userProfileModal = ref(false)
-const userAvatar = ref(
-  'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
-)
+const userAvatar = ref(DEFAULT_AVATAR)
 const username = ref('')
 const userStore = useUserStore()
+const notificationStore = useNotification()
 
 const menuItems = computed(() => {
   const items = [
@@ -67,8 +76,9 @@ const menuItems = computed(() => {
     { text: 'Recherche', to: '/search', icon: 'mdi-magnify', exact: false },
     { text: 'Code', to: '/code', icon: 'mdi-code-tags', exact: false },
     { text: 'Notifications', to: '/notifications', icon: 'mdi-bell', exact: false },
-    { text: 'Profil', to: '/profile', icon: 'mdi-account', exact: false },
-    { text: 'Déconnexion', to: '/logout', icon: 'mdi-logout', exact: false }
+    { text: 'Pipeline', to: '/pipeline', icon: 'mdi-pipe', exact: false },
+    { text: 'Groupes', to: '/groups', icon: 'mdi-account-group', exact: false },
+    { text: 'Profil', to: '/profile', icon: 'mdi-account', exact: false }
   ]
 
   if (!isAuthenticated.value) {
@@ -79,6 +89,18 @@ const menuItems = computed(() => {
 })
 
 const isMobile = ref(window.innerWidth <= 600)
+const countNotifications = ref(0)
+
+const isNotificationsShowed = (itemName: string) => {
+  return countNotifications.value > 0 && itemName === 'Notifications'
+}
+
+const actualizeCountNotifications = async () => {
+  const value = await notificationStore.fetchNotificationCount()
+  if (value !== null) {
+    countNotifications.value = value
+  }
+}
 
 const handleResize = () => {
   isMobile.value = window.innerWidth <= 600
@@ -92,9 +114,7 @@ const fetchUserProfile = async () => {
     await userStore.fetchUserProfile()
     const user = userStore.user
     username.value = user?.username || ''
-    userAvatar.value =
-      user?.avatar ||
-      'https://image.noelshack.com/fichiers/2024/21/4/1716483099-image-2024-05-23-185151555.jpg'
+    userAvatar.value = user?.avatar || DEFAULT_AVATAR
   } catch (error) {
     console.error('Error fetching user profile:', error)
   }
@@ -106,6 +126,8 @@ onMounted(() => {
   if (isAuthenticated.value) {
     fetchUserProfile()
   }
+  actualizeCountNotifications()
+  window.setInterval(actualizeCountNotifications, 60000)
 })
 
 onBeforeUnmount(() => {

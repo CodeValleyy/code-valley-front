@@ -3,6 +3,11 @@
     {
       "source": "/url/:path*",
       "destination": "https://user-management.code-valley.xyz/:path*"
-    }
+    },
+    {
+      "source": "/pipeline-ms/:path*",
+      "destination": "https://pipeline-orchestrator.code-valley.xyz/:path*"
+    },
+    { "source": "/(.*)", "destination": "/" }
   ]
 }

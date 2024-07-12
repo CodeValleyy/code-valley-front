@@ -66,8 +66,14 @@
           </template>
         </v-card>
 
+        <v-btn-toggle v-model="viewMode" mandatory>
+          <v-btn value="posts">Posts</v-btn>
+          <v-btn value="snippets">Snippets</v-btn>
+        </v-btn-toggle>
+
         <v-divider class="my-4"></v-divider>
-        <v-list>
+
+        <v-list v-if="viewMode === 'posts'">
           <template v-for="(post, index) in userPosts" :key="post.id">
             <PostItem
               :post="post"
@@ -82,9 +88,29 @@
             ></v-divider>
           </template>
         </v-list>
-      </v-col>
-    </v-row>
 
+        <v-list v-else-if="viewMode === 'snippets'">
+          <v-list-item v-for="snippet in userSnippets" :key="snippet.id">
+            <v-list-item-content>
+              <v-list-item-title>{{ filenameShort(snippet.filename) }}</v-list-item-title>
+              <v-chip :color="getLanguageColor(snippet.language)">{{ snippet.language }}</v-chip>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn icon @click="editSnippet(snippet)">
+                <v-icon size="small">mdi-pencil</v-icon>
+              </v-btn>
+              <v-btn icon @click="deleteSnippet(snippet)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </v-col>
+      <div class="pagination-buttons">
+        <v-btn @click="previousPage" :disabled="offset === 0">Précédent</v-btn>
+        <v-btn @click="nextPage" :disabled="userPosts.length < limit">Suivant</v-btn>
+      </div>
+    </v-row>
     <v-dialog v-model="showFollowersModal" max-width="600">
       <FriendList
         @close="showFollowersModal = false"
@@ -127,12 +153,18 @@ import FriendList from '@/components/FriendList.vue'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import PostItem from '@/components/PostItem.vue'
 import router from '@/router'
-import type { Post } from '@/types'
+import type { Post, Snippets } from '@/types'
 import { useUserStore } from '@/stores/useUserStore'
 import type { UserFriend } from '@/types/FriendshipTypes'
+import { useContentStore } from '@/stores/useContentStore'
+import { getLanguageColor } from '@/config/languagesConfig'
+import { filenameShort } from '@/utils/file-utils'
+import { useCodeRunner } from '@/composables/useCodeRunner'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const route = useRoute()
 
+const { editSnippet } = useCodeRunner()
 const { fetchMe, getToken, logout, uploadAvatar, fetchProfile } = useAuth()
 const followers = ref(0)
 const followings = ref(0)
@@ -143,12 +175,14 @@ const userAvatar = ref('')
 const hover = ref(false)
 const isFollowing = ref(false)
 const userPosts = ref([] as Post[])
+const userSnippets = ref([] as Snippets[])
 const deleteDialog = ref(false)
 const postToDelete = ref<Post | null>(null)
 
 const friendshipStore = useFriendshipStore()
 const postStore = usePostStore()
 const userStore = useUserStore()
+const contentStore = useContentStore()
 
 const friendRequests = ref([] as UserFriend[])
 const sentFriendRequests = ref([] as UserFriend[])
@@ -160,6 +194,16 @@ const userProfile = ref({
   email: '',
   createdAt: ''
 })
+
+const limit = ref(1)
+const offset = ref(0)
+
+const viewMode = ref('posts')
+
+const fetchUserSnippets = async () => {
+  await contentStore.fetchContentsByOwner(profile.value.id)
+  userSnippets.value = contentStore.snippets
+}
 
 const goToSettings = async () => {
   await nextTick()
@@ -215,6 +259,10 @@ const viewPost = (postId: number) => {
 const deletePost = async () => {
   if (postToDelete.value) {
     await postStore.deletePost(postToDelete.value.id)
+    const confirm = window.confirm('Voulez-vous supprimer la snippet liée à ce post ?')
+    if (confirm) {
+      await contentStore.deleteContent(postToDelete.value.fileId || '')
+    }
     deleteDialog.value = false
     await fetchUserPosts()
   }
@@ -239,6 +287,7 @@ const fetchUserData = async (username?: string) => {
   }
 
   fetchUserPosts()
+  fetchUserSnippets()
 
   try {
     if (!username) {
@@ -248,8 +297,7 @@ const fetchUserData = async (username?: string) => {
     }
 
     userProfile.value = profile.value
-    userAvatar.value = profile.value.avatar || 'https://via.placeholder.com/100'
-
+    userAvatar.value = profile.value.avatar || DEFAULT_AVATAR
     if (profile.value.id !== me.id) {
       await friendshipStore.fetchFriendshipFollowing(me.id, profile.value.id)
       isFollowing.value = friendshipStore.isFollowing
@@ -263,11 +311,38 @@ const fetchUserData = async (username?: string) => {
     sentFriendRequests.value = friendshipStore.sentFriendRequests
 
     await fetchUserPosts()
+    await fetchUserSnippets()
   } catch (error) {
     router.push('/')
     console.error('Error fetching profile:', error)
   } finally {
     loading.value = false
+  }
+}
+
+const deleteSnippet = async (snippet: Snippets) => {
+  if (userPosts.value.some((post) => post.fileId?.includes(snippet.id))) {
+    console.error('Cannot delete a snippet used in a post')
+    alert('Vous ne pouvez pas supprimer un snippet utilisé dans un post')
+    return
+  }
+  const confirm = window.confirm('Voulez-vous vraiment supprimer ce snippet ?')
+  if (!confirm) {
+    return
+  }
+  await contentStore.deleteContent(snippet.id)
+  await fetchUserSnippets()
+}
+
+const nextPage = () => {
+  offset.value += limit.value
+  fetchUserPosts()
+}
+
+const previousPage = () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    fetchUserPosts()
   }
 }
 
@@ -288,4 +363,9 @@ watch(
     fetchUserData(newUsername)
   }
 )
+
+// watch contentStore.snippets
+watch(contentStore.snippets, () => {
+  userSnippets.value = contentStore.snippets
+})
 </script>

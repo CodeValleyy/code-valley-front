@@ -35,11 +35,11 @@
             class="mb-4"
           />
           <v-card-actions class="ml-4">
-            <v-btn icon @click="toggleLike(post)">
-              <v-icon>{{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}</v-icon>
-              <span class="ml-2">{{ post.likes }} likes</span>
+            <v-btn @click="toggleLike(post)">
+              <v-icon>{{ hasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}</v-icon>
+              <span class="ml-2">{{ likeCount }} likes</span>
             </v-btn>
-            <v-btn class="ml-8" icon @click="showCommentInput = true">
+            <v-btn class="ml-8" @click="showCommentInput = true">
               <v-icon>mdi-comment</v-icon>
             </v-btn>
           </v-card-actions>
@@ -111,8 +111,10 @@ const newComment = ref('')
 const deleteDialog = ref(false)
 const postToDelete = ref<Post | null>(null)
 const me = await fetchMe()
+const hasLiked = ref(false)
+const likeCount = ref(0)
 
-// TODO delete it later
+// TODO: delete it later
 const comments = ref([
   {
     id: 1,
@@ -148,9 +150,10 @@ const fetchPost = async () => {
   post.value = await postStore.fetchPost(postId)
   if (post.value) {
     post.value.isOwner = post.value.userId === me.id
-    console.log(post.value)
     codeMirrorValue.value = typeof post.value.code === 'string' ? post.value.code : ''
   }
+  hasLiked.value = post.value?.userHasLiked
+  likeCount.value = post.value?.likes ?? 0
   isLoading.value = false
 }
 
@@ -161,11 +164,14 @@ onMounted(async () => {
 })
 
 const toggleLike = async (post: Post) => {
-  if (post.userHasLiked) {
+  if (hasLiked.value) {
     await postStore.unlikePost(post.id)
+    likeCount.value -= 1
   } else {
     await postStore.likePost(post.id)
+    likeCount.value += 1
   }
+  hasLiked.value = !hasLiked.value
 }
 
 const postComment = () => {

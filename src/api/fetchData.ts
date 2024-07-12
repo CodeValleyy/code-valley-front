@@ -1,24 +1,24 @@
-import axiosInstance from "@/config/axiosInstance";
-import type { ExecuteCodeRequest, ExecuteCodeResponse } from "@/types";
+import { createAxiosInstance } from '@/config/axiosInstance'
+import type { ExecuteCodeResponse } from '@/types'
 
-export async function fetchData(requestDto: ExecuteCodeRequest): Promise<string> {
-    const endpoint = 'execute';
-    try {
-        const response = await axiosInstance.post(`/code/${endpoint}`, requestDto);
+export async function fetchData(requestDto: FormData): Promise<ExecuteCodeResponse> {
+  const endpoint = 'execute'
+  const axiosInstance2 = createAxiosInstance()
 
-        if (response.status !== 201) {
-            throw new Error('Network response was not ok');
-        }
+  try {
+    const response = await axiosInstance2.post(`/code/${endpoint}`, requestDto, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    })
 
-        const responseData: ExecuteCodeResponse = response.data;
-
-        if (responseData.error && responseData.error !== '') {
-            throw new Error(responseData.error);
-        }
-
-        return responseData.output;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
+    if (response.status !== 201) {
+      throw new Error('Network response was not ok')
     }
+
+    return response.data
+  } catch (error) {
+    console.error('Error fetching data:', error)
+    throw error
+  }
 }
