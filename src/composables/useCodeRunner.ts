@@ -15,7 +15,8 @@ import {
   pythonBoilerplate,
   javascriptBoilerplate,
   rustBoilerplate,
-  luaBoilerplate
+  luaBoilerplate,
+  getExtensionFromPath
 } from '@/config/languagesConfig'
 
 import { useContentStore } from '@/stores/useContentStore'
@@ -199,6 +200,8 @@ export function useCodeRunner() {
     const formData = new FormData()
     formData.append('language', String(currentLanguage.value))
     formData.append('code', String(codeInput.value))
+    formData.append('output_extension', String(currentOutputExtension.value))
+
     if (file.value) {
       formData.append('input_file', file.value)
     }
@@ -208,7 +211,10 @@ export function useCodeRunner() {
       result.value = fetchedResult.output
         ? transformNewlines(fetchedResult.output)
         : 'Aucun résultat à afficher'
-      if (fetchedResult.outputFileContent) {
+      if (fetchedResult.outputFileContent && fetchedResult.outputFile) {
+        console.log(fetchedResult.outputFile)
+        currentOutputExtension.value = getExtensionFromPath(fetchedResult.outputFile)
+
         const byteArray = Uint8Array.from(atob(fetchedResult.outputFileContent), (char) =>
           char.charCodeAt(0)
         )
@@ -221,7 +227,18 @@ export function useCodeRunner() {
       }
     } catch (err: any) {
       if (err.response) {
-        error.value = err.response.data.error.error || 'Une erreur est survenue'
+        if (err.response.data.message) {
+          for (const message of err.response.data.message) {
+            if (error.value === '') {
+              error.value = message
+            } else {
+              error.value += ', ' + message
+            }
+          }
+        } else {
+          error.value = err.response.data.error || 'Une erreur est survenue'
+        }
+
       } else {
         error.value = (err as Error).message || 'Une erreur est survenue'
       }

@@ -67,6 +67,9 @@ export const getExtensionFromContentType = (content_type: string): string => {
   }
 }
 
+export const getExtensionFromPath = (path: string): string => {
+  return path.substring(path.lastIndexOf('.'))
+}
 export const getContent_type = (language: string): string => {
   switch (language) {
     case 'python':

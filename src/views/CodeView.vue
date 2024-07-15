@@ -16,8 +16,12 @@
                 label="Langage"
                 class="mb-4"
               ></v-select>
-              <v-chip class="mb-4" v-if="error" color="error" dark>{{ error }}</v-chip>
-              <v-chip class="mb-4" v-if="success" color="success" dark>{{ success }}</v-chip>
+              <v-chip class="mb-4" v-if="error && error.length < 100" color="error" dark>{{
+                error
+              }}</v-chip>
+              <v-chip class="mb-4" v-if="success && success.length < 100" color="success" dark>{{
+                success
+              }}</v-chip>
               <v-file-input
                 v-model="file"
                 label="Fichier Input"
@@ -77,7 +81,7 @@
               <v-btn
                 v-if="downloadLink"
                 :href="downloadLink"
-                download="output.txt"
+                :download="`output${currentOutputExtension}`"
                 class="mt-2 ml-4"
               >
                 Download Output File
@@ -150,7 +154,10 @@
       </v-col>
     </v-row>
     <!--Code View-->
-    <v-container class="mt-4 min-h-screen">
+    <v-container
+      class="mt-4 min-h-screen rounded shadow-lg p-4"
+      :class="useOneDarkTheme ? 'bg-gray-900' : 'bg-white'"
+    >
       <CodeMirror
         v-model="codeInput"
         basic
