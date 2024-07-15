@@ -1,4 +1,5 @@
-import { onMounted, ref, watch } from 'vue'
+import mimeDb from 'mime-db'
+import { computed, onMounted, ref, watch } from 'vue'
 import { fetchData } from '@/api/fetchData'
 import type { ExecuteCodeResponse, Snippets } from '@/types'
 import {
@@ -8,6 +9,8 @@ import {
   getLanguageFromExtension,
   languageMap,
   languages,
+  outputExtensions,
+  outputRestrictedExtensions,
   parseLanguageFromCodeUrl
 } from '@/config/languagesConfig'
 import {
@@ -19,6 +22,10 @@ import {
 import { useContentStore } from '@/stores/useContentStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useRouter } from 'vue-router'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
+import { oneDark } from '@codemirror/theme-one-dark'
 
 const transformNewlines = (str: string): string => {
   return str.replace(/\r?\n/g, '<br>')
@@ -32,6 +39,7 @@ export function useCodeRunner() {
   const error = ref<string>('')
   const success = ref<string>('')
   const currentLanguage = ref<string>(languageMap['py'])
+  const currentOutputExtension = ref<string>('')
   const file = ref<File | null>(null)
   const file_loaded = ref<File | null>(null)
   const downloadLink = ref<string | null>(null)
@@ -44,6 +52,8 @@ export function useCodeRunner() {
   const isCodeLoaded = ref(false)
   const loadOption = ref('file')
   const selectedSnippet = ref('')
+  const showAllExtensions = ref(false)
+  const useOneDarkTheme = ref(false)
 
   const snippets = ref(contentStore.snippets as Snippets[])
 
@@ -58,7 +68,21 @@ export function useCodeRunner() {
       loadCode()
     }
 
-    console.log('selectedSnippet: ', selectedSnippet.value, 'loadOption: ', loadOption.value)
+    const savedTheme = localStorage.getItem('theme')
+    const savedExtensions = JSON.parse(localStorage.getItem('extensions') ?? '[]')
+    if (savedTheme) {
+      userStore.setTheme(savedTheme)
+      useOneDarkTheme.value = savedTheme === 'dark'
+    }
+
+    if (savedExtensions.length > 0) {
+      showAllExtensions.value = true
+      userStore.setExtensions(savedExtensions)
+    }
+
+    if (!mimeDb || Object.keys(mimeDb).length === 0) {
+      console.error('mimeDb is not properly initialized or is empty')
+    }
 
     const user = userStore.user
     if (!user) {
@@ -83,6 +107,30 @@ export function useCodeRunner() {
 
   watch(contentStore, (newVal) => {
     snippets.value = newVal.snippets
+  })
+
+  watch(() => useOneDarkTheme.value, (newValue) => {
+    if (newValue) {
+      userStore.setTheme('dark')
+    } else {
+      userStore.setTheme('light')
+    }
+  })
+
+  watch(() => showAllExtensions.value, (newValue) => {
+    if (newValue) {
+      const outputExtensions = Object.keys(mimeDb).reduce((acc: { text: string, value: string }[], mimeType) => {
+        if (mimeDb[mimeType].extensions) {
+          mimeDb[mimeType].extensions.forEach(extension => {
+            acc.push({ text: `${extension.toUpperCase()} File`, value: `.${extension}` })
+          })
+        }
+        return acc
+      }, [])
+      userStore.setExtensions(outputExtensions)
+    } else {
+      userStore.setExtensions([])
+    }
   })
 
   const runCode = async () => {
@@ -147,6 +195,35 @@ export function useCodeRunner() {
         break
       default:
         codeInput.value = ''
+    }
+  }
+
+  const displayedExtensions = computed(() => {
+    return showAllExtensions.value ? outputExtensions : outputRestrictedExtensions
+  })
+
+  const lang = computed<any[]>(() => {
+    const extensions: any[] = [
+      getCodeMirrorLangExtension()
+    ]
+
+    if (useOneDarkTheme.value) {
+      extensions.push(oneDark)
+    }
+
+    return extensions
+  })
+
+  const getCodeMirrorLangExtension = () => {
+    switch (currentLanguage.value) {
+      case 'python':
+        return python()
+      case 'rust':
+        return rust()
+      case 'javascript':
+        return javascript()
+      default:
+        return python()
     }
   }
 
@@ -243,6 +320,7 @@ export function useCodeRunner() {
     success,
     languages,
     currentLanguage,
+    currentOutputExtension,
     file,
     file_loaded,
     runCode,
@@ -262,9 +340,14 @@ export function useCodeRunner() {
     loadOption,
     selectedSnippet,
     editSnippet,
+    displayedExtensions,
+    showAllExtensions,
+    useOneDarkTheme,
+    lang,
     openModal: () => (saveDialog.value = true),
     closeModal: () => (saveDialog.value = false),
     openLoadDialog: () => (loadDialog.value = true),
     closeLoadDialog: () => (loadDialog.value = false)
   }
 }
+

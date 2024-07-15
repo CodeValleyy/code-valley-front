@@ -21,25 +21,52 @@
               <v-file-input
                 v-model="file"
                 label="Fichier Input"
-                accept=".txt, .py, .js, .rs"
+                accept="*"
                 class="mb-4"
               ></v-file-input>
-              <CodeMirror
-                v-model="codeInput"
-                basic
-                :extensions="[lang]"
-                height="300px"
+              <v-autocomplete
+                v-model="currentOutputExtension"
+                :items="displayedExtensions"
+                item-title="text"
+                item-value="value"
+                label="Extension de l'output"
                 class="mb-4"
-                @keydown.tab.prevent.stop="handleTab"
-                @keydown.shift.tab.prevent.stop="handleTab"
-                @keydown.ctrl.s.prevent.stop="runCode"
-              />
-              <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
-              <v-btn color="primaryLight" v-if="isCodeLoaded" @click="unloadCode" class="mt-2 ml-4"
+                clearable
+                hide-details
+                hide-selected
+                solo
+              ></v-autocomplete>
+              <p class="mb-4">Extensions affichées : {{ displayedExtensions.length }}</p>
+              <p class="text-green-700 mb-4">
+                Ce système d'affichage d'extension permet de ne pas surcharger le menu déroulant
+                avec des extensions inutiles.
+              </p>
+              <v-switch
+                v-model="showAllExtensions"
+                :label="
+                  showAllExtensions
+                    ? 'Extensons affichées : Toutes'
+                    : 'Extensons affichées : Seulement les plus courantes'
+                "
+                :class="showAllExtensions ? 'text-green-700' : 'text-red-700'"
+              ></v-switch>
+              <v-switch
+                v-model="useOneDarkTheme"
+                :label="useOneDarkTheme ? 'Thème : One Dark' : 'Thème : Default'"
+                :class="useOneDarkTheme ? 'text-green-700' : 'text-red-700'"
+              ></v-switch>
+              <v-btn color="primary" @click="runCode" class="mt-2 mb-4">Run Code</v-btn>
+              <v-btn
+                color="primaryLight"
+                v-if="isCodeLoaded"
+                @click="unloadCode"
+                class="mt-2 mb-4 ml-4"
                 >Décharger</v-btn
               >
-              <v-btn color="primaryLight" @click="openLoadDialog" class="mt-2 ml-4">Charger</v-btn>
-              <v-btn color="primaryLight" v-if="codeInput" class="mt-2 ml-4" @click="openModal"
+              <v-btn color="primaryLight" @click="openLoadDialog" class="mt-2 mb-4 ml-4"
+                >Charger</v-btn
+              >
+              <v-btn color="primaryLight" v-if="codeInput" class="mt-2 mb-4 ml-4" @click="openModal"
                 >Sauvegarder</v-btn
               >
               <v-btn
@@ -50,6 +77,21 @@
               >
                 Download Output File
               </v-btn>
+              <!--Code View-->
+              <CodeMirror
+                v-model="codeInput"
+                basic
+                :extensions="[lang]"
+                :style="{ height: '400px' }"
+                height="300px"
+                class="mb-4"
+                :tab-size="2"
+                :autofocus="true"
+                :indent-with-tab="true"
+                @keydown.tab.prevent.stop="handleTab"
+                @keydown.shift.tab.prevent.stop="handleShiftTab"
+                @keydown.ctrl.s.prevent.stop="runCode"
+              />
             </v-col>
             <v-col cols="8" md="4" v-show="isLoading || error || result !== '' || fileContent">
               <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
@@ -121,13 +163,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
-import { python } from '@codemirror/lang-python'
-import { rust } from '@codemirror/lang-rust'
-import { javascript } from '@codemirror/lang-javascript'
 import { useCodeRunner } from '@/composables/useCodeRunner'
+import { shallowRef } from 'vue'
 const {
   codeInput,
   result,
@@ -137,10 +176,12 @@ const {
   file,
   runCode,
   currentLanguage,
+  currentOutputExtension,
+  displayedExtensions,
+  showAllExtensions,
   languages,
   downloadLink,
   fileContent,
-  setBoilerplate,
   saveCodeToFile,
   saveDialog,
   filename,
@@ -154,22 +195,10 @@ const {
   unloadCode,
   loadCode,
   loadOption,
-  selectedSnippet
+  selectedSnippet,
+  lang,
+  useOneDarkTheme
 } = useCodeRunner()
-
-const lang = computed(() => {
-  setBoilerplate(currentLanguage.value)
-  switch (currentLanguage.value) {
-    case 'python':
-      return python()
-    case 'rust':
-      return rust()
-    case 'javascript':
-      return javascript()
-    default:
-      return python()
-  }
-})
 
 const handleTab = (e: KeyboardEvent) => {
   const cm = e.target as HTMLDivElement
@@ -181,7 +210,7 @@ const handleTab = (e: KeyboardEvent) => {
       const selection = window.getSelection()
 
       if (activeLine.textContent !== null) {
-        activeLine.textContent = '    ' + activeLine.textContent
+        activeLine.textContent = '  ' + activeLine.textContent
         const spaces = activeLine.textContent.match(/^ +/)
         if (spaces) {
           const spacesLength = spaces[0].length
@@ -190,6 +219,34 @@ const handleTab = (e: KeyboardEvent) => {
         }
 
         range.setStart(activeLine.childNodes[0], spaces ? spaces[0].length : 0)
+        range.collapse(true)
+
+        if (selection) {
+          selection.removeAllRanges()
+          selection.addRange(range)
+        }
+      }
+    }
+  }
+}
+
+const handleShiftTab = (e: KeyboardEvent) => {
+  const cm = e.target as HTMLDivElement
+
+  if (cm.classList.contains('cm-content')) {
+    const activeLine = cm.querySelector('.cm-activeLine')
+    if (activeLine && activeLine.textContent !== null) {
+      const range = document.createRange()
+      const selection = window.getSelection()
+
+      if (activeLine.textContent !== null) {
+        const spaces = activeLine.textContent.match(/^ +/)
+        if (spaces) {
+          const spacesLength = spaces[0].length
+          activeLine.textContent = activeLine.textContent.substring(spacesLength)
+        }
+
+        range.setStart(activeLine.childNodes[0], 0)
         range.collapse(true)
 
         if (selection) {

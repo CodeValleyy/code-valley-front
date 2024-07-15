@@ -1,3 +1,5 @@
+import mimeDb from 'mime-db'
+
 const defaultLanguage = 'python'
 export const languages = ['python', 'rust', 'javascript', 'lua']
 
@@ -79,6 +81,32 @@ export const getContent_type = (language: string): string => {
       return 'text/plain'
   }
 }
+
+
+export const outputRestrictedExtensions = [
+  { text: 'JSON File', value: '.json' },
+  { text: 'CSV File', value: '.csv' },
+  { text: 'XML File', value: '.xml' },
+  { text: 'HTML File', value: '.html' },
+  { text: 'Markdown File', value: '.md' },
+  { text: 'JPEG Image', value: '.jpg' },
+  { text: 'PNG Image', value: '.png' },
+  { text: 'HEIC Image', value: '.heic' },
+  { text: 'Text File', value: '.txt' },
+  { text: 'YAML File', value: '.yaml' },
+  { text: 'PDF File', value: '.pdf' }
+]
+
+
+export const outputExtensions = Object.keys(mimeDb).reduce((acc: { text: string, value: string }[], mimeType) => {
+  if (mimeDb[mimeType].extensions) {
+    mimeDb[mimeType].extensions.forEach(extension => {
+      acc.push({ text: `${extension.toUpperCase()} File`, value: `.${extension}` })
+    })
+  }
+  return acc
+}, [])
+
 
 export const pythonBoilerplate = `def main():
     print("Hello, World!")\n
