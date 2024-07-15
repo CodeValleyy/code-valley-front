@@ -11,14 +11,13 @@ import {
   languages,
   outputExtensions,
   outputRestrictedExtensions,
-  parseLanguageFromCodeUrl
-} from '@/config/languagesConfig'
-import {
+  parseLanguageFromCodeUrl,
   pythonBoilerplate,
   javascriptBoilerplate,
   rustBoilerplate,
   luaBoilerplate
 } from '@/config/languagesConfig'
+
 import { useContentStore } from '@/stores/useContentStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useRouter } from 'vue-router'
@@ -70,6 +69,12 @@ export function useCodeRunner() {
 
     const savedTheme = localStorage.getItem('theme')
     const savedExtensions = JSON.parse(localStorage.getItem('extensions') ?? '[]')
+    const lastLanguage = localStorage.getItem('currentLanguage')
+    const savedCodeInput = localStorage.getItem('codeInput')
+    const savedCurrentExtension = localStorage.getItem('currentExtension')
+    const savedSelectedSnippet = localStorage.getItem('selectedSnippet')
+    const savedFilenameSnippet = localStorage.getItem('selectedFilenameSnippet')
+
     if (savedTheme) {
       userStore.setTheme(savedTheme)
       useOneDarkTheme.value = savedTheme === 'dark'
@@ -78,6 +83,27 @@ export function useCodeRunner() {
     if (savedExtensions.length > 0) {
       showAllExtensions.value = true
       userStore.setExtensions(savedExtensions)
+    }
+
+    if (lastLanguage) {
+      currentLanguage.value = lastLanguage
+    }
+
+    if (savedCodeInput) {
+      codeInput.value = savedCodeInput
+    }
+
+    if (savedCurrentExtension) {
+      currentOutputExtension.value = savedCurrentExtension
+    }
+
+    if (savedSelectedSnippet) {
+      selectedSnippet.value = savedSelectedSnippet
+      isCodeLoaded.value = true
+    }
+
+    if (savedFilenameSnippet) {
+      filename.value = savedFilenameSnippet
     }
 
     if (!mimeDb || Object.keys(mimeDb).length === 0) {
@@ -117,21 +143,50 @@ export function useCodeRunner() {
     }
   })
 
+  watch(() => currentLanguage.value, (newValue: string) => {
+    if (newValue) {
+      userStore.setCurrentLanguage(newValue)
+    }
+  })
+
+  watch(() => codeInput.value, (newValue) => {
+    localStorage.setItem('codeInput', newValue)
+  })
+
+  watch(() => currentOutputExtension.value, (newValue) => {
+    if (newValue) {
+      userStore.setCurrentExtension(newValue)
+    }
+  })
+
+  watch(() => selectedSnippet.value, (newValue) => {
+    if (newValue) {
+      localStorage.setItem('selectedSnippet', newValue)
+    }
+  })
+
+  watch(() => filename.value, (newValue) => {
+    if (newValue) {
+      localStorage.setItem('selectedFilenameSnippet', newValue)
+    }
+  })
+
   watch(() => showAllExtensions.value, (newValue) => {
     if (newValue) {
       const outputExtensions = Object.keys(mimeDb).reduce((acc: { text: string, value: string }[], mimeType) => {
-        if (mimeDb[mimeType].extensions) {
-          mimeDb[mimeType].extensions.forEach(extension => {
-            acc.push({ text: `${extension.toUpperCase()} File`, value: `.${extension}` })
-          })
+        const extensions = mimeDb[mimeType]?.extensions;
+        if (extensions) {
+          extensions.forEach(extension => {
+            acc.push({ text: `${extension.toUpperCase()} File`, value: `.${extension}` });
+          });
         }
-        return acc
-      }, [])
-      userStore.setExtensions(outputExtensions)
+        return acc;
+      }, []);
+      userStore.setExtensions(outputExtensions);
     } else {
-      userStore.setExtensions([])
+      userStore.setExtensions([]);
     }
-  })
+  });
 
   const runCode = async () => {
     if (!codeInput.value.trim()) return
@@ -210,6 +265,8 @@ export function useCodeRunner() {
     if (useOneDarkTheme.value) {
       extensions.push(oneDark)
     }
+
+    setBoilerplate(currentLanguage.value)
 
     return extensions
   })
@@ -298,6 +355,10 @@ export function useCodeRunner() {
     filename.value = ''
     selectedSnippet.value = ''
     currentLanguage.value = languageMap['py']
+
+    localStorage.removeItem('selectedSnippet')
+    localStorage.removeItem('selectedFilenameSnippet')
+    setBoilerplate(languageMap['py'])
   }
 
   const editSnippet = (snippet: Snippets) => {

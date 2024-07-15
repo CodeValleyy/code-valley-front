@@ -84,29 +84,29 @@ export const getContent_type = (language: string): string => {
 
 
 export const outputRestrictedExtensions = [
-  { text: 'JSON File', value: '.json' },
-  { text: 'CSV File', value: '.csv' },
-  { text: 'XML File', value: '.xml' },
-  { text: 'HTML File', value: '.html' },
-  { text: 'Markdown File', value: '.md' },
-  { text: 'JPEG Image', value: '.jpg' },
-  { text: 'PNG Image', value: '.png' },
-  { text: 'HEIC Image', value: '.heic' },
-  { text: 'Text File', value: '.txt' },
-  { text: 'YAML File', value: '.yaml' },
-  { text: 'PDF File', value: '.pdf' }
+  { text: 'JSON', value: '.json' },
+  { text: 'CSV', value: '.csv' },
+  { text: 'XML', value: '.xml' },
+  { text: 'HTML', value: '.html' },
+  { text: 'Markdown', value: '.md' },
+  { text: 'JPEG', value: '.jpg' },
+  { text: 'PNG', value: '.png' },
+  { text: 'HEIC', value: '.heic' },
+  { text: 'Text', value: '.txt' },
+  { text: 'YAML', value: '.yaml' },
+  { text: 'PDF', value: '.pdf' }
 ]
 
 
 export const outputExtensions = Object.keys(mimeDb).reduce((acc: { text: string, value: string }[], mimeType) => {
-  if (mimeDb[mimeType].extensions) {
-    mimeDb[mimeType].extensions.forEach(extension => {
-      acc.push({ text: `${extension.toUpperCase()} File`, value: `.${extension}` })
-    })
+  const extensions = mimeDb[mimeType]?.extensions;
+  if (extensions) {
+    extensions.forEach(extension => {
+      acc.push({ text: `${extension.toUpperCase()}`, value: `.${extension}` })
+    });
   }
-  return acc
-}, [])
-
+  return acc;
+}, []);
 
 export const pythonBoilerplate = `def main():
     print("Hello, World!")\n

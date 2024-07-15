@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="min-w-full min-h-full">
     <v-row class="justify-center mt-4">
       <h1 class="mb-6 text-4xl font-bold text-primary">🦖 Code</h1>
     </v-row>
@@ -61,9 +61,14 @@
                 v-if="isCodeLoaded"
                 @click="unloadCode"
                 class="mt-2 mb-4 ml-4"
+                :disabled="!isCodeLoaded"
                 >Décharger</v-btn
               >
-              <v-btn color="primaryLight" @click="openLoadDialog" class="mt-2 mb-4 ml-4"
+              <v-btn
+                color="primaryLight"
+                @click="openLoadDialog"
+                class="mt-2 mb-4 ml-4"
+                :disabled="isCodeLoaded"
                 >Charger</v-btn
               >
               <v-btn color="primaryLight" v-if="codeInput" class="mt-2 mb-4 ml-4" @click="openModal"
@@ -77,21 +82,6 @@
               >
                 Download Output File
               </v-btn>
-              <!--Code View-->
-              <CodeMirror
-                v-model="codeInput"
-                basic
-                :extensions="[lang]"
-                :style="{ height: '400px' }"
-                height="300px"
-                class="mb-4"
-                :tab-size="2"
-                :autofocus="true"
-                :indent-with-tab="true"
-                @keydown.tab.prevent.stop="handleTab"
-                @keydown.shift.tab.prevent.stop="handleShiftTab"
-                @keydown.ctrl.s.prevent.stop="runCode"
-              />
             </v-col>
             <v-col cols="8" md="4" v-show="isLoading || error || result !== '' || fileContent">
               <div v-show="!isLoading" class="text-primary mb-2">Résultats :</div>
@@ -159,6 +149,23 @@
         </v-dialog>
       </v-col>
     </v-row>
+    <!--Code View-->
+    <v-container class="mt-4 min-h-screen">
+      <CodeMirror
+        v-model="codeInput"
+        basic
+        :extensions="[lang]"
+        :style="{ height: '400px' }"
+        height="400px"
+        class="mb-4"
+        :tab-size="2"
+        :autofocus="true"
+        :indent-with-tab="true"
+        @keydown.tab.prevent.stop="handleTab"
+        @keydown.shift.tab.prevent.stop="handleShiftTab"
+        @keydown.ctrl.s.prevent.stop="runCode"
+      />
+    </v-container>
   </v-container>
 </template>
 
@@ -166,7 +173,6 @@
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import { useCodeRunner } from '@/composables/useCodeRunner'
-import { shallowRef } from 'vue'
 const {
   codeInput,
   result,
