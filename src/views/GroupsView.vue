@@ -61,7 +61,6 @@ const handleBackgroundClick = (event: Event) => {
 }
 
 const joinCurrentGroup = async () => {
-  console.log(currentGroup)
   if (currentGroup.value) {
     if (currentGroup.value.isPublic) await joinGroup(currentGroup.value?.id, me.id)
     else {

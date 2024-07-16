@@ -13,6 +13,11 @@ const setToken = (newToken: string) => {
 const resetToken = () => {
   token.value = ''
   localStorage.removeItem('token')
+  localStorage.removeItem('codeInput')
+  localStorage.removeItem('currentExtension')
+  localStorage.removeItem('currentLanguage')
+  localStorage.removeItem('selectedSnippet')
+  localStorage.removeItem('selectedFilenameSnippet')
 }
 
 const getToken = () => token.value

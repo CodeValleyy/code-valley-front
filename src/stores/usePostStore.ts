@@ -67,10 +67,10 @@ export const usePostStore = defineStore('post', {
         throw error
       }
     },
-    async createPost(content: string, file?: File | null) {
+    async createPost(content: string, output_extension: string, file?: File | null) {
       try {
         if (file) {
-          await this.createPostWithFile(content, file)
+          await this.createPostWithFile(content, file, output_extension)
         } else {
           await axiosInstance.post('/posts', { content })
         }
@@ -91,11 +91,12 @@ export const usePostStore = defineStore('post', {
         }
       }
     },
-    async createPostWithFile(content: string, file: File) {
+    async createPostWithFile(content: string, file: File, output_extension: string) {
       try {
         const formData = new FormData()
         formData.append('content', content)
         formData.append('file', file)
+        formData.append('output_extension', output_extension)
         await axiosInstance.post('/posts', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'

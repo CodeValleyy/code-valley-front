@@ -4,6 +4,7 @@ export interface Post {
   userId: number
   fileId?: string
   code_url?: string
+  output_type?: string
   code?: String
   code_language?: string | null
   username: string

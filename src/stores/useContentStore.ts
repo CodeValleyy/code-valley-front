@@ -23,6 +23,7 @@ export const useContentStore = defineStore('content', {
             file_hash: content.file_hash,
             file_path: content.file_path,
             file_size: content.file_size,
+            output_type: content.output_type,
             filename: content.filename,
             owner_id: content.owner_id,
             update_time: content.update_time,
@@ -36,7 +37,8 @@ export const useContentStore = defineStore('content', {
             owner_id: content.owner_id,
             filename: content.filename,
             code: content.code_url,
-            language: getLanguageFromFilename(content.filename)
+            language: getLanguageFromFilename(content.filename),
+            output_type: content.output_type
           }
         })
       } catch (error) {
@@ -51,10 +53,11 @@ export const useContentStore = defineStore('content', {
         console.error('Error fetching content:', error)
       }
     },
-    async uploadProgram(file: File) {
+    async uploadProgram(file: File, output_extension: string) {
       try {
         const formData = new FormData()
         formData.append('file', file)
+        formData.append('output_extension', output_extension)
         await axiosInstance.post(`${endpoint}/upload`, formData)
       } catch (error) {
         console.error('Error uploading program:', error)

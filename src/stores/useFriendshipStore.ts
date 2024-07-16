@@ -46,20 +46,20 @@ export const useFriendshipStore = defineStore('friendship', {
     },
     async acceptFriendRequest(senderId: number): Promise<boolean> {
       try {
-        await axiosInstance.post(`/friendships/accept/${senderId}`);
-        return true;
+        await axiosInstance.post(`/friendships/accept/${senderId}`)
+        return true
       } catch (error) {
-        console.error('Error accepting friend request:', error);
-        return false;
+        console.error('Error accepting friend request:', error)
+        return false
       }
     },
     async declineFriendRequest(senderId: number): Promise<boolean> {
       try {
-        await axiosInstance.post(`/friendships/decline/${senderId}`);
-        return true;
+        await axiosInstance.post(`/friendships/decline/${senderId}`)
+        return true
       } catch (error) {
-        console.error('Error declining friend request:', error);
-        return false;
+        console.error('Error declining friend request:', error)
+        return false
       }
     },
     async removeFriend(friendId: number) {
@@ -122,10 +122,10 @@ export const useFriendshipStore = defineStore('friendship', {
     },
     async fetchFriendshipStatus(userId: number) {
       try {
-        const response = await axiosInstance.get(`/friendships/status?friendId=${userId}`);
-        return response.data;
+        const response = await axiosInstance.get(`/friendships/status?friendId=${userId}`)
+        return response.data
       } catch (error) {
-        console.error('Error fetching friendship status:', error);
+        console.error('Error fetching friendship status:', error)
       }
     }
   }

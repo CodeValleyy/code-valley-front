@@ -26,15 +26,15 @@
                 </ul>
               </li>
               <li>
-                <strong>Usage:</strong> you must use
+                <strong>(Usage)</strong> you must use the following variables to read and write
+                files:
                 <ul>
                   <li>
-                    For <strong>Python</strong>, <strong>Javascript</strong> and
-                    <strong>Lua</strong>: <code>(input_data, output_path)</code>
+                    For <strong>Python</strong>, <strong>Javascript</strong>,
+                    <strong>Rust</strong> and <strong>Lua</strong>:
+                    <code>(INPUT_PATH, OUTPUT_PATH)</code>
                   </li>
-                  <li>For <strong>result</strong>: <code>(INPUT_PATH, OUTPUT_PATH)</code></li>
                 </ul>
-                variables for JS, PY et LUA as in the example below.
               </li>
             </ul>
           </v-card-text>
@@ -45,7 +45,7 @@
                   <v-file-input
                     v-model="initialInput"
                     label="Initial Input File"
-                    accept=".txt, .py, .js, .rs"
+                    accept=".*"
                   ></v-file-input>
                 </v-col>
               </v-row>
@@ -97,7 +97,12 @@
                   <v-list-item-subtitle>
                     <v-row>
                       <v-col cols="12">
-                        <v-chip v-if="result.output_file_content" color="primary" class="mr-2"
+                        <v-chip
+                          v-if="
+                            result.output_file_content && result.output_file_content.length < 1000
+                          "
+                          color="primary"
+                          class="mr-2"
                           >Output File</v-chip
                         >
                         <v-chip v-if="result.output" color="green" class="mr-2">Output</v-chip>
@@ -120,7 +125,13 @@
                             }}</v-card-text>
                           </v-alert>
                           <v-btn
-                            @click="downloadFile(result.output_file_content, result.stepNumber)"
+                            @click="
+                              downloadFile(
+                                result.output_file_content,
+                                result.stepNumber,
+                                result.output_file_path
+                              )
+                            "
                             color="primary"
                             outlined
                             >Download Output File</v-btn
@@ -194,7 +205,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import type { StepResultDto } from '@/types/Pipeline'
-import { languages } from '@/config/languagesConfig'
+import { getExtensionFromPath, getMimeType, languages } from '@/config/languagesConfig'
 import { usePipeline } from '@/composables/usePipeline'
 const {
   contents,
@@ -266,13 +277,18 @@ const decodeBase64 = (base64Content: string) => {
   }
 }
 
-const downloadFile = (base64Content: string, stepNumber: number) => {
+const downloadFile = (base64Content: string, stepNumber: number, outputFilePath: string) => {
   const decodedContent = Uint8Array.from(atob(base64Content), (char) => char.charCodeAt(0))
-  const blob = new Blob([decodedContent], { type: 'text/plain' })
+  let finalOutputFileExtension = getExtensionFromPath(outputFilePath)
+  console.log('Final output file extension:', finalOutputFileExtension)
+
+  const blob = new Blob([decodedContent], {
+    type: 'application/octet-stream'
+  })
   const url = URL.createObjectURL(blob)
   const link = document.createElement('a')
   link.href = url
-  link.download = `output_step_${stepNumber}.txt`
+  link.download = `output_step_${stepNumber}${finalOutputFileExtension}`
   document.body.appendChild(link)
   link.click()
   document.body.removeChild(link)

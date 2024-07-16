@@ -7,6 +7,7 @@ export interface ExecuteCodeResponse {
   output: string
   error?: string
   outputFileContent?: string
+  outputFile?: string
 }
 
 export * from './User'

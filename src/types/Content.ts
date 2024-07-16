@@ -5,6 +5,7 @@ export interface Content {
   file_hash: string
   file_path: string
   file_size: number
+  output_type: string
   filename: string
   owner_id: number
   update_time: string
@@ -20,6 +21,7 @@ export interface ContentRaw {
   file_hash: string
   file_path: string
   file_size: number
+  output_type: string
   filename: string
   owner_id: number
   update_time: string
@@ -32,4 +34,5 @@ export interface Snippets {
   filename: string
   code: string
   language: string
+  output_type: string
 }

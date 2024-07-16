@@ -6,7 +6,7 @@ export default {
       colors: {
         primaryTailwind: '#902de0',
         primary: '#902de0',
-        primaryLight: '#bf80f2',
+        primaryLight: '#b13df5',
         primaryHover: '#6a21a6',
         secondaryTailwind: '#e07e2d',
         secondaryHover: '#b06221',

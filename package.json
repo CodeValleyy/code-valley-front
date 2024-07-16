@@ -1,7 +1,7 @@
 {
   "name": "code-valley-front",
   "displayName": "Code Valley",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -22,6 +22,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "@mdi/font": "^7.4.47",
     "@mdi/js": "^7.4.47",
+    "@types/mime-types": "^2.1.4",
     "@upleveled/theme-vs-code-dark-plus": "github:upleveled/theme-vs-code-dark-plus",
     "@vercel/speed-insights": "^1.0.12",
     "axios": "^1.7.1",
@@ -29,6 +30,8 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "http-proxy-middleware": "^3.0.0",
+    "mime-db": "^1.53.0",
+    "mime-types": "^2.1.35",
     "pinia": "^2.1.7",
     "socket.io-client": "^4.7.5",
     "vite-plugin-node-polyfills": "^0.22.0",
@@ -43,6 +46,7 @@
     "@rushstack/eslint-patch": "^1.10.3",
     "@tsconfig/node20": "^20.1.4",
     "@types/jsdom": "^21.1.6",
+    "@types/mime-db": "^1.43.5",
     "@types/node": "^20.12.12",
     "@vitejs/plugin-vue": "^5.0.4",
     "@vue/eslint-config-prettier": "^9.0.0",
