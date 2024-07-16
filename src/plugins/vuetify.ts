@@ -33,7 +33,18 @@ export default createVuetify({
           'bg-python': '#306998',
           'bg-rust': '#b7410e',
           'bg-javascript': '#f0db4f',
-          'bg-lua': '#000080'
+          'bg-lua': '#000080',
+          'bg-json': '#66d9ef',
+          'bg-csv': '#f92672',
+          'bg-xml': '#a6e22e',
+          'bg-html': '#e6db74',
+          'bg-markdown': '#ae81ff',
+          'bg-jpeg': '#fd971f',
+          'bg-png': '#e74c3c',
+          'bg-heic': '#8e44ad',
+          'bg-txt': '#2ecc71',
+          'bg-yaml': '#3498db',
+          'bg-pdf': '#c0392b'
         },
         variables: {
           'border-color': '#4a4a4a'

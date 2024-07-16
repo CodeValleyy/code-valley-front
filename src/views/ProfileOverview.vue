@@ -94,6 +94,9 @@
             <v-list-item-content>
               <v-list-item-title>{{ filenameShort(snippet.filename) }}</v-list-item-title>
               <v-chip :color="getLanguageColor(snippet.language)">{{ snippet.language }}</v-chip>
+              <v-chip :color="getLanguageColor(snippet.output_type.split('.')[1])" class="ml-2">{{
+                snippet.output_type.split('.')[1]
+              }}</v-chip>
             </v-list-item-content>
             <v-list-item-action>
               <v-btn icon @click="editSnippet(snippet)">

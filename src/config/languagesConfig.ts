@@ -34,6 +34,28 @@ export const getLanguageColor = (language: string): string => {
       return 'bg-javascript'
     case 'lua':
       return 'bg-lua'
+    case 'json':
+      return 'bg-json'
+    case 'csv':
+      return 'bg-csv'
+    case 'xml':
+      return 'bg-xml'
+    case 'html':
+      return 'bg-html'
+    case 'markdown':
+      return 'bg-markdown'
+    case 'jpeg':
+      return 'bg-jpeg'
+    case 'png':
+      return 'bg-png'
+    case 'heic':
+      return 'bg-heic'
+    case 'txt':
+      return 'bg-txt'
+    case 'yaml':
+      return 'bg-yaml'
+    case 'pdf':
+      return 'bg-pdf'
     default:
       return 'bg-gray-400'
   }
@@ -85,7 +107,6 @@ export const getContent_type = (language: string): string => {
   }
 }
 
-
 export const outputRestrictedExtensions = [
   { text: 'JSON', value: '.json' },
   { text: 'CSV', value: '.csv' },
@@ -100,16 +121,18 @@ export const outputRestrictedExtensions = [
   { text: 'PDF', value: '.pdf' }
 ]
 
-
-export const outputExtensions = Object.keys(mimeDb).reduce((acc: { text: string, value: string }[], mimeType) => {
-  const extensions = mimeDb[mimeType]?.extensions;
-  if (extensions) {
-    extensions.forEach(extension => {
-      acc.push({ text: `${extension.toUpperCase()}`, value: `.${extension}` })
-    });
-  }
-  return acc;
-}, []);
+export const outputExtensions = Object.keys(mimeDb).reduce(
+  (acc: { text: string; value: string }[], mimeType) => {
+    const extensions = mimeDb[mimeType]?.extensions
+    if (extensions) {
+      extensions.forEach((extension) => {
+        acc.push({ text: `${extension.toUpperCase()}`, value: `.${extension}` })
+      })
+    }
+    return acc
+  },
+  []
+)
 
 export const pythonBoilerplate = `def main():
     print("Hello, World!")\n

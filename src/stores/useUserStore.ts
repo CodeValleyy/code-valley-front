@@ -3,7 +3,7 @@ import type { User } from '@/types'
 import axiosInstance from '@/config/axiosInstance'
 
 type Extension = {
-  text: string,
+  text: string
   value: string
 }
 
@@ -80,11 +80,16 @@ export const useUserStore = defineStore('user', {
     isAuthenticated: (state) => !!state.user,
     isTwoFactorEnabled: (state) => state.user?.isTwoFactorAuthenticationEnabled ?? false,
     getTheme: (state) => state.theme || (localStorage.getItem('theme') ?? 'light'),
-    getExtensions: (state) => state.extensions || JSON.parse(localStorage.getItem('extensions') ?? '[]'),
-    getCurrentLanguage: (state) => state.currentLanguage || (localStorage.getItem('currentLanguage') ?? 'python'),
+    getExtensions: (state) =>
+      state.extensions || JSON.parse(localStorage.getItem('extensions') ?? '[]'),
+    getCurrentLanguage: (state) =>
+      state.currentLanguage || (localStorage.getItem('currentLanguage') ?? 'python'),
     getCodeInput: (state) => state.codeInput || (localStorage.getItem('codeInput') ?? ''),
-    getCurrentExtension: (state) => state.currentExtension || (localStorage.getItem('currentExtension') ?? ''),
-    getSelectedSnippet: (state) => state.selectedSnippet || (localStorage.getItem('selectedSnippet') ?? ''),
-    getSelectedFilenameSnippet: (state) => state.selectedFilenameSnippet || (localStorage.getItem('selectedFilenameSnippet') ?? '')
+    getCurrentExtension: (state) =>
+      state.currentExtension || (localStorage.getItem('currentExtension') ?? ''),
+    getSelectedSnippet: (state) =>
+      state.selectedSnippet || (localStorage.getItem('selectedSnippet') ?? ''),
+    getSelectedFilenameSnippet: (state) =>
+      state.selectedFilenameSnippet || (localStorage.getItem('selectedFilenameSnippet') ?? '')
   }
 })

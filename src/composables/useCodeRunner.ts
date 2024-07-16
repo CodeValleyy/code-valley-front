@@ -122,36 +122,50 @@ export function useCodeRunner() {
     snippets.value = newVal.snippets
   })
 
-  watch(() => useOneDarkTheme.value, (newValue) => {
-    if (newValue) {
-      userStore.setTheme('dark')
-    } else {
-      userStore.setTheme('light')
+  watch(
+    () => useOneDarkTheme.value,
+    (newValue) => {
+      if (newValue) {
+        userStore.setTheme('dark')
+      } else {
+        userStore.setTheme('light')
+      }
     }
-  })
+  )
 
-  watch(() => currentLanguage.value, (newValue: string) => {
-    if (newValue) {
-      userStore.setCurrentLanguage(newValue)
+  watch(
+    () => currentLanguage.value,
+    (newValue: string) => {
+      if (newValue) {
+        userStore.setCurrentLanguage(newValue)
+      }
     }
-  })
+  )
 
-  watch(() => codeInput.value, (newValue) => {
-    localStorage.setItem('codeInput', newValue)
-  })
-
-  watch(() => selectedSnippet.value, (newValue) => {
-    if (newValue) {
-      localStorage.setItem('selectedSnippet', newValue)
+  watch(
+    () => codeInput.value,
+    (newValue) => {
+      localStorage.setItem('codeInput', newValue)
     }
-  })
+  )
 
-  watch(() => filename.value, (newValue) => {
-    if (newValue) {
-      localStorage.setItem('selectedFilenameSnippet', newValue)
+  watch(
+    () => selectedSnippet.value,
+    (newValue) => {
+      if (newValue) {
+        localStorage.setItem('selectedSnippet', newValue)
+      }
     }
-  })
+  )
 
+  watch(
+    () => filename.value,
+    (newValue) => {
+      if (newValue) {
+        localStorage.setItem('selectedFilenameSnippet', newValue)
+      }
+    }
+  )
 
   const runCode = async () => {
     if (!codeInput.value.trim()) return
@@ -202,7 +216,6 @@ export function useCodeRunner() {
         } else {
           error.value = err.response.data.error || 'Une erreur est survenue'
         }
-
       } else {
         error.value = (err as Error).message || 'Une erreur est survenue'
       }
@@ -235,9 +248,7 @@ export function useCodeRunner() {
   }
 
   const lang = computed<any[]>(() => {
-    const extensions: any[] = [
-      getCodeMirrorLangExtension()
-    ]
+    const extensions: any[] = [getCodeMirrorLangExtension()]
 
     if (useOneDarkTheme.value) {
       extensions.push(oneDark)
@@ -287,8 +298,12 @@ export function useCodeRunner() {
     error.value = ''
     const content_type = getContent_type(currentLanguage.value)
     const extension = getExtensionFromContentType(content_type)
+
+    if (!filename.value.endsWith(extension)) {
+      filename.value += extension
+    }
     const blob = new Blob([codeInput.value], { type: content_type })
-    const file = new File([blob], filename.value + extension)
+    const file = new File([blob], filename.value)
 
     try {
       await contentStore.uploadProgram(file, currentOutputExtension.value)
@@ -312,6 +327,7 @@ export function useCodeRunner() {
           isCodeLoaded.value = true
         }
       }
+      filename.value = file_loaded.value.name
       reader.readAsText(file_loaded.value)
       const extension = file_loaded.value.name.split('.').pop()
       currentLanguage.value = getLanguageFromExtension(extension ?? '')
@@ -390,4 +406,3 @@ export function useCodeRunner() {
     closeLoadDialog: () => (loadDialog.value = false)
   }
 }
-
