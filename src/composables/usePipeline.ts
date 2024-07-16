@@ -111,10 +111,9 @@ export function usePipeline() {
           step.payload.language = parseLanguageFromCodeUrl(step.payload.snippet.code)
           step.payload.owner_id = step.payload.snippet.owner_id
           step.payload.codeId = step.payload.snippet.id
+          step.payload.output_extension = step.payload.snippet.output_type
         }
-
         const isValid = !!step.payload.code
-
         step.payload.language = parseLanguageFromCodeUrl(step.payload.code)
         return isValid
       })

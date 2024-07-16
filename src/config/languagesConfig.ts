@@ -89,6 +89,23 @@ export const getExtensionFromContentType = (content_type: string): string => {
   }
 }
 
+export const getMimeType = (extension: string): string => {
+  for (const type in mimeDb) {
+    const types = mimeDb[type].extensions
+    if (types && types.includes(extension.toUpperCase())) {
+      return type
+    }
+  }
+  return 'application/octet-stream'
+}
+
+/**
+ * Returns the extension from a path
+ * @param path
+ * @returns
+ * @example
+ * getExtensionFromPath('path/to/file.py') // '.py'
+ */
 export const getExtensionFromPath = (path: string): string => {
   return path.substring(path.lastIndexOf('.'))
 }

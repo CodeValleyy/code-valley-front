@@ -25,6 +25,18 @@
                   </router-link>
                   - {{ formatDate(post.createdAt) }}
                 </v-list-item-title>
+                <v-chip
+                  v-if="post.code_language"
+                  :color="getLanguageColor(post.code_language)"
+                  class="mb-4"
+                  >{{ post.code_language }}</v-chip
+                >
+                <v-chip
+                  v-if="post.output_type"
+                  :color="getLanguageColor(post.output_type.split('.')[1])"
+                  class="mb-4 ml-2"
+                  >{{ post.output_type.split('.')[1] }}
+                </v-chip>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
                 <CodeMirror
                   v-if="post.code"
@@ -106,6 +118,7 @@ import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import type LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { getLanguageColor } from '@/config/languagesConfig'
 
 const router = useRouter()
 const postStore = usePostStore()

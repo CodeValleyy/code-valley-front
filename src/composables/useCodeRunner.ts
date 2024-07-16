@@ -190,7 +190,6 @@ export function useCodeRunner() {
         ? transformNewlines(fetchedResult.output)
         : 'Aucun résultat à afficher'
       if (fetchedResult.outputFileContent && fetchedResult.outputFile) {
-        console.log(fetchedResult.outputFile)
         currentOutputExtension.value = getExtensionFromPath(fetchedResult.outputFile)
 
         const byteArray = Uint8Array.from(atob(fetchedResult.outputFileContent), (char) =>

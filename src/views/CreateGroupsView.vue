@@ -14,7 +14,6 @@ const groupInput = ref<GroupInput>({
 })
 
 const onSubmit = () => {
-  console.log(groupInput.value)
   createGroup(groupInput.value)
 }
 
