@@ -62,6 +62,18 @@ export const useUserStore = defineStore('user', {
     setSelectedFilenameSnippet(selectedFilenameSnippet: string) {
       this.selectedFilenameSnippet = selectedFilenameSnippet
       localStorage.setItem('selectedFilenameSnippet', selectedFilenameSnippet)
+    },
+    resetAllCode() {
+      localStorage.removeItem('codeInput')
+      localStorage.removeItem('currentExtension')
+      localStorage.removeItem('currentLanguage')
+      localStorage.removeItem('selectedSnippet')
+      localStorage.removeItem('selectedFilenameSnippet')
+      this.codeInput = ''
+      this.currentExtension = ''
+      this.currentLanguage = ''
+      this.selectedSnippet = ''
+      this.selectedFilenameSnippet = ''
     }
   },
   getters: {

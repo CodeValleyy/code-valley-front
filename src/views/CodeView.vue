@@ -28,32 +28,7 @@
                 accept="*"
                 class="mb-4"
               ></v-file-input>
-              <v-autocomplete
-                v-model="currentOutputExtension"
-                :items="displayedExtensions"
-                item-title="text"
-                item-value="value"
-                label="Extension de l'output"
-                class="mb-4"
-                clearable
-                hide-details
-                hide-selected
-                solo
-              ></v-autocomplete>
-              <p class="mb-4">Extensions affichées : {{ displayedExtensions.length }}</p>
-              <p class="text-green-700 mb-4">
-                Ce système d'affichage d'extension permet de ne pas surcharger le menu déroulant
-                avec des extensions inutiles.
-              </p>
-              <v-switch
-                v-model="showAllExtensions"
-                :label="
-                  showAllExtensions
-                    ? 'Extensons affichées : Toutes'
-                    : 'Extensons affichées : Seulement les plus courantes'
-                "
-                :class="showAllExtensions ? 'text-green-700' : 'text-red-700'"
-              ></v-switch>
+              <OutputExtensionSelector v-model="currentOutputExtension" />
               <v-switch
                 v-model="useOneDarkTheme"
                 :label="useOneDarkTheme ? 'Thème : One Dark' : 'Thème : Default'"
@@ -179,6 +154,7 @@
 <script setup lang="ts">
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
+import OutputExtensionSelector from '@/components/OutputExtensionSelector.vue'
 import { useCodeRunner } from '@/composables/useCodeRunner'
 const {
   codeInput,
@@ -190,8 +166,6 @@ const {
   runCode,
   currentLanguage,
   currentOutputExtension,
-  displayedExtensions,
-  showAllExtensions,
   languages,
   downloadLink,
   fileContent,
