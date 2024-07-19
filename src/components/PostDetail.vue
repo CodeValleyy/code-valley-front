@@ -22,8 +22,20 @@
             </v-btn>
           </v-card-title>
           <v-card-subtitle>
-            {{ new Date(post.createdAt).toLocaleDateString('fr-FR') }}
+            {{ formatCreatedAt(new Date(post.createdAt)) }}
           </v-card-subtitle>
+          <v-chip
+            v-if="post.code_language"
+            :color="getLanguageColor(post.code_language)"
+            class="mt-2"
+            >{{ post.code_language }}</v-chip
+          >
+          <v-chip
+            v-if="post.output_type"
+            :color="getLanguageColor(post.output_type.split('.')[1])"
+            class="ml-2 mt-2"
+            >{{ post.output_type.split('.')[1] }}
+          </v-chip>
           <v-card-text>{{ post.content }}</v-card-text>
           <CodeMirror
             v-if="codeMirrorValue"
@@ -36,7 +48,7 @@
           />
           <v-card-actions class="ml-4">
             <v-btn @click="toggleLike(post)">
-              <v-icon>{{ hasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}</v-icon>
+              <v-icon>{{ hasLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
               <span class="ml-2">{{ likeCount }} likes</span>
             </v-btn>
             <v-btn class="ml-8" @click="showCommentInput = true">
@@ -131,6 +143,8 @@ import CodeMirror from 'vue-codemirror6'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { formatCreatedAt } from '@/utils/date-utils'
 import { getCodeMirrorModes } from '@/config/languagesConfig'
+import { getLanguageColor } from '@/config/languagesConfig'
+
 const { fetchMe } = useAuth()
 
 const route = useRoute()

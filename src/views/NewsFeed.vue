@@ -23,7 +23,7 @@
                   <router-link :to="`/profile/${post.username}`" class="username-link">
                     {{ post.username }}
                   </router-link>
-                  - {{ formatDate(post.createdAt) }}
+                  - {{ formatCreatedAt(new Date(post.createdAt)) }}
                 </v-list-item-title>
                 <v-chip
                   v-if="post.code_language"
@@ -58,7 +58,7 @@
                   size="25"
                 >
                   <v-icon class="small-icon">
-                    {{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
+                    {{ post.userHasLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
                   </v-icon>
                 </v-btn>
                 <v-btn icon @click.stop="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
@@ -119,6 +119,7 @@ import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import type LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { getLanguageColor } from '@/config/languagesConfig'
+import { formatCreatedAt } from '@/utils/date-utils'
 
 const router = useRouter()
 const postStore = usePostStore()
@@ -158,11 +159,6 @@ watch(
 
 const isLastItem = (index: number) => {
   return index === posts.value.length - 1
-}
-
-const formatDate = (dateString: Date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' } as const
-  return new Date(dateString).toLocaleDateString('fr-FR', options)
 }
 
 const toggleLike = async (post: Post) => {
@@ -247,10 +243,6 @@ const previousPage = () => {
 
 .small-icon {
   font-size: 18px;
-}
-
-.liked .small-icon {
-  color: red;
 }
 
 .username-link {

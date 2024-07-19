@@ -30,7 +30,7 @@
         size="25"
       >
         <v-icon class="small-icon">
-          {{ userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
+          {{ userHasLiked ? 'mdi-thumb-up-outline' : 'mdi-thumb-up' }}
         </v-icon>
       </v-btn>
       <v-btn icon @click="commentOnPost" class="mr-2 text-xs" size="25">
