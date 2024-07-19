@@ -11,8 +11,6 @@ export const usePostStore = defineStore('post', {
   state: () => ({
     posts: [] as Post[],
     currentPost: null as Post | null,
-    comments: [] as Comment[],
-    totalComments: 0,
     error: null as {
       message: string
       error: string
@@ -138,24 +136,6 @@ export const usePostStore = defineStore('post', {
         console.error('Error unliking post:', error)
       }
     },
-    async fetchComments(postId: number, limit: number = 10, offset: number = 0) {
-      try {
-        const response = await axiosInstance.get(`/posts/${postId}/comments?limit=${limit}&offset=${offset}`)
-        this.comments = response.data.data
-        this.totalComments = response.data.total
-      } catch (error) {
-        console.error('Error fetching comments:', error)
-      }
-    },
-    async createComment(postId: number, createCommentDto: CreateCommentDto) {
-      try {
-        const response = await axiosInstance.post(`/posts/${postId}/comments`, createCommentDto)
-        this.comments.unshift(response.data)
-      } catch (error) {
-        console.error('Error creating comment:', error)
-      }
-    },
-
     /* TODO in the API */
     async fetchPostsByUserId(userId: number) {
       try {
