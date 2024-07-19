@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type RouteLocationNormalizedLoaded } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import CodeView from '@/views/CodeView.vue'
 import LoginView from '@/views/LoginView.vue'
@@ -79,7 +79,11 @@ const routes = [
   {
     path: '/post/:id',
     name: 'PostDetail',
-    component: PostDetail
+    component: () => import('@/components/PostDetail.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      id: Number(route.params.id),
+      showComment: route.query.showComment === 'true'
+    })
   },
   {
     path: '/code',

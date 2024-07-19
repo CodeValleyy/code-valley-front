@@ -1,3 +1,6 @@
+import { javascript } from '@codemirror/lang-javascript'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
 import mimeDb from 'mime-db'
 
 const defaultLanguage = 'python'
@@ -60,6 +63,20 @@ export const getLanguageColor = (language: string): string => {
       return 'bg-gray-400'
   }
 }
+
+export const getCodeMirrorModes = (language: string): any => {
+  switch (language) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
+  }
+}
+
 
 export const fetchRawContentFromUrl = async (code_url: string): Promise<string> => {
   try {
@@ -151,6 +168,10 @@ export const outputExtensions = Object.keys(mimeDb).reduce(
   []
 )
 
+export const getCodeLanguageFromUrl = (url: string): string | null => {
+  const extension = url.split('.').pop()?.split('?')[0]
+  return extension ? getLanguageFromExtension(extension) : null
+}
 export const pythonBoilerplate = `def main():
     print("Hello, World!")\n
 main()`

@@ -2,8 +2,7 @@
 import type { User } from '@/types'
 import type { Message } from '@/types/Message'
 import type { MessageResponse } from '@/types/MessageResponse'
-import { format, isToday, isYesterday, subDays } from 'date-fns'
-import { fr } from 'date-fns/locale'
+import { formatCreatedAt } from '@/utils/date-utils'
 import { ref } from 'vue'
 
 const props = defineProps<{
@@ -12,18 +11,6 @@ const props = defineProps<{
 }>()
 
 const isAuthor = ref(props.user?.id === props.message.author.id ? true : false)
-
-const formatCreatedAt = (createdAt: Date) => {
-  if (isToday(createdAt)) {
-    return format(createdAt, 'HH:mm', { locale: fr })
-  } else if (isYesterday(createdAt)) {
-    return `hier à ${format(createdAt, 'HH:mm', { locale: fr })}`
-  } else if (createdAt > subDays(new Date(), 2)) {
-    return `avant-hier à ${format(createdAt, 'HH:mm', { locale: fr })}`
-  } else {
-    return format(createdAt, 'EEEE d MMMM yyyy à HH:mm', { locale: fr })
-  }
-}
 </script>
 
 <template>

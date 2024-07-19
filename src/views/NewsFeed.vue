@@ -173,8 +173,8 @@ const toggleLike = async (post: Post) => {
   }
 }
 
-const commentOnPost = async (postId: number) => {
-  console.log(`Comment on post ${postId}`)
+const commentOnPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId }, query: { showComment: 'true' } })
 }
 
 const confirmDelete = (post: Post) => {
