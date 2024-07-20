@@ -41,18 +41,25 @@
                 @click="unloadCode"
                 class="mt-2 mb-4 ml-4"
                 :disabled="!isCodeLoaded"
-                >Décharger</v-btn
               >
+                Décharger
+              </v-btn>
               <v-btn
                 color="primaryLight"
                 @click="openLoadDialog"
                 class="mt-2 mb-4 ml-4"
                 :disabled="isCodeLoaded"
-                >Charger</v-btn
               >
-              <v-btn color="primaryLight" v-if="codeInput" class="mt-2 mb-4 ml-4" @click="openModal"
-                >Sauvegarder</v-btn
+                Charger
+              </v-btn>
+              <v-btn
+                color="primaryLight"
+                v-if="codeInput"
+                class="mt-2 mb-4 ml-4"
+                @click="openModal"
               >
+                Sauvegarder
+              </v-btn>
               <v-btn
                 v-if="downloadLink"
                 :href="downloadLink"
@@ -72,8 +79,12 @@
               <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
               <v-card v-if="fileContent" class="mt-4">
                 <v-card-title>Output File Content</v-card-title>
-                <v-img v-if="fileContent.includes('data:image')" :src="fileContent" />
-                <v-card-text v-else>{{ fileContent }}</v-card-text>
+                <v-card-text v-if="fileContent && fileContent.length < 100">{{
+                  fileContent
+                }}</v-card-text>
+                <v-card-text v-else>
+                  Aucun contenu a afficher, veuillez télécharger le fichier pour le voir.
+                </v-card-text>
               </v-card>
             </v-col>
           </v-row>
