@@ -72,7 +72,8 @@
               <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
               <v-card v-if="fileContent" class="mt-4">
                 <v-card-title>Output File Content</v-card-title>
-                <v-card-text>{{ fileContent }}</v-card-text>
+                <v-img v-if="fileContent.includes('data:image')" :src="fileContent" />
+                <v-card-text v-else>{{ fileContent }}</v-card-text>
               </v-card>
             </v-col>
           </v-row>
