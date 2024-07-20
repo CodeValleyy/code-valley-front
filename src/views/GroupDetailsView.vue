@@ -89,7 +89,8 @@ onBeforeMount(() => {
 const newMessage = ref<MessageInput>({
   authorId: String(me.id),
   groupId: String(groupId),
-  value: ''
+  value: '',
+  file: null
 })
 
 const messageContainerRef = ref<HTMLElement | null>(null)
@@ -98,7 +99,10 @@ const sendMessage = async () => {
   if (newMessage.value && newMessage.value.value !== '') {
     await createMessage(newMessage.value)
     newMessage.value.value = ''
+    newMessage.value.file = null
     refreshMessages(true)
+    photoToUpload.value = undefined
+    fileToUpload.value = undefined
   }
 }
 
@@ -206,6 +210,48 @@ const checkIfAdmin = (user: User): boolean => {
 
 const isAdmin = ref(false)
 
+const photoToUpload = ref<{ fileURL: string; fileName: string | ArrayBuffer | null; image: any }>()
+const fileToUpload = ref<string>()
+
+const onFilePicked = (event: any) => {
+  fileToUpload.value = undefined
+  photoToUpload.value = undefined
+  const files = event.target.files
+  const fileReader = new FileReader()
+  let fileName
+  fileReader.addEventListener('load', () => {
+    fileName = fileReader.result
+  })
+  fileReader.readAsDataURL(files[0])
+
+  const file = files[0]
+  const extension = file.name.split('.').pop().toLowerCase()
+
+  console.log(extension)
+
+  if (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif') {
+    const image = files[0]
+    const fileURL = URL.createObjectURL(files[0])
+
+    photoToUpload.value = {
+      fileURL: fileURL,
+      fileName: fileName || '',
+      image: image
+    }
+  } else {
+    console.log(file)
+    fileToUpload.value = file.name
+    console.log(fileToUpload.value)
+  }
+  newMessage.value.file = files[0]
+}
+
+const fileInput = ref()
+
+const triggerFileInput = () => {
+  if (fileInput.value) fileInput.value.click()
+}
+
 watch(route, async (newRoute) => {
   const newGroupId = newRoute.params.id
   group.value = await getOneWithId(String(newGroupId))
@@ -287,6 +333,45 @@ onMounted(() => {
           </div>
           <div class="w-full mb-2 text-gray-400 italic" v-else>Il n'y a aucun message</div>
         </div>
+        <div v-if="fileToUpload" class="w-full h-1/3 flex items-center">
+          <div class="w-full h-5/6 rounded-2xl bg-white shadow p-4 flex flex-wrap overflow-auto">
+            <div class="h-full w-1/3 object-contain border shadow rounded-2xl flex flex-col mr-4">
+              <v-icon
+                class="self-end -mb-6"
+                color="secondary"
+                @click="
+                  () => {
+                    fileToUpload = undefined
+                  }
+                "
+              >
+                mdi-close
+              </v-icon>
+              <div class="h-full w-full text-center flex items-center p-4 truncate font-bold">
+                <v-icon color="primary" class="mr-2"> mdi-file </v-icon>
+                <div>{{ fileToUpload }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div v-if="photoToUpload" class="w-full h-1/3 flex items-center">
+          <div class="w-full h-5/6 rounded-2xl bg-white shadow p-4 flex flex-wrap overflow-auto">
+            <div class="h-full object-contain border shadow rounded-2xl flex flex-col mr-4">
+              <v-icon
+                class="self-end -mb-6"
+                color="secondary"
+                @click="
+                  () => {
+                    photoToUpload = undefined
+                  }
+                "
+              >
+                mdi-close
+              </v-icon>
+              <img :src="photoToUpload.fileURL" class="w-full h-full rounded-2xl" />
+            </div>
+          </div>
+        </div>
         <div class="w-full h-1/6 flex flex-col justify-end">
           <form
             @submit.prevent="sendMessage"
@@ -298,11 +383,20 @@ onMounted(() => {
               class="w-10/12 h-full p-4"
               placeholder="Votre message..."
             />
+            <input
+              type="file"
+              accept=".jpg,.jpeg,.png,.gif,.js,.rs,.lua,.py"
+              class="hidden-input"
+              @change="onFilePicked"
+              ref="fileInput"
+            />
             <v-icon
               class="w-1/12 h-full rounded-2xl cursor-pointer hover:bg-gray-100"
               color="primary"
-              >mdi-attachment</v-icon
+              @click="triggerFileInput"
             >
+              mdi-attachment
+            </v-icon>
             <button type="submit" class="w-1/12 h-full">
               <v-icon
                 class="w-full h-full rounded-2xl cursor-pointer hover:bg-gray-100"
@@ -489,3 +583,14 @@ onMounted(() => {
     </div>
   </Teleport>
 </template>
+
+<style scoped>
+.hidden-input {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+</style>

@@ -7,4 +7,5 @@ export interface MessageResponse {
   author: User
   group: GroupResponse
   createdAt: Date
+  file: string | null
 }

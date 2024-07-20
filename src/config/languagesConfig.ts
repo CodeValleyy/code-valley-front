@@ -77,7 +77,6 @@ export const getCodeMirrorModes = (language: string): any => {
   }
 }
 
-
 export const fetchRawContentFromUrl = async (code_url: string): Promise<string> => {
   try {
     const response = await fetch(code_url)
@@ -172,6 +171,17 @@ export const getCodeLanguageFromUrl = (url: string): string | null => {
   const extension = url.split('.').pop()?.split('?')[0]
   return extension ? getLanguageFromExtension(extension) : null
 }
+
+export const getExtensionFromUrl = (url: string): string | null => {
+  return url.split('.').pop()?.split('?')[0] || ''
+}
+
+export const getNameFromUrl = (url: string): string => {
+  console.log(url)
+  // https://firebasestorage.googleapis.com/v0/b/pa2024-free.appspot.com/o/group%2F186%2Fmessages%2F84-186-63.js?alt=media
+  return url.split('%2F').pop()?.split('?')[0] || ''
+}
+
 export const pythonBoilerplate = `def main():
     print("Hello, World!")\n
 main()`
