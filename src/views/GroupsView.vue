@@ -66,7 +66,7 @@ const joinCurrentGroup = async () => {
     else {
       await sendJoinRequest(currentGroup.value?.id, me.id)
       isModalOpen.value = false
-      alert('Votre demande a bien été envoyé')
+      alert('Votre demande a bien été envoyée')
       onInputChange()
     }
   }
@@ -114,15 +114,18 @@ const getAvatar = () => {
             <div
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <div class="h-10 w-10">
+              <div class="h-10 w-10 flex-shrink-0">
                 <div
                   class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
                 >
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
-              <div class="w-1/4 flex justify-end itemcenter">
+              <div class="flex flex-col flex-grow px-4">
+                <div class="font-bold truncate">{{ group.name }}</div>
+                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              </div>
+              <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
                 <v-icon color="primary">mdi-account-group</v-icon>
                 <v-icon class="ml-1" color="primary">mdi-check</v-icon>
@@ -137,15 +140,18 @@ const getAvatar = () => {
               @click="openJoinGroupModal(group)"
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <div class="h-10 w-10">
+              <div class="h-10 w-10 flex-shrink-0">
                 <div
                   class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
                 >
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
-              <div class="w-1/4 flex justify-end itemcenter">
+              <div class="flex flex-col flex-grow px-4">
+                <div class="font-bold truncate">{{ group.name }}</div>
+                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              </div>
+              <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
                 <v-icon color="secondary">mdi-account-group</v-icon>
                 <v-icon class="ml-1" color="secondary">mdi-send-clock</v-icon>
@@ -157,15 +163,18 @@ const getAvatar = () => {
               @click="openJoinGroupModal(group)"
               class="mb-3 border p-4 w-11/12 flex justify-between items-center hover:bg-gray-300 rounded cursor-pointer"
             >
-              <div class="h-10 w-10">
+              <div class="h-10 w-10 flex-shrink-0">
                 <div
                   class="h-full w-full overflow-hidden flex justify-center items-center rounded-full"
                 >
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="w-1/2 mr-2 truncate">{{ group.name }}</div>
-              <div class="w-1/4 flex justify-end itemcenter">
+              <div class="flex flex-col flex-grow px-4">
+                <div class="font-bold truncate">{{ group.name }}</div>
+                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              </div>
+              <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
                 <v-icon color="secondary">mdi-account-group</v-icon>
                 <v-icon class="ml-1" v-if="group.isPublic" color="secondary">mdi-plus</v-icon>
@@ -199,6 +208,7 @@ const getAvatar = () => {
             </div>
           </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
+          <div class="w-1/2 text-gray-500 text-sm">{{ currentGroup?.description }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>
             <v-icon color="secondary">mdi-account-group</v-icon>
@@ -247,6 +257,7 @@ const getAvatar = () => {
             </div>
           </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
+          <div class="w-1/2 text-gray-500 text-sm">{{ currentGroup?.description }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>
             <v-icon color="secondary">mdi-account-group</v-icon>
