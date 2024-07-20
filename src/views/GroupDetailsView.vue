@@ -44,6 +44,23 @@ const memberItems = [
   }
 ]
 
+const groupItems = [
+  {
+    action: 'leaveGroup',
+    disableType: null,
+    title: 'Quitter le groupe',
+    color: 'red',
+    icon: 'mdi-arrow-left'
+  },
+  {
+    action: 'editGroup',
+    disableType: 'notAdmin',
+    title: 'Modifier le groupe',
+    color: 'primary',
+    icon: 'mdi-account-cog'
+  }
+]
+
 const memberJoinRequestItems = [
   { action: 'checkAccount', title: 'Voir le profil', color: 'secondary', icon: 'mdi-account' },
   {
@@ -90,6 +107,7 @@ const getAvatar = () => {
 }
 
 const isModalOpen = ref(false)
+const isLeaveGroupModalOpen = ref(false)
 const currentUser = ref<User>()
 
 const openModal = (user: User) => {
@@ -100,6 +118,7 @@ const openModal = (user: User) => {
 const handleBackgroundClick = (event: Event) => {
   if (event.target === event.currentTarget) {
     isModalOpen.value = false
+    isLeaveGroupModalOpen.value = false
   }
 }
 
@@ -150,6 +169,12 @@ const itemActions = async (action = 'default', user: User | null = null) => {
         await refuseRequest(Number(groupId), user.id)
       }
       break
+    case 'leaveGroup':
+      isLeaveGroupModalOpen.value = true
+      break
+    case 'editGroup':
+      router.push('/groups/update/' + group.value.id)
+      break
   }
 }
 
@@ -170,6 +195,11 @@ const userActions = async (action = 'default', user: User | null = null) => {
   }
 }
 
+const leaveGroup = async () => {
+  await removeUser(Number(groupId), Number(me.id))
+  router.push('/groups')
+}
+
 const checkIfAdmin = (user: User): boolean => {
   return group.value.admins.some((member) => member.id === user.id)
 }
@@ -187,7 +217,7 @@ messages.value = sortMessagesByDate(messages.value)
 nextTick(scrollToBottom)
 
 onMounted(() => {
-  const intervalId = setInterval(refreshMessages, 20000)
+  const intervalId = setInterval(refreshMessages, 5000)
 
   isAdmin.value = checkIfAdmin(me)
 
@@ -208,18 +238,37 @@ onMounted(() => {
         </div>
         <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
       </div>
-      <router-link
-        :to="`/groups/update/${group.id}`"
-        class="w-fit flex justify-center items-center"
-      >
-        <div
-          v-if="isAdmin"
-          class="border w-fit text-sm text-white bg-primaryTailwind hover:bg-primaryHover shadow rounded-lg px-2 py-1 font-bold w-11/12 flex justify-between items-center rounded cursor-pointer"
-        >
-          <v-icon color="white" class="mr-2">mdi-pencil</v-icon>
-          <div>Modifier le groupe</div>
-        </div>
-      </router-link>
+      <v-menu>
+        <template v-slot:activator="{ props }">
+          <v-btn color="primary" v-bind="props"
+            ><v-icon color="white">mdi-dots-horizontal</v-icon></v-btn
+          >
+        </template>
+        <v-list>
+          <div v-for="(item, index) in groupItems" :key="index">
+            <v-list-item
+              @click="itemActions(item.action, me)"
+              v-if="item.disableType === 'notAdmin' && isAdmin"
+              :value="index"
+            >
+              <v-list-item-title class="flex items-center">
+                <v-icon class="mr-1" :color="item.color">{{ item.icon }}</v-icon
+                >{{ item.title }}</v-list-item-title
+              >
+            </v-list-item>
+            <v-list-item
+              @click="itemActions(item.action, me)"
+              v-else-if="!item.disableType"
+              :value="index"
+            >
+              <v-list-item-title class="flex items-center">
+                <v-icon class="mr-1" :color="item.color">{{ item.icon }}</v-icon
+                >{{ item.title }}</v-list-item-title
+              >
+            </v-list-item>
+          </div>
+        </v-list>
+      </v-menu>
     </div>
 
     <div class="w-full h-5/6 flex justify-between">
@@ -286,7 +335,7 @@ onMounted(() => {
                 </v-avatar>
                 <div>{{ member.username }}</div>
                 <div v-if="checkIfAdmin(member)" class="text-gray-300 italic ml-1">
-                  - administrateur
+                  - modérateur
                 </div>
               </div>
               <v-menu>
@@ -405,6 +454,37 @@ onMounted(() => {
         >
           Définir en tant qu'Administrateur du groupe
         </button>
+      </div>
+    </div>
+  </Teleport>
+  <Teleport to="body">
+    <div
+      v-if="isLeaveGroupModalOpen"
+      style="z-index: 2000"
+      @click="handleBackgroundClick"
+      class="top-0 left-0 fixed w-screen h-screen bg-black/50 flex justify-center items-center"
+    >
+      <div class="w-fit bg-white rounded flex flex-col items-center p-4">
+        <div class="mb-4 font-bold text-primary text-center">
+          Êtes-vous sûr de vouloir quitter le groupe ?
+        </div>
+
+        <div class="w-full mb-2 flex items-center justify-center">
+          <button
+            @click="isLeaveGroupModalOpen = false"
+            type="button"
+            class="p-2 w-1/2 font-bold bg-gray-300 rounded shadow mr-1"
+          >
+            Annuler
+          </button>
+          <button
+            @click="leaveGroup"
+            type="button"
+            class="p-2 w-1/2 font-bold text-white bg-red-600 rounded shadow ml-1"
+          >
+            Quitter
+          </button>
+        </div>
       </div>
     </div>
   </Teleport>
