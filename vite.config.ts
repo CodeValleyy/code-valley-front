@@ -1,11 +1,11 @@
-import { fileURLToPath, URL } from 'node:url'
-import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import VueDevTools from 'vite-plugin-vue-devtools'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig, loadEnv } from 'vite';
+import vue from '@vitejs/plugin-vue';
+import VueDevTools from 'vite-plugin-vue-devtools';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '')
+  const env = loadEnv(mode, process.cwd(), '');
   return {
     plugins: [
       vue(),
@@ -32,6 +32,9 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/pipeline-ms/, '')
         }
       }
-    }
+    },
+    build: {
+      chunkSizeWarningLimit: 2000,
+    },
   }
-})
+});
