@@ -89,7 +89,12 @@ const routes = [
     path: '/code',
     name: 'code',
     meta: { requiresAuth: true },
-    component: CodeView
+    component: CodeView,
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      code: route.query.code,
+      language: route.query.language,
+      outputType: route.query.outputType
+    })
   },
   {
     path: '/login',

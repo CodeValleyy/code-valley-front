@@ -15,7 +15,9 @@ export const useCommentStore = defineStore('comment', {
       if (this.loading) return
       this.loading = true
       try {
-        const response = await axiosInstance.get(`/posts/${postId}/comments?limit=${this.limit}&offset=${this.offset}`)
+        const response = await axiosInstance.get(
+          `/posts/${postId}/comments?limit=${this.limit}&offset=${this.offset}`
+        )
         const comments = response.data
         if (reset) {
           this.comments = comments

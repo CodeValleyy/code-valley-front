@@ -16,15 +16,15 @@ export interface Post {
 }
 
 export interface CreateCommentDto {
-  content: string;
+  content: string
 }
 
 export interface CommentResponseDto {
-  id: number;
-  content: string;
-  userId: number;
-  username: string;
+  id: number
+  content: string
+  userId: number
+  username: string
   avatar: string
-  postId: number;
-  createdAt: Date;
+  postId: number
+  createdAt: Date
 }

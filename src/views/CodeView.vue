@@ -168,6 +168,8 @@ import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
 import OutputExtensionSelector from '@/components/OutputExtensionSelector.vue'
 import { useCodeRunner } from '@/composables/useCodeRunner'
+import { onMounted } from 'vue'
+import router from '@/router'
 const {
   codeInput,
   result,
@@ -198,6 +200,18 @@ const {
   lang,
   useOneDarkTheme
 } = useCodeRunner()
+
+onMounted(() => {
+  if (router.currentRoute.value.query.code) {
+    codeInput.value = String(router.currentRoute.value.query.code)
+  }
+  if (router.currentRoute.value.query.language) {
+    currentLanguage.value = String(router.currentRoute.value.query.language)
+  }
+  if (router.currentRoute.value.query.outputType) {
+    currentOutputExtension.value = String(router.currentRoute.value.query.outputType)
+  }
+})
 
 const handleTab = (e: KeyboardEvent) => {
   const cm = e.target as HTMLDivElement

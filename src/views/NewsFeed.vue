@@ -65,12 +65,16 @@
                   <v-icon class="small-icon">mdi-comment</v-icon>
                 </v-btn>
                 <v-btn
-                  v-if="post.isOwner"
                   icon
-                  @click.stop="confirmDelete(post)"
+                  @click.stop="redirectToCodeView(post)"
                   class="mr-2 text-xs"
                   size="25"
+                  v-if="post.code"
                 >
+                  <v-icon class="small-icon">mdi-code-tags</v-icon>
+                </v-btn>
+
+                <v-btn icon @click.stop="confirmDelete(post)" class="mr-2 text-xs" size="25">
                   <v-icon class="small-icon">mdi-delete</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -200,6 +204,13 @@ const lang = (codeLanguage: string) => {
 
 const viewPost = (postId: number) => {
   router.push({ name: 'PostDetail', params: { id: postId } })
+}
+
+const redirectToCodeView = (post: Post) => {
+  const code = post.code ? String(post.code) : ''
+  const language = post.code_language ? String(post.code_language) : ''
+  const outputType = post.output_type ? String(post.output_type) : ''
+  router.push({ name: 'code', query: { code, language, outputType } })
 }
 
 const nextPage = () => {

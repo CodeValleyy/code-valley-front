@@ -11,6 +11,8 @@ import { useAuth } from '@/composables/useAuth'
 import { useUserStore } from '@/stores/useUserStore'
 import type { User } from '@/types'
 import { DEFAULT_AVATAR } from '@/config/constants'
+import EmojiPicker from 'vue3-emoji-picker'
+import 'vue3-emoji-picker/css'
 
 const route = useRoute()
 const router = useRouter()
@@ -271,6 +273,11 @@ onMounted(() => {
     clearInterval(intervalId)
   })
 })
+
+const showEmojiPicker = ref(false)
+const addEmoji = (emoji: any) => {
+  newMessage.value.value += emoji.i
+}
 </script>
 
 <template>
@@ -372,7 +379,13 @@ onMounted(() => {
             </div>
           </div>
         </div>
-        <div class="w-full h-1/6 flex flex-col justify-end">
+        <div class="w-full h-1/6 flex flex-col justify-end relative">
+          <div
+            v-if="showEmojiPicker"
+            class="absolute bottom-full mb-2 bg-white p-6 rounded shadow-lg flex flex-wrap"
+          >
+            <EmojiPicker :native="true" @select="addEmoji" />
+          </div>
           <form
             @submit.prevent="sendMessage"
             class="w-full h-5/6 rounded-2xl bg-white shadow flex justify-between items-center"
@@ -397,6 +410,13 @@ onMounted(() => {
             >
               mdi-attachment
             </v-icon>
+            <v-icon
+              class="w-1/12 h-full rounded-2xl cursor-pointer hover:bg-gray-100"
+              color="primary"
+              @click="showEmojiPicker = !showEmojiPicker"
+              >mdi-emoticon</v-icon
+            >
+
             <button type="submit" class="w-1/12 h-full">
               <v-icon
                 class="w-full h-full rounded-2xl cursor-pointer hover:bg-gray-100"
