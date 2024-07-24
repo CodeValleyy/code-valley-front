@@ -398,7 +398,7 @@ const addEmoji = (emoji: any) => {
             />
             <input
               type="file"
-              accept=".jpg,.jpeg,.png,.gif,.js,.rs,.lua,.py"
+              accept=".jpg,.jpeg,.png,.gif,.js,.rs,.lua,.py,.ts,.java,.cpp,.cs"
               class="hidden-input"
               @change="onFilePicked"
               ref="fileInput"

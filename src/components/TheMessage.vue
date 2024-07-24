@@ -48,7 +48,7 @@ onMounted(() => {
   extension.value = result != null ? result : ''
 
   const imageExtensions = ['jpg', 'jpeg', 'png', 'gif']
-  const scriptExtensions = ['js', 'rs', 'lua', 'py']
+  const scriptExtensions = ['js', 'rs', 'lua', 'py', 'ts', 'java', 'cpp', 'cs']
 
   if (imageExtensions.includes(extension.value)) {
     hasImage.value = true
