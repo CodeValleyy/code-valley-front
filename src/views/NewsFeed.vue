@@ -11,10 +11,7 @@
               <v-list-item-avatar>
                 <router-link :to="`/profile/${post.username}`">
                   <v-avatar>
-                    <img
-                      :src="post.avatar ? post.avatar : 'https://via.placeholder.com/40'"
-                      alt="User Avatar"
-                    />
+                    <img :src="post.avatar ? post.avatar : DEFAULT_AVATAR" alt="User Avatar" />
                   </v-avatar>
                 </router-link>
               </v-list-item-avatar>
@@ -124,6 +121,7 @@ import { javascript } from '@codemirror/lang-javascript'
 import type LoadingSpinner from '@/components/LoadingSpinner.vue'
 import { getLanguageColor } from '@/config/languagesConfig'
 import { formatCreatedAt } from '@/utils/date-utils'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const router = useRouter()
 const postStore = usePostStore()
