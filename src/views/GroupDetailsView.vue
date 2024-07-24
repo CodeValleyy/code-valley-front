@@ -155,7 +155,6 @@ const itemActions = async (action = 'default', user: User | null = null) => {
       router.push('/profile/' + user?.username)
       break
     case 'manageAccount':
-      console.log('Manage')
       if (user) openModal(user)
       break
     case 'acceptDemand':
@@ -229,8 +228,6 @@ const onFilePicked = (event: any) => {
   const file = files[0]
   const extension = file.name.split('.').pop().toLowerCase()
 
-  console.log(extension)
-
   if (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif') {
     const image = files[0]
     const fileURL = URL.createObjectURL(files[0])
@@ -241,9 +238,7 @@ const onFilePicked = (event: any) => {
       image: image
     }
   } else {
-    console.log(file)
     fileToUpload.value = file.name
-    console.log(fileToUpload.value)
   }
   newMessage.value.file = files[0]
 }

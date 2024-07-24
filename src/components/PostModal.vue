@@ -43,7 +43,6 @@ const postContent = async () => {
   try {
     await postStore.createPost(content.value, currentOutputExtension.value, file.value)
     if (postStore.error) {
-      console.log('Error posting content:', postStore.error.message)
       error.value = postStore.error.message
       return
     }

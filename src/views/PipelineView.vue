@@ -247,13 +247,10 @@ watch(initialInput, validateForm, { deep: true })
 onMounted(() => {
   socket.on('pipelineUpdate', (update: StepResultDto) => {
     if (!update) return
-    console.log('Pipeline update:', update)
     results.value.push(update)
   })
 
-  socket.on('pipelineResult', (result: string) => {
-    console.log('Pipeline execution completed:', result)
-  })
+  socket.on('pipelineResult', (result: string) => {})
 
   socket.on('pipelineError', (pipelineError: string) => {
     console.error('Pipeline execution error:', pipelineError)
@@ -261,7 +258,6 @@ onMounted(() => {
   })
 
   socket.on('pipelineSaved', (pipelineSaved: string) => {
-    console.log('Pipeline saved:', pipelineSaved)
     fetchMyPipelines()
     closeSaveDialog()
 
@@ -283,7 +279,6 @@ const decodeBase64 = (base64Content: string) => {
 const downloadFile = (base64Content: string, stepNumber: number, outputFilePath: string) => {
   const decodedContent = Uint8Array.from(atob(base64Content), (char) => char.charCodeAt(0))
   let finalOutputFileExtension = getExtensionFromPath(outputFilePath)
-  console.log('Final output file extension:', finalOutputFileExtension)
 
   const blob = new Blob([decodedContent], {
     type: 'application/octet-stream'

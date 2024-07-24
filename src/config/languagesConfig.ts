@@ -177,8 +177,6 @@ export const getExtensionFromUrl = (url: string): string | null => {
 }
 
 export const getNameFromUrl = (url: string): string => {
-  console.log(url)
-  // https://firebasestorage.googleapis.com/v0/b/pa2024-free.appspot.com/o/group%2F186%2Fmessages%2F84-186-63.js?alt=media
   return url.split('%2F').pop()?.split('?')[0] || ''
 }
 

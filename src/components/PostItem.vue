@@ -115,7 +115,7 @@ const toggleLike = async () => {
 }
 
 const commentOnPost = () => {
-  console.log(`Comment on post ${props.post.id}`)
+  /* TODO: Implement comment on post */
 }
 
 const confirmDelete = () => {

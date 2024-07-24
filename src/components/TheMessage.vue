@@ -77,7 +77,7 @@ onMounted(() => {
             <div
               v-if="file_name"
               class="cursor-pointer bg-gray-100 text-black p-4 rounded flex items-center hover:bg-gray-400 shadow"
-              @click="downloadPage(file_name, file_name)"
+              @click="downloadPage(message.file, file_name)"
             >
               <v-icon color="primary" class="mr-2"> mdi-download </v-icon>
               <div>{{ file_name }}</div>
@@ -99,7 +99,7 @@ onMounted(() => {
           <div
             v-if="file_name"
             class="cursor-pointer bg-gray-100 text-black p-4 rounded flex items-center hover:bg-gray-400 shadow"
-            @click="downloadPage(file_name, file_name)"
+            @click="downloadPage(message.file, file_name)"
           >
             <v-icon color="primary" class="mr-2"> mdi-download </v-icon>
             <div>{{ file_name }}</div>

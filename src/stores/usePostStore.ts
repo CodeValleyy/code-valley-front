@@ -49,7 +49,6 @@ export const usePostStore = defineStore('post', {
       }
     },
     async createPost(content: string, output_extension: string, file?: File | null) {
-      console.log('output_extension:', output_extension)
       try {
         if (file) {
           await this.createPostWithFile(content, file, output_extension)
