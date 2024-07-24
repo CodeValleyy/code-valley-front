@@ -120,9 +120,12 @@
                         <div v-if="result.output_file_content">
                           <v-alert type="info" class="mb-2"
                             >Output File Content:
-                            <v-card-text>{{
+                            <v-card-text v-if="result.output_file_content.length < 100">{{
                               decodeBase64(result.output_file_content)
                             }}</v-card-text>
+                            <v-card-text v-else>
+                              Output file content is too large to display.
+                            </v-card-text>
                           </v-alert>
                           <v-btn
                             @click="
