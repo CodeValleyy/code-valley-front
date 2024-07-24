@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container class="min-w-full min-h-full">
     <v-row class="justify-center mt-4">
       <h1 class="mb-6 text-4xl font-bold text-primary">🦖 Code</h1>
     </v-row>
@@ -16,36 +16,54 @@
                 label="Langage"
                 class="mb-4"
               ></v-select>
-              <v-chip class="mb-4" v-if="error" color="error" dark>{{ error }}</v-chip>
-              <v-chip class="mb-4" v-if="success" color="success" dark>{{ success }}</v-chip>
+              <v-chip class="mb-4" v-if="error && error.length < 100" color="error" dark>{{
+                error
+              }}</v-chip>
+              <v-chip class="mb-4" v-if="success && success.length < 100" color="success" dark>{{
+                success
+              }}</v-chip>
               <v-file-input
                 v-model="file"
                 label="Fichier Input"
-                accept=".txt, .py, .js, .rs"
+                accept="*"
                 class="mb-4"
               ></v-file-input>
-              <CodeMirror
-                v-model="codeInput"
-                basic
-                :extensions="[lang]"
-                height="300px"
-                class="mb-4"
-                @keydown.tab.prevent.stop="handleTab"
-                @keydown.shift.tab.prevent.stop="handleTab"
-                @keydown.ctrl.s.prevent.stop="runCode"
-              />
-              <v-btn color="primary" @click="runCode" class="mt-2">Run Code</v-btn>
-              <v-btn color="primaryLight" v-if="isCodeLoaded" @click="unloadCode" class="mt-2 ml-4"
-                >Décharger</v-btn
+              <OutputExtensionSelector v-model="currentOutputExtension" />
+              <v-switch
+                v-model="useOneDarkTheme"
+                :label="useOneDarkTheme ? 'Thème : One Dark' : 'Thème : Default'"
+                :class="useOneDarkTheme ? 'text-green-700' : 'text-red-700'"
+              ></v-switch>
+              <v-btn color="primary" @click="runCode" class="mt-2 mb-4">Run Code</v-btn>
+              <v-btn
+                color="primaryLight"
+                v-if="isCodeLoaded"
+                @click="unloadCode"
+                class="mt-2 mb-4 ml-4"
+                :disabled="!isCodeLoaded"
               >
-              <v-btn color="primaryLight" @click="openLoadDialog" class="mt-2 ml-4">Charger</v-btn>
-              <v-btn color="primaryLight" v-if="codeInput" class="mt-2 ml-4" @click="openModal"
-                >Sauvegarder</v-btn
+                Décharger
+              </v-btn>
+              <v-btn
+                color="primaryLight"
+                @click="openLoadDialog"
+                class="mt-2 mb-4 ml-4"
+                :disabled="isCodeLoaded"
               >
+                Charger
+              </v-btn>
+              <v-btn
+                color="primaryLight"
+                v-if="codeInput"
+                class="mt-2 mb-4 ml-4"
+                @click="openModal"
+              >
+                Sauvegarder
+              </v-btn>
               <v-btn
                 v-if="downloadLink"
                 :href="downloadLink"
-                download="output.txt"
+                :download="`output${currentOutputExtension}`"
                 class="mt-2 ml-4"
               >
                 Download Output File
@@ -61,7 +79,12 @@
               <div v-else class="w-full p-4 h-fit rounded bg-gray-300" v-html="result"></div>
               <v-card v-if="fileContent" class="mt-4">
                 <v-card-title>Output File Content</v-card-title>
-                <v-card-text>{{ fileContent }}</v-card-text>
+                <v-card-text v-if="fileContent && fileContent.length < 100">{{
+                  fileContent
+                }}</v-card-text>
+                <v-card-text v-else>
+                  Aucun contenu a afficher, veuillez télécharger le fichier pour le voir.
+                </v-card-text>
               </v-card>
             </v-col>
           </v-row>
@@ -117,17 +140,36 @@
         </v-dialog>
       </v-col>
     </v-row>
+    <!--Code View-->
+    <v-container
+      class="mt-4 min-h-screen rounded shadow-lg p-4"
+      :class="useOneDarkTheme ? 'bg-gray-900' : 'bg-white'"
+    >
+      <CodeMirror
+        v-model="codeInput"
+        basic
+        :extensions="[lang]"
+        :style="{ height: '400px' }"
+        height="400px"
+        class="mb-4"
+        :tab-size="2"
+        :autofocus="true"
+        :indent-with-tab="true"
+        @keydown.tab.prevent.stop="handleTab"
+        @keydown.shift.tab.prevent.stop="handleShiftTab"
+        @keydown.ctrl.s.prevent.stop="runCode"
+      />
+    </v-container>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import Loading from '@/components/Loading.vue'
 import CodeMirror from 'vue-codemirror6'
-import { python } from '@codemirror/lang-python'
-import { rust } from '@codemirror/lang-rust'
-import { javascript } from '@codemirror/lang-javascript'
+import OutputExtensionSelector from '@/components/OutputExtensionSelector.vue'
 import { useCodeRunner } from '@/composables/useCodeRunner'
+import { onMounted } from 'vue'
+import router from '@/router'
 const {
   codeInput,
   result,
@@ -137,10 +179,10 @@ const {
   file,
   runCode,
   currentLanguage,
+  currentOutputExtension,
   languages,
   downloadLink,
   fileContent,
-  setBoilerplate,
   saveCodeToFile,
   saveDialog,
   filename,
@@ -154,20 +196,20 @@ const {
   unloadCode,
   loadCode,
   loadOption,
-  selectedSnippet
+  selectedSnippet,
+  lang,
+  useOneDarkTheme
 } = useCodeRunner()
 
-const lang = computed(() => {
-  setBoilerplate(currentLanguage.value)
-  switch (currentLanguage.value) {
-    case 'python':
-      return python()
-    case 'rust':
-      return rust()
-    case 'javascript':
-      return javascript()
-    default:
-      return python()
+onMounted(() => {
+  if (router.currentRoute.value.query.code) {
+    codeInput.value = String(router.currentRoute.value.query.code)
+  }
+  if (router.currentRoute.value.query.language) {
+    currentLanguage.value = String(router.currentRoute.value.query.language)
+  }
+  if (router.currentRoute.value.query.outputType) {
+    currentOutputExtension.value = String(router.currentRoute.value.query.outputType)
   }
 })
 
@@ -181,7 +223,7 @@ const handleTab = (e: KeyboardEvent) => {
       const selection = window.getSelection()
 
       if (activeLine.textContent !== null) {
-        activeLine.textContent = '    ' + activeLine.textContent
+        activeLine.textContent = '  ' + activeLine.textContent
         const spaces = activeLine.textContent.match(/^ +/)
         if (spaces) {
           const spacesLength = spaces[0].length
@@ -190,6 +232,34 @@ const handleTab = (e: KeyboardEvent) => {
         }
 
         range.setStart(activeLine.childNodes[0], spaces ? spaces[0].length : 0)
+        range.collapse(true)
+
+        if (selection) {
+          selection.removeAllRanges()
+          selection.addRange(range)
+        }
+      }
+    }
+  }
+}
+
+const handleShiftTab = (e: KeyboardEvent) => {
+  const cm = e.target as HTMLDivElement
+
+  if (cm.classList.contains('cm-content')) {
+    const activeLine = cm.querySelector('.cm-activeLine')
+    if (activeLine && activeLine.textContent !== null) {
+      const range = document.createRange()
+      const selection = window.getSelection()
+
+      if (activeLine.textContent !== null) {
+        const spaces = activeLine.textContent.match(/^ +/)
+        if (spaces) {
+          const spacesLength = spaces[0].length
+          activeLine.textContent = activeLine.textContent.substring(spacesLength)
+        }
+
+        range.setStart(activeLine.childNodes[0], 0)
         range.collapse(true)
 
         if (selection) {

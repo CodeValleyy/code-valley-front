@@ -18,7 +18,7 @@ export interface StepResultDto {
   error: string
   stepNumber: number
   output_file_content?: string
-  output_file_path?: string
+  output_file_path: string
 }
 
 export interface SavePipelineDto {

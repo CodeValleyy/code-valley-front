@@ -22,13 +22,25 @@
             </v-btn>
           </v-card-title>
           <v-card-subtitle>
-            {{ new Date(post.createdAt).toLocaleDateString('fr-FR') }}
+            {{ formatCreatedAt(new Date(post.createdAt)) }}
           </v-card-subtitle>
+          <v-chip
+            v-if="post.code_language"
+            :color="getLanguageColor(post.code_language)"
+            class="mt-2"
+            >{{ post.code_language }}</v-chip
+          >
+          <v-chip
+            v-if="post.output_type"
+            :color="getLanguageColor(post.output_type.split('.')[1])"
+            class="ml-2 mt-2"
+            >{{ post.output_type.split('.')[1] }}
+          </v-chip>
           <v-card-text>{{ post.content }}</v-card-text>
           <CodeMirror
             v-if="codeMirrorValue"
             v-model="codeMirrorValue"
-            :extensions="[lang(post.code_language ?? 'plaintext')]"
+            :extensions="[getCodeMirrorModes(post.code_language ?? 'plaintext')]"
             :height="'300px'"
             basic
             disabled
@@ -36,7 +48,7 @@
           />
           <v-card-actions class="ml-4">
             <v-btn @click="toggleLike(post)">
-              <v-icon>{{ hasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}</v-icon>
+              <v-icon>{{ hasLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}</v-icon>
               <span class="ml-2">{{ likeCount }} likes</span>
             </v-btn>
             <v-btn class="ml-8" @click="showCommentInput = true">
@@ -45,7 +57,7 @@
           </v-card-actions>
         </v-card>
         <v-divider class="my-4"></v-divider>
-        <div v-if="showCommentInput" class="d-flex align-center">
+        <div v-if="showCommentInput || showComment" class="d-flex align-center">
           <v-text-field
             v-model="newComment"
             label="Write a comment..."
@@ -54,7 +66,23 @@
           <v-btn @click="postComment" color="primary">Post</v-btn>
         </div>
         <v-list>
-          <v-list-item v-for="comment in comments" :key="comment.id">
+          <v-row justify="center" class="mt-4 button-row">
+            <v-btn
+              @click="loadPreviousComments"
+              :disabled="offset <= 0"
+              color="primary"
+              class="mx-2"
+              >Previous</v-btn
+            >
+            <v-btn
+              @click="loadNextComments"
+              :disabled="comments.length < limit"
+              color="primary"
+              class="mx-2"
+              >Next</v-btn
+            >
+          </v-row>
+          <v-list-item v-for="comment in comments" :key="comment.id" class="comment-item">
             <router-link :to="`/profile/${comment.username}`">
               <v-list-item-avatar>
                 <v-avatar>
@@ -64,12 +92,29 @@
                   />
                 </v-avatar>
               </v-list-item-avatar>
-              <v-list-item-content>
-                <v-list-item-title>{{ comment.username }}</v-list-item-title>
-                <v-list-item-subtitle>{{ comment.content }}</v-list-item-subtitle>
-              </v-list-item-content>
             </router-link>
+            <v-list-item-content>
+              <v-list-item-subtitle class="text-caption">{{
+                formatCreatedAt(new Date(comment.createdAt))
+              }}</v-list-item-subtitle>
+              <v-list-item-title>{{ comment.username }}</v-list-item-title>
+              <v-list-item-subtitle>{{ comment.content }}</v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-btn
+                icon
+                @click="postDeleteComment(comment.id)"
+                class="delete-comment-btn"
+                size="30"
+                v-if="comment.userId === me.id"
+              >
+                <v-icon color="red" small>mdi-delete</v-icon>
+              </v-btn>
+            </v-list-item-action>
           </v-list-item>
+          <div v-if="loading" class="d-flex justify-center">
+            <LoadingSpinner />
+          </div>
         </v-list>
       </v-col>
     </v-row>
@@ -88,22 +133,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostStore } from '@/stores/usePostStore'
+import { useCommentStore } from '@/stores/useCommentStore'
 import type { Post } from '@/types'
 import { useAuth } from '@/composables/useAuth'
 import CodeMirror from 'vue-codemirror6'
-import { python } from '@codemirror/lang-python'
-import { rust } from '@codemirror/lang-rust'
-import { javascript } from '@codemirror/lang-javascript'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { formatCreatedAt } from '@/utils/date-utils'
+import { getCodeMirrorModes } from '@/config/languagesConfig'
+import { getLanguageColor } from '@/config/languagesConfig'
 
 const { fetchMe } = useAuth()
 
 const route = useRoute()
 const router = useRouter()
 const postStore = usePostStore()
+const commentStore = useCommentStore()
 const post = ref<Post | null>(null)
 const isLoading = ref(false)
 const showCommentInput = ref(false)
@@ -114,34 +161,19 @@ const me = await fetchMe()
 const hasLiked = ref(false)
 const likeCount = ref(0)
 
-// TODO: delete it later
-const comments = ref([
-  {
-    id: 1,
-    username: 'Alice',
-    content: 'Great post!',
-    avatar: 'https://via.placeholder.com/40'
-  },
-  {
-    id: 2,
-    username: 'Bob',
-    content: 'I agree!',
-    avatar: 'https://via.placeholder.com/40'
-  }
-])
+const comments = ref(commentStore.comments)
+const loading = ref(commentStore.loading)
+const limit = ref(commentStore.limit)
+const offset = ref(commentStore.offset)
 
-const lang = (codeLanguage: string) => {
-  switch (codeLanguage) {
-    case 'python':
-      return python()
-    case 'rust':
-      return rust()
-    case 'javascript':
-      return javascript()
-    default:
-      return python()
+const showComment = route.query.showComment === 'true'
+
+watch(
+  () => commentStore.comments,
+  (newComments) => {
+    comments.value = newComments
   }
-}
+)
 
 const codeMirrorValue = ref<string>('')
 const fetchPost = async () => {
@@ -157,9 +189,33 @@ const fetchPost = async () => {
   isLoading.value = false
 }
 
+const loadComments = async (reset: boolean = false) => {
+  await commentStore.fetchComments(post.value!.id, reset)
+}
+
+const loadPreviousComments = async () => {
+  if (offset.value > 0) {
+    offset.value -= limit.value
+    commentStore.offset = offset.value
+    await loadComments(true)
+  }
+}
+
+const loadNextComments = async () => {
+  if (comments.value.length >= limit.value) {
+    offset.value += limit.value
+    commentStore.offset = offset.value
+    await loadComments(true)
+  }
+}
+
 onMounted(async () => {
   isLoading.value = true
   await fetchPost()
+  await loadComments(true)
+  if (showComment) {
+    showCommentInput.value = true
+  }
   isLoading.value = false
 })
 
@@ -174,17 +230,16 @@ const toggleLike = async (post: Post) => {
   hasLiked.value = !hasLiked.value
 }
 
-const postComment = () => {
+const postComment = async () => {
   if (newComment.value.trim()) {
-    comments.value.push({
-      id: me.id,
-      username: me.username,
-      content: newComment.value,
-      avatar: me.avatar
-    })
+    await commentStore.createComment(post.value!.id, { content: newComment.value })
     newComment.value = ''
     showCommentInput.value = false
   }
+}
+
+const postDeleteComment = async (commentId: number) => {
+  await commentStore.deleteComment(post.value!.id, commentId)
 }
 
 const confirmDelete = (post: Post) => {
@@ -216,5 +271,14 @@ const goBack = () => {
 
 .ml-3 {
   margin-left: 16px;
+}
+
+.comment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 8px;
 }
 </style>

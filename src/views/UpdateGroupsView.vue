@@ -42,7 +42,6 @@ const onFilePicked = (event: any) => {
 }
 
 const onSubmit = async () => {
-  console.log(groupInput.value)
   await updateGroup(groupInput.value, group.value.id)
   router.push('groups/' + group.value.id)
 }

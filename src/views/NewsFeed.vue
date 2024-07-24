@@ -11,10 +11,7 @@
               <v-list-item-avatar>
                 <router-link :to="`/profile/${post.username}`">
                   <v-avatar>
-                    <img
-                      :src="post.avatar ? post.avatar : 'https://via.placeholder.com/40'"
-                      alt="User Avatar"
-                    />
+                    <img :src="post.avatar ? post.avatar : DEFAULT_AVATAR" alt="User Avatar" />
                   </v-avatar>
                 </router-link>
               </v-list-item-avatar>
@@ -23,8 +20,20 @@
                   <router-link :to="`/profile/${post.username}`" class="username-link">
                     {{ post.username }}
                   </router-link>
-                  - {{ formatDate(post.createdAt) }}
+                  - {{ formatCreatedAt(new Date(post.createdAt)) }}
                 </v-list-item-title>
+                <v-chip
+                  v-if="post.code_language"
+                  :color="getLanguageColor(post.code_language)"
+                  class="mb-4"
+                  >{{ post.code_language }}</v-chip
+                >
+                <v-chip
+                  v-if="post.output_type"
+                  :color="getLanguageColor(post.output_type.split('.')[1])"
+                  class="mb-4 ml-2"
+                  >{{ post.output_type.split('.')[1] }}
+                </v-chip>
                 <v-list-item-subtitle class="post-content">{{ post.content }}</v-list-item-subtitle>
                 <CodeMirror
                   v-if="post.code"
@@ -46,19 +55,23 @@
                   size="25"
                 >
                   <v-icon class="small-icon">
-                    {{ post.userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
+                    {{ post.userHasLiked ? 'mdi-thumb-up' : 'mdi-thumb-up-outline' }}
                   </v-icon>
                 </v-btn>
                 <v-btn icon @click.stop="commentOnPost(post.id)" class="mr-2 text-xs" size="25">
                   <v-icon class="small-icon">mdi-comment</v-icon>
                 </v-btn>
                 <v-btn
-                  v-if="post.isOwner"
                   icon
-                  @click.stop="confirmDelete(post)"
+                  @click.stop="redirectToCodeView(post)"
                   class="mr-2 text-xs"
                   size="25"
+                  v-if="post.code"
                 >
+                  <v-icon class="small-icon">mdi-code-tags</v-icon>
+                </v-btn>
+
+                <v-btn icon @click.stop="confirmDelete(post)" class="mr-2 text-xs" size="25">
                   <v-icon class="small-icon">mdi-delete</v-icon>
                 </v-btn>
               </v-list-item-action>
@@ -106,6 +119,9 @@ import { python } from '@codemirror/lang-python'
 import { rust } from '@codemirror/lang-rust'
 import { javascript } from '@codemirror/lang-javascript'
 import type LoadingSpinner from '@/components/LoadingSpinner.vue'
+import { getLanguageColor } from '@/config/languagesConfig'
+import { formatCreatedAt } from '@/utils/date-utils'
+import { DEFAULT_AVATAR } from '@/config/constants'
 
 const router = useRouter()
 const postStore = usePostStore()
@@ -147,11 +163,6 @@ const isLastItem = (index: number) => {
   return index === posts.value.length - 1
 }
 
-const formatDate = (dateString: Date) => {
-  const options = { year: 'numeric', month: 'long', day: 'numeric' } as const
-  return new Date(dateString).toLocaleDateString('fr-FR', options)
-}
-
 const toggleLike = async (post: Post) => {
   if (post.userHasLiked) {
     await postStore.unlikePost(post.id)
@@ -160,8 +171,8 @@ const toggleLike = async (post: Post) => {
   }
 }
 
-const commentOnPost = async (postId: number) => {
-  console.log(`Comment on post ${postId}`)
+const commentOnPost = (postId: number) => {
+  router.push({ name: 'PostDetail', params: { id: postId }, query: { showComment: 'true' } })
 }
 
 const confirmDelete = (post: Post) => {
@@ -191,6 +202,13 @@ const lang = (codeLanguage: string) => {
 
 const viewPost = (postId: number) => {
   router.push({ name: 'PostDetail', params: { id: postId } })
+}
+
+const redirectToCodeView = (post: Post) => {
+  const code = post.code ? String(post.code) : ''
+  const language = post.code_language ? String(post.code_language) : ''
+  const outputType = post.output_type ? String(post.output_type) : ''
+  router.push({ name: 'code', query: { code, language, outputType } })
 }
 
 const nextPage = () => {
@@ -234,10 +252,6 @@ const previousPage = () => {
 
 .small-icon {
   font-size: 18px;
-}
-
-.liked .small-icon {
-  color: red;
 }
 
 .username-link {

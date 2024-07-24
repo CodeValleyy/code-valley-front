@@ -30,7 +30,7 @@
         size="25"
       >
         <v-icon class="small-icon">
-          {{ userHasLiked ? 'mdi-thumb-down' : 'mdi-thumb-up' }}
+          {{ userHasLiked ? 'mdi-thumb-up-outline' : 'mdi-thumb-up' }}
         </v-icon>
       </v-btn>
       <v-btn icon @click="commentOnPost" class="mr-2 text-xs" size="25">
@@ -115,7 +115,7 @@ const toggleLike = async () => {
 }
 
 const commentOnPost = () => {
-  console.log(`Comment on post ${props.post.id}`)
+  /* TODO: Implement comment on post */
 }
 
 const confirmDelete = () => {

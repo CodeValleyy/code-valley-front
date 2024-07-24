@@ -1,11 +1,11 @@
 export interface Notification {
-  id: number;
-  createdAt: Date;
-  hasBeenRead: boolean;
-  fromUsername: string;
-  fromUserId: number;
-  linkId?: number;
-  notificationType: NotificationType;
+  id: number
+  createdAt: Date
+  hasBeenRead: boolean
+  fromUsername: string
+  fromUserId: number
+  linkId?: number
+  notificationType: NotificationType
 }
 
 export enum NotificationType {
@@ -13,5 +13,5 @@ export enum NotificationType {
   friendshipAccepted = 'friendshipAccepted',
   friendshipRefused = 'friendshipRefused',
   like = 'like',
-  post = 'post',
+  post = 'post'
 }

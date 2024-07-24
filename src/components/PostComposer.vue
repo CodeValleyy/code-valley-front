@@ -4,6 +4,7 @@
     <v-card-text>
       <v-textarea v-model="content" label="Écrire un post..." outlined></v-textarea>
       <v-file-input v-model="file" label="Joindre un fichier" outlined></v-file-input>
+      <OutputExtensionSelector v-model="currentOutputExtension" />
     </v-card-text>
     <v-card-actions>
       <v-spacer-spacer></v-spacer-spacer>
@@ -16,11 +17,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { usePostStore } from '@/stores/usePostStore'
+import OutputExtensionSelector from '@/components/OutputExtensionSelector.vue'
 
 const content = ref('')
 const file = ref(null)
 const postStore = usePostStore()
 const error = ref('')
+const currentOutputExtension = ref('.txt')
 
 const postContent = async () => {
   error.value = ''
@@ -29,7 +32,8 @@ const postContent = async () => {
     return
   }
 
-  await postStore.createPost(content.value, file.value)
+  error.value = currentOutputExtension.value
+  await postStore.createPost(content.value, currentOutputExtension.value, file.value)
   if (postStore.error) {
     error.value = postStore.error.message
     return

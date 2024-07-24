@@ -1,21 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import CodeView from '@/views/CodeView.vue'
-import LoginView from '@/views/LoginView.vue'
-import NewsFeed from '@/views/NewsFeed.vue'
-import RegisterView from '@/views/RegisterView.vue'
-import ProfileOverview from '@/views/ProfileOverview.vue'
-import ProfileSettings from '@/views/ProfileSettings.vue'
-import ChangePassword from '@/views/ChangePassword.vue'
-import ChangeEmail from '@/views/ChangeEmail.vue'
-import SearchView from '@/views/SearchView.vue'
+import { createRouter, createWebHistory, type RouteLocationNormalizedLoaded } from 'vue-router'
 import NotificationsView from '@/views/NotificationsView.vue'
 import PipelineView from '@/views/PipelineView.vue'
-import GroupsView from '@/views/GroupsView.vue'
-import CreateGroupsView from '@/views/CreateGroupsView.vue'
-import GroupDetailsView from '@/views/GroupDetailsView.vue'
-import UpdateGroupsView from '@/views/UpdateGroupsView.vue'
-import PostDetail from '@/components/PostDetail.vue'
 
 import { useAuth } from '@/composables/useAuth'
 
@@ -25,20 +10,20 @@ const routes = [
   {
     path: '/',
     name: 'home',
-    component: HomeView,
-    meta: { requiresGuest: true }
+    component: () => import('@/views/HomeView.vue'),
+    meta: { requiresGuest: true },
   },
   {
     path: '/newsfeed',
     name: 'newsfeed',
     meta: { requiresAuth: true },
-    component: NewsFeed
+    component: () => import('@/views/NewsFeed.vue'),
   },
   {
     path: '/search',
     name: 'search',
     meta: { requiresAuth: true },
-    component: SearchView
+    component: () => import('@/views/SearchView.vue'),
   },
   {
     path: '/notifications',
@@ -56,77 +41,86 @@ const routes = [
     path: '/groups',
     name: 'groups',
     meta: { requiresAuth: true },
-    component: GroupsView
+    component: () => import('@/views/GroupsView.vue'),
   },
   {
     path: '/groups/new',
     name: 'groupCreate',
     meta: { requiresAuth: true },
-    component: CreateGroupsView
+    component: () => import('@/views/CreateGroupsView.vue'),
   },
   {
     path: '/groups/update/:id',
     name: 'groupUpdate',
     meta: { requiresAuth: true },
-    component: UpdateGroupsView
+    component: () => import('@/views/UpdateGroupsView.vue'),
   },
   {
     path: '/groups/:id',
     name: 'groupDetails',
     meta: { requiresAuth: true },
-    component: GroupDetailsView
+    component: () => import('@/views/GroupDetailsView.vue'),
   },
   {
     path: '/post/:id',
     name: 'PostDetail',
-    component: PostDetail
+    component: () => import('@/components/PostDetail.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      id: Number(route.params.id),
+      showComment: route.query.showComment === 'true',
+    }),
   },
   {
     path: '/code',
     name: 'code',
     meta: { requiresAuth: true },
-    component: CodeView
+    component: () => import('@/views/CodeView.vue'),
+    props: (route: RouteLocationNormalizedLoaded) => ({
+      code: route.query.code,
+      language: route.query.language,
+      outputType: route.query.outputType,
+    }),
   },
   {
     path: '/login',
     name: 'login',
-    component: LoginView,
-    meta: { requiresGuest: true }
+    component: () => import('@/views/LoginView.vue'),
+    meta: { requiresGuest: true },
   },
   {
     path: '/register',
     name: 'register',
-    component: RegisterView,
-    meta: { requiresGuest: true }
+    component: () => import('@/views/RegisterView.vue'),
+    meta: { requiresGuest: true },
   },
   {
     path: '/profile/:username?',
     name: 'profile',
-    component: ProfileOverview,
-    meta: { requiresAuth: true }
+    component: () => import('@/views/ProfileOverview.vue'),
+    meta: { requiresAuth: true },
   },
   {
     path: '/settings',
     name: 'profile-settings',
-    component: ProfileSettings,
+    component: () => import('@/views/ProfileSettings.vue'),
     meta: { requiresAuth: true },
     children: [
       {
         path: 'change-password',
         name: 'change-password',
-        component: ChangePassword
+        component: () => import('@/views/ChangePassword.vue'),
       },
       {
         path: 'change-email',
         name: 'change-email',
-        component: ChangeEmail
-      }
-    ]
+        component: () => import('@/views/ChangeEmail.vue'),
+      },
+    ],
   },
   {
     path: '/:pathMatch(.*)*',
-    redirect: { name: 'home' }
-  }
+    redirect: { name: 'home' },
+  },
 ]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

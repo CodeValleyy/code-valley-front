@@ -1,26 +1,7 @@
 import axiosInstance from '@/config/axiosInstance'
-import type { Post } from '@/types'
+import { getCodeLanguageFromUrl } from '@/config/languagesConfig'
+import type { CreateCommentDto, Post } from '@/types'
 import { defineStore } from 'pinia'
-
-function getCodeLanguageFromUrl(url: string): string | null {
-  const extension = url.split('.').pop()?.split('?')[0]
-  if (!extension) {
-    return null
-  }
-
-  switch (extension.toLowerCase()) {
-    case 'py':
-      return 'python'
-    case 'js':
-      return 'javascript'
-    case 'rs':
-      return 'rust'
-    case 'lua':
-      return 'lua'
-    default:
-      return 'Unknown'
-  }
-}
 
 export interface CreatePostDto {
   content: string
@@ -67,10 +48,10 @@ export const usePostStore = defineStore('post', {
         throw error
       }
     },
-    async createPost(content: string, file?: File | null) {
+    async createPost(content: string, output_extension: string, file?: File | null) {
       try {
         if (file) {
-          await this.createPostWithFile(content, file)
+          await this.createPostWithFile(content, file, output_extension)
         } else {
           await axiosInstance.post('/posts', { content })
         }
@@ -91,11 +72,12 @@ export const usePostStore = defineStore('post', {
         }
       }
     },
-    async createPostWithFile(content: string, file: File) {
+    async createPostWithFile(content: string, file: File, output_extension: string) {
       try {
         const formData = new FormData()
         formData.append('content', content)
         formData.append('file', file)
+        formData.append('output_extension', output_extension)
         await axiosInstance.post('/posts', formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
@@ -154,7 +136,6 @@ export const usePostStore = defineStore('post', {
         console.error('Error unliking post:', error)
       }
     },
-
     /* TODO in the API */
     async fetchPostsByUserId(userId: number) {
       try {

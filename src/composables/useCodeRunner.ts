@@ -1,4 +1,5 @@
-import { onMounted, ref, watch } from 'vue'
+import mimeDb from 'mime-db'
+import { computed, onMounted, ref, watch } from 'vue'
 import { fetchData } from '@/api/fetchData'
 import type { ExecuteCodeResponse, Snippets } from '@/types'
 import {
@@ -8,17 +9,21 @@ import {
   getLanguageFromExtension,
   languageMap,
   languages,
-  parseLanguageFromCodeUrl
-} from '@/config/languagesConfig'
-import {
+  parseLanguageFromCodeUrl,
   pythonBoilerplate,
   javascriptBoilerplate,
   rustBoilerplate,
-  luaBoilerplate
+  luaBoilerplate,
+  getExtensionFromPath
 } from '@/config/languagesConfig'
+
 import { useContentStore } from '@/stores/useContentStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useRouter } from 'vue-router'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import { javascript } from '@codemirror/lang-javascript'
+import { oneDark } from '@codemirror/theme-one-dark'
 
 const transformNewlines = (str: string): string => {
   return str.replace(/\r?\n/g, '<br>')
@@ -32,6 +37,7 @@ export function useCodeRunner() {
   const error = ref<string>('')
   const success = ref<string>('')
   const currentLanguage = ref<string>(languageMap['py'])
+  const currentOutputExtension = ref<string>('')
   const file = ref<File | null>(null)
   const file_loaded = ref<File | null>(null)
   const downloadLink = ref<string | null>(null)
@@ -44,6 +50,7 @@ export function useCodeRunner() {
   const isCodeLoaded = ref(false)
   const loadOption = ref('file')
   const selectedSnippet = ref('')
+  const useOneDarkTheme = ref(false)
 
   const snippets = ref(contentStore.snippets as Snippets[])
 
@@ -58,7 +65,37 @@ export function useCodeRunner() {
       loadCode()
     }
 
-    console.log('selectedSnippet: ', selectedSnippet.value, 'loadOption: ', loadOption.value)
+    const savedTheme = localStorage.getItem('theme')
+    const lastLanguage = localStorage.getItem('currentLanguage')
+    const savedCodeInput = localStorage.getItem('codeInput')
+    const savedSelectedSnippet = localStorage.getItem('selectedSnippet')
+    const savedFilenameSnippet = localStorage.getItem('selectedFilenameSnippet')
+
+    if (savedTheme) {
+      userStore.setTheme(savedTheme)
+      useOneDarkTheme.value = savedTheme === 'dark'
+    }
+
+    if (lastLanguage) {
+      currentLanguage.value = lastLanguage
+    }
+
+    if (savedCodeInput) {
+      codeInput.value = savedCodeInput
+    }
+
+    if (savedSelectedSnippet) {
+      selectedSnippet.value = savedSelectedSnippet
+      isCodeLoaded.value = true
+    }
+
+    if (savedFilenameSnippet) {
+      filename.value = savedFilenameSnippet
+    }
+
+    if (!mimeDb || Object.keys(mimeDb).length === 0) {
+      console.error('mimeDb is not properly initialized or is empty')
+    }
 
     const user = userStore.user
     if (!user) {
@@ -85,6 +122,51 @@ export function useCodeRunner() {
     snippets.value = newVal.snippets
   })
 
+  watch(
+    () => useOneDarkTheme.value,
+    (newValue) => {
+      if (newValue) {
+        userStore.setTheme('dark')
+      } else {
+        userStore.setTheme('light')
+      }
+    }
+  )
+
+  watch(
+    () => currentLanguage.value,
+    (newValue: string) => {
+      if (newValue) {
+        userStore.setCurrentLanguage(newValue)
+      }
+    }
+  )
+
+  watch(
+    () => codeInput.value,
+    (newValue) => {
+      localStorage.setItem('codeInput', newValue)
+    }
+  )
+
+  watch(
+    () => selectedSnippet.value,
+    (newValue) => {
+      if (newValue) {
+        localStorage.setItem('selectedSnippet', newValue)
+      }
+    }
+  )
+
+  watch(
+    () => filename.value,
+    (newValue) => {
+      if (newValue) {
+        localStorage.setItem('selectedFilenameSnippet', newValue)
+      }
+    }
+  )
+
   const runCode = async () => {
     if (!codeInput.value.trim()) return
 
@@ -96,6 +178,8 @@ export function useCodeRunner() {
     const formData = new FormData()
     formData.append('language', String(currentLanguage.value))
     formData.append('code', String(codeInput.value))
+    formData.append('output_extension', String(currentOutputExtension.value))
+
     if (file.value) {
       formData.append('input_file', file.value)
     }
@@ -105,7 +189,9 @@ export function useCodeRunner() {
       result.value = fetchedResult.output
         ? transformNewlines(fetchedResult.output)
         : 'Aucun résultat à afficher'
-      if (fetchedResult.outputFileContent) {
+      if (fetchedResult.outputFileContent && fetchedResult.outputFile) {
+        currentOutputExtension.value = getExtensionFromPath(fetchedResult.outputFile)
+
         const byteArray = Uint8Array.from(atob(fetchedResult.outputFileContent), (char) =>
           char.charCodeAt(0)
         )
@@ -118,7 +204,17 @@ export function useCodeRunner() {
       }
     } catch (err: any) {
       if (err.response) {
-        error.value = err.response.data.error.error || 'Une erreur est survenue'
+        if (err.response.data.message) {
+          for (const message of err.response.data.message) {
+            if (error.value === '') {
+              error.value = message
+            } else {
+              error.value += ', ' + message
+            }
+          }
+        } else {
+          error.value = err.response.data.error || 'Une erreur est survenue'
+        }
       } else {
         error.value = (err as Error).message || 'Une erreur est survenue'
       }
@@ -150,6 +246,33 @@ export function useCodeRunner() {
     }
   }
 
+  const lang = computed<any[]>(() => {
+    const extensions: any[] = [getCodeMirrorLangExtension()]
+
+    if (useOneDarkTheme.value) {
+      extensions.push(oneDark)
+    }
+
+    if (!isCodeLoaded.value) {
+      setBoilerplate(currentLanguage.value)
+    }
+
+    return extensions
+  })
+
+  const getCodeMirrorLangExtension = () => {
+    switch (currentLanguage.value) {
+      case 'python':
+        return python()
+      case 'rust':
+        return rust()
+      case 'javascript':
+        return javascript()
+      default:
+        return python()
+    }
+  }
+
   const saveCodeToFile = () => {
     const content_type = getContent_type(currentLanguage.value)
     const blob = new Blob([codeInput.value], { type: content_type })
@@ -174,11 +297,15 @@ export function useCodeRunner() {
     error.value = ''
     const content_type = getContent_type(currentLanguage.value)
     const extension = getExtensionFromContentType(content_type)
+
+    if (!filename.value.endsWith(extension)) {
+      filename.value += extension
+    }
     const blob = new Blob([codeInput.value], { type: content_type })
-    const file = new File([blob], filename.value + extension)
+    const file = new File([blob], filename.value)
 
     try {
-      await contentStore.uploadProgram(file)
+      await contentStore.uploadProgram(file, currentOutputExtension.value)
       saveDialog.value = false
       success.value = 'Programme sauvegardé avec succès dans vos snippets'
     } catch (err: any) {
@@ -199,6 +326,7 @@ export function useCodeRunner() {
           isCodeLoaded.value = true
         }
       }
+      filename.value = file_loaded.value.name
       reader.readAsText(file_loaded.value)
       const extension = file_loaded.value.name.split('.').pop()
       currentLanguage.value = getLanguageFromExtension(extension ?? '')
@@ -206,6 +334,7 @@ export function useCodeRunner() {
       const snippet = snippets.value.find((s) => s.id === selectedSnippet.value)
       if (snippet) {
         filename.value = snippet.filename
+        currentOutputExtension.value = snippet.output_type
         currentLanguage.value = parseLanguageFromCodeUrl(snippet.code)
         codeInput.value = await fetchRawContentFromUrl(snippet.code)
         isCodeLoaded.value = true
@@ -221,6 +350,10 @@ export function useCodeRunner() {
     filename.value = ''
     selectedSnippet.value = ''
     currentLanguage.value = languageMap['py']
+    currentOutputExtension.value = ''
+
+    userStore.resetAllCode()
+    setBoilerplate(languageMap['py'])
   }
 
   const editSnippet = (snippet: Snippets) => {
@@ -230,7 +363,8 @@ export function useCodeRunner() {
         loadOption: 'snippet',
         snippet: snippet.id,
         filename: snippet.filename,
-        currentLanguage: parseLanguageFromCodeUrl(snippet.code)
+        currentLanguage: parseLanguageFromCodeUrl(snippet.code),
+        output_type: snippet.output_type
       }
     })
   }
@@ -243,6 +377,7 @@ export function useCodeRunner() {
     success,
     languages,
     currentLanguage,
+    currentOutputExtension,
     file,
     file_loaded,
     runCode,
@@ -262,6 +397,8 @@ export function useCodeRunner() {
     loadOption,
     selectedSnippet,
     editSnippet,
+    useOneDarkTheme,
+    lang,
     openModal: () => (saveDialog.value = true),
     closeModal: () => (saveDialog.value = false),
     openLoadDialog: () => (loadDialog.value = true),

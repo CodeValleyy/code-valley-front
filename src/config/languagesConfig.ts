@@ -1,3 +1,8 @@
+import { javascript } from '@codemirror/lang-javascript'
+import { python } from '@codemirror/lang-python'
+import { rust } from '@codemirror/lang-rust'
+import mimeDb from 'mime-db'
+
 const defaultLanguage = 'python'
 export const languages = ['python', 'rust', 'javascript', 'lua']
 
@@ -32,8 +37,43 @@ export const getLanguageColor = (language: string): string => {
       return 'bg-javascript'
     case 'lua':
       return 'bg-lua'
+    case 'json':
+      return 'bg-json'
+    case 'csv':
+      return 'bg-csv'
+    case 'xml':
+      return 'bg-xml'
+    case 'html':
+      return 'bg-html'
+    case 'markdown':
+      return 'bg-markdown'
+    case 'jpeg':
+      return 'bg-jpeg'
+    case 'png':
+      return 'bg-png'
+    case 'heic':
+      return 'bg-heic'
+    case 'txt':
+      return 'bg-txt'
+    case 'yaml':
+      return 'bg-yaml'
+    case 'pdf':
+      return 'bg-pdf'
     default:
       return 'bg-gray-400'
+  }
+}
+
+export const getCodeMirrorModes = (language: string): any => {
+  switch (language) {
+    case 'python':
+      return python()
+    case 'rust':
+      return rust()
+    case 'javascript':
+      return javascript()
+    default:
+      return python()
   }
 }
 
@@ -65,6 +105,26 @@ export const getExtensionFromContentType = (content_type: string): string => {
   }
 }
 
+export const getMimeType = (extension: string): string => {
+  for (const type in mimeDb) {
+    const types = mimeDb[type].extensions
+    if (types && types.includes(extension.toUpperCase())) {
+      return type
+    }
+  }
+  return 'application/octet-stream'
+}
+
+/**
+ * Returns the extension from a path
+ * @param path
+ * @returns
+ * @example
+ * getExtensionFromPath('path/to/file.py') // '.py'
+ */
+export const getExtensionFromPath = (path: string): string => {
+  return path.substring(path.lastIndexOf('.'))
+}
 export const getContent_type = (language: string): string => {
   switch (language) {
     case 'python':
@@ -78,6 +138,46 @@ export const getContent_type = (language: string): string => {
     default:
       return 'text/plain'
   }
+}
+
+export const outputRestrictedExtensions = [
+  { text: 'JSON', value: '.json' },
+  { text: 'CSV', value: '.csv' },
+  { text: 'XML', value: '.xml' },
+  { text: 'HTML', value: '.html' },
+  { text: 'Markdown', value: '.md' },
+  { text: 'JPEG', value: '.jpg' },
+  { text: 'PNG', value: '.png' },
+  { text: 'HEIC', value: '.heic' },
+  { text: 'Text', value: '.txt' },
+  { text: 'YAML', value: '.yaml' },
+  { text: 'PDF', value: '.pdf' }
+]
+
+export const outputExtensions = Object.keys(mimeDb).reduce(
+  (acc: { text: string; value: string }[], mimeType) => {
+    const extensions = mimeDb[mimeType]?.extensions
+    if (extensions) {
+      extensions.forEach((extension) => {
+        acc.push({ text: `${extension.toUpperCase()}`, value: `.${extension}` })
+      })
+    }
+    return acc
+  },
+  []
+)
+
+export const getCodeLanguageFromUrl = (url: string): string | null => {
+  const extension = url.split('.').pop()?.split('?')[0]
+  return extension ? getLanguageFromExtension(extension) : null
+}
+
+export const getExtensionFromUrl = (url: string): string | null => {
+  return url.split('.').pop()?.split('?')[0] || ''
+}
+
+export const getNameFromUrl = (url: string): string => {
+  return url.split('%2F').pop()?.split('?')[0] || ''
 }
 
 export const pythonBoilerplate = `def main():
