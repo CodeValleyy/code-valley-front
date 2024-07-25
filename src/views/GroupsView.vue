@@ -121,9 +121,9 @@ const getAvatar = () => {
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="flex flex-col flex-grow px-4">
-                <div class="font-bold truncate">{{ group.name }}</div>
-                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              <div class="w-1/2 flex flex-col flex-grow px-4">
+                <div class="w-full font-bold truncate">{{ group.name }}</div>
+                <div class="w-full text-gray-500 text-sm truncate">{{ group.description }}</div>
               </div>
               <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -147,9 +147,9 @@ const getAvatar = () => {
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="flex flex-col flex-grow px-4">
-                <div class="font-bold truncate">{{ group.name }}</div>
-                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              <div class="w-1/2 flex flex-col flex-grow px-4">
+                <div class="w-full font-bold truncate">{{ group.name }}</div>
+                <div class="w-full text-gray-500 text-sm truncate">{{ group.description }}</div>
               </div>
               <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -170,9 +170,9 @@ const getAvatar = () => {
                   <img :src="group.avatar" class="h-full w-full object-cover" alt="Avatar" />
                 </div>
               </div>
-              <div class="flex flex-col flex-grow px-4">
-                <div class="font-bold truncate">{{ group.name }}</div>
-                <div class="text-gray-500 text-sm truncate">{{ group.description }}</div>
+              <div class="w-1/2 flex flex-col flex-grow px-4">
+                <div class="w-full font-bold truncate">{{ group.name }}</div>
+                <div class="w-full text-gray-500 text-sm truncate">{{ group.description }}</div>
               </div>
               <div class="w-1/4 flex justify-end items-center">
                 <div class="mr-1">{{ group.members.length }}</div>
@@ -208,7 +208,7 @@ const getAvatar = () => {
             </div>
           </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
-          <div class="w-1/2 text-gray-500 text-sm">{{ currentGroup?.description }}</div>
+          <div class="w-1/2 text-gray-500 text-sm truncate">{{ currentGroup?.description }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>
             <v-icon color="secondary">mdi-account-group</v-icon>
@@ -257,7 +257,7 @@ const getAvatar = () => {
             </div>
           </div>
           <div class="w-1/2 mr-2 truncate">{{ currentGroup?.name }}</div>
-          <div class="w-1/2 text-gray-500 text-sm">{{ currentGroup?.description }}</div>
+          <div class="w-1/2 text-gray-500 text-sm truncate">{{ currentGroup?.description }}</div>
           <div class="w-1/4 flex justify-end itemcenter">
             <div class="mr-1">{{ currentGroup?.members.length }}</div>
             <v-icon color="secondary">mdi-account-group</v-icon>
