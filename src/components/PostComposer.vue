@@ -32,7 +32,6 @@ const postContent = async () => {
     return
   }
 
-  error.value = currentOutputExtension.value
   await postStore.createPost(content.value, currentOutputExtension.value, file.value)
   if (postStore.error) {
     error.value = postStore.error.message
