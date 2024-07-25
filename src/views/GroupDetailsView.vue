@@ -277,7 +277,7 @@ const addEmoji = (emoji: any) => {
 
 <template>
   <v-container class="h-screen">
-    <div class="w-full flex justify-between">
+    <div class="w-full flex justify-between items-center">
       <div class="flex p-4 w-1/2">
         <div class="h-20 w-20">
           <div class="h-full w-full overflow-hidden rounded-full">
@@ -285,6 +285,11 @@ const addEmoji = (emoji: any) => {
           </div>
         </div>
         <div class="text-3xl font-bold text-primary p-4">{{ group.name }}</div>
+      </div>
+      <div
+        class="p-4 w-2/3 h-20 italic text-gray-500 text-sm bg-white border mr-8 shadow overflow-auto round"
+      >
+        {{ group.description }}
       </div>
       <v-menu>
         <template v-slot:activator="{ props }">
